@@ -27,8 +27,8 @@
 #
 #   BEHAVIOR:
 #     RALPH_NOTIFY_FREQUENCY     - How often to send progress notifications
-#                                  1 = every iteration (default)
-#                                  5 = every 5th iteration (reduces noise)
+#                                  5 = every 5th iteration (default)
+#                                  1 = every iteration
 #
 # Usage:
 #   ./notify.sh "Your message here"

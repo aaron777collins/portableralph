@@ -16,7 +16,7 @@ Ralph supports four notification channels:
 Notifications fire when:
 
 - Run **starts**
-- **Every iteration** (configurable via `RALPH_NOTIFY_FREQUENCY`)
+- **Every 5 iterations** (configurable via `RALPH_NOTIFY_FREQUENCY`)
 - Work **completes** (RALPH_DONE)
 - **Max iterations** reached
 
@@ -141,7 +141,7 @@ export RALPH_CUSTOM_NOTIFY_SCRIPT="/path/to/my-notify.sh"
 | `RALPH_TELEGRAM_BOT_TOKEN` | Telegram | Bot token |
 | `RALPH_TELEGRAM_CHAT_ID` | Telegram | Target chat ID |
 | `RALPH_CUSTOM_NOTIFY_SCRIPT` | Custom | Path to script |
-| `RALPH_NOTIFY_FREQUENCY` | All | Notify every N iterations (default: 1) |
+| `RALPH_NOTIFY_FREQUENCY` | All | Notify every N iterations (default: 5) |
 
 ## Persisting Configuration
 
@@ -171,7 +171,7 @@ Plan: auth-feature
 Mode: build
 Repo: my-project
 
-⚙️ Ralph Progress: Iteration 1 completed
+⚙️ Ralph Progress: Iteration 5 completed
 Plan: auth-feature
 
 ✅ Ralph Complete!
