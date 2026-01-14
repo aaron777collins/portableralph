@@ -1,0 +1,23 @@
+# Environment files (may contain credentials)
+.env
+.env.local
+.env.*
+!.env.example
+
+# Ralph config (should be in ~/.ralph.env, but just in case)
+ralph.env
+*.env
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editor files
+*.swp
+*.swo
+*~
+.idea/
+.vscode/
+
+# Logs
+*.log
