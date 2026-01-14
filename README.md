@@ -42,9 +42,9 @@ chmod +x ~/ralph/*.sh
 ```
 
 1. **You write** a plan file describing what to build
-2. **Ralph breaks it** into discrete tasks
+2. **Ralph breaks it** into discrete tasks (plan mode exits here)
 3. **Each iteration**: pick one task → implement → validate → commit
-4. **Loop exits** when `RALPH_DONE` appears in progress file
+4. **Loop exits** when `RALPH_DONE` appears in progress file (build mode)
 
 ## Usage
 

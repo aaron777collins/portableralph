@@ -176,7 +176,7 @@ if [ "$MODE" = "plan" ]; then
     echo "  - Planning completes when task list is created (Status: IN_PROGRESS)"
     echo "  - Plan mode runs once then exits automatically"
 else
-    echo "  - Add 'RALPH_DONE' to $PROGRESS_FILE when all tasks complete"
+    echo "  - RALPH_DONE in $PROGRESS_FILE signals all tasks complete (set by AI)"
 fi
 echo "  - Press Ctrl+C to stop manually"
 echo ""

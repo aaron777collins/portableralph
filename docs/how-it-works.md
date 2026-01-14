@@ -32,7 +32,7 @@ Technical deep-dive into Ralph's architecture and execution model.
 |                                                                   |
 |   - Shared state between iterations                               |
 |   - Task list with completion status                              |
-|   - RALPH_DONE signals completion                                 |
+|   - RALPH_DONE signals build completion (set by AI only)          |
 +------------------------------------------------------------------+
 ```
 
