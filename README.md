@@ -106,7 +106,7 @@ See [Notifications Guide](https://aaron777collins.github.io/portableralph/notifi
 
 ## Requirements
 
-- [Claude Code CLI](https://docs.anthropic.com/en/docs/claude-code) installed and authenticated
+- [Claude Code CLI](https://platform.claude.com/docs/en/get-started) installed and authenticated
 - Bash shell
 - Git (optional, for auto-commits)
 

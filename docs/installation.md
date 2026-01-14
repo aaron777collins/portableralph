@@ -67,7 +67,7 @@ Before installing, make sure you have:
 
 | Requirement | Description |
 |:------------|:------------|
-| **Claude Code CLI** | [Install from Anthropic](https://docs.anthropic.com/en/docs/claude-code) |
+| **Claude Code CLI** | [Install from Anthropic](https://platform.claude.com/docs/en/get-started) |
 | **Bash** | Most Unix systems have this |
 | **Git** | For auto-commits (optional) |
 | **curl** | For notifications (optional) |

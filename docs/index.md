@@ -95,7 +95,7 @@ ralph ./my-feature.md
 
     ---
 
-    Install and authenticate the [Claude Code CLI](https://docs.anthropic.com/en/docs/claude-code)
+    Install and authenticate the [Claude Code CLI](https://platform.claude.com/docs/en/get-started)
 
 -   :octicons-terminal-24:{ .lg .middle } **Bash Shell**
 
