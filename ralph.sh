@@ -25,7 +25,19 @@ YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
-VERSION="1.0.0"
+VERSION="1.1.0"
+
+# Slack notification helper (optional - only sends if RALPH_SLACK_WEBHOOK_URL is set)
+notify_slack() {
+    local message="$1"
+    local emoji="${2:-}"
+    "$RALPH_DIR/slack-notify.sh" "$message" "$emoji" 2>/dev/null || true
+}
+
+# Check if Slack is configured
+slack_enabled() {
+    [ -n "${RALPH_SLACK_WEBHOOK_URL:-}" ]
+}
 
 usage() {
     echo -e "${GREEN}PortableRalph${NC} v${VERSION} - Autonomous AI Development Loop"
@@ -58,6 +70,10 @@ usage() {
     echo -e "${YELLOW}Progress File:${NC}"
     echo "  Created as <plan-name>_PROGRESS.md in current directory"
     echo "  This is the only artifact left in your repo"
+    echo ""
+    echo -e "${YELLOW}Slack Notifications (optional):${NC}"
+    echo "  Set RALPH_SLACK_WEBHOOK_URL environment variable to enable"
+    echo "  See .env.example for all configuration options"
     echo ""
     echo "More info: https://github.com/aaron777collins/portableralph"
     exit 0
@@ -126,12 +142,21 @@ echo -e "  Plan:      ${YELLOW}$PLAN_FILE${NC}"
 echo -e "  Mode:      ${YELLOW}$MODE${NC}"
 echo -e "  Progress:  ${YELLOW}$PROGRESS_FILE${NC}"
 [ "$MAX_ITERATIONS" -gt 0 ] && echo -e "  Max Iter:  ${YELLOW}$MAX_ITERATIONS${NC}"
+if slack_enabled; then
+    echo -e "  Slack:     ${GREEN}enabled${NC}"
+else
+    echo -e "  Slack:     ${YELLOW}disabled${NC} (set RALPH_SLACK_WEBHOOK_URL to enable)"
+fi
 echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
 echo ""
 echo -e "${YELLOW}Exit conditions:${NC}"
 echo "  - Add 'RALPH_DONE' to $PROGRESS_FILE when complete"
 echo "  - Press Ctrl+C to stop manually"
 echo ""
+
+# Send start notification to Slack
+REPO_NAME=$(basename "$(pwd)")
+notify_slack ":rocket: *Ralph Started*\n\`\`\`Plan: $PLAN_BASENAME\nMode: $MODE\nRepo: $REPO_NAME\`\`\`" ":rocket:"
 
 # Initialize progress file if it doesn't exist
 if [ ! -f "$PROGRESS_FILE" ]; then
@@ -165,6 +190,7 @@ while true; do
         echo -e "${GREEN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
         echo -e "${GREEN}  RALPH_DONE - Work complete!${NC}"
         echo -e "${GREEN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+        notify_slack ":white_check_mark: *Ralph Complete!*\n\`\`\`Plan: $PLAN_BASENAME\nIterations: $ITERATION\nRepo: $REPO_NAME\`\`\`" ":white_check_mark:"
         break
     fi
 
@@ -173,6 +199,7 @@ while true; do
         echo -e "${YELLOW}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
         echo -e "${YELLOW}  Max iterations reached: $MAX_ITERATIONS${NC}"
         echo -e "${YELLOW}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+        notify_slack ":warning: *Ralph Stopped*\n\`\`\`Plan: $PLAN_BASENAME\nReason: Max iterations reached ($MAX_ITERATIONS)\nRepo: $REPO_NAME\`\`\`" ":warning:"
         break
     fi
 
@@ -197,6 +224,11 @@ while true; do
 
     echo ""
     echo -e "${GREEN}Iteration $ITERATION complete${NC}"
+
+    # Send iteration notification to Slack (only every 5 iterations to reduce noise, or on first iteration)
+    if [ "$ITERATION" -eq 1 ] || [ $((ITERATION % 5)) -eq 0 ]; then
+        notify_slack ":gear: *Ralph Progress*: Iteration $ITERATION completed\n\`Plan: $PLAN_BASENAME\`" ":gear:"
+    fi
 
     # Small delay between iterations
     sleep 2

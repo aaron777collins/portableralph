@@ -241,19 +241,81 @@ The progress file shows what Ralph is doing:
 cat ./my-plan_PROGRESS.md
 ```
 
+## Slack Notifications (Optional)
+
+Ralph can send notifications to Slack when:
+- A run starts
+- Progress updates (every 5 iterations)
+- Work completes (RALPH_DONE)
+- Max iterations reached
+
+### Setup
+
+1. Create a Slack Incoming Webhook:
+   - Go to [Slack API: Incoming Webhooks](https://api.slack.com/messaging/webhooks)
+   - Create a new app or use an existing one
+   - Enable Incoming Webhooks
+   - Create a webhook for your desired channel
+   - Copy the webhook URL
+
+2. Set the environment variable:
+```bash
+# Option 1: Add to your shell profile (~/.bashrc or ~/.zshrc)
+export RALPH_SLACK_WEBHOOK_URL="https://hooks.slack.com/services/XXX/YYY/ZZZ"
+
+# Option 2: Create a local config file
+echo 'export RALPH_SLACK_WEBHOOK_URL="https://hooks.slack.com/services/XXX/YYY/ZZZ"' > ~/.ralph.env
+source ~/.ralph.env
+
+# Option 3: Pass inline when running
+RALPH_SLACK_WEBHOOK_URL="https://hooks.slack.com/..." ~/ralph/ralph.sh ./plan.md
+```
+
+### Configuration Options
+
+| Variable | Required | Default | Description |
+|----------|----------|---------|-------------|
+| `RALPH_SLACK_WEBHOOK_URL` | Yes* | - | Slack webhook URL (*required only if you want notifications) |
+| `RALPH_SLACK_CHANNEL` | No | (webhook default) | Override the default channel |
+| `RALPH_SLACK_USERNAME` | No | `Ralph` | Bot display name |
+| `RALPH_SLACK_ICON_EMOJI` | No | `:robot_face:` | Bot icon emoji |
+
+See `.env.example` for a template.
+
+### Notification Examples
+
+```
+:rocket: Ralph Started
+Plan: my-feature
+Mode: build
+Repo: my-project
+
+:gear: Ralph Progress: Iteration 5 completed
+Plan: my-feature
+
+:white_check_mark: Ralph Complete!
+Plan: my-feature
+Iterations: 12
+Repo: my-project
+```
+
 ## Requirements
 
 - [Claude CLI](https://docs.anthropic.com/en/docs/claude-code) installed and authenticated
 - Bash shell
 - Git (optional, for commits)
+- curl (for Slack notifications)
+- jq (optional, for better JSON handling in Slack messages)
 
 ## Files
 
 ```
 ~/ralph/
 ├── ralph.sh          # Main script
+├── slack-notify.sh   # Slack notification helper (optional)
 ├── PROMPT_plan.md    # Plan mode prompt template
 ├── PROMPT_build.md   # Build mode prompt template
+├── .env.example      # Configuration template
 └── README.md
 ```
 
