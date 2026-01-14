@@ -56,7 +56,7 @@ Each iteration:
 
 ```text
 1. Check exit conditions
-   |-- RALPH_DONE in progress file? -> Exit
+   |-- RALPH_DONE in progress file? -> Exit (build mode)
    +-- Max iterations reached? -> Exit
 
 2. Build prompt
@@ -66,18 +66,20 @@ Each iteration:
    +-- Claude reads files, implements task, updates progress
 
 4. Post-iteration
-   |-- Send notification (every 5 iterations)
+   |-- Plan mode? -> Exit immediately (runs once only)
+   |-- Send notification (every 5 iterations, build mode only)
    |-- Sleep 2 seconds
    +-- Loop back to step 1
 ```
 
 ### Termination
 
-| Exit Condition | Meaning |
-|:---------------|:--------|
-| `RALPH_DONE` | Success - all tasks complete |
-| Max iterations | Limit reached |
-| `Ctrl+C` | Manual stop |
+| Exit Condition | Mode | Meaning |
+|:---------------|:-----|:--------|
+| Plan mode complete | Plan | Success - task list created (exits after 1 iteration) |
+| `RALPH_DONE` | Build | Success - all tasks complete |
+| Max iterations | Both | Limit reached |
+| `Ctrl+C` | Both | Manual stop |
 
 ## Prompt Templates
 
@@ -86,17 +88,18 @@ Each iteration:
 Used in `plan` mode. Instructs Claude to:
 
 1. Read and analyze the plan file
-2. Explore the codebase thoroughly
+2. Explore the codebase using subagents from multiple perspectives
 3. Identify what exists vs. what's needed
-4. Create a prioritized task breakdown
-5. Update progress file with analysis
-6. Set status to `IN_PROGRESS` when done
+4. Consider all contingencies and dependencies
+5. Create a prioritized task breakdown (ordered by dependencies)
+6. Update progress file with analysis
+7. Set status to `IN_PROGRESS` when done
 
 !!! info "Important"
-    Plan mode makes **no code changes**—analysis only.
+    Plan mode makes **no code changes**—analysis only. It runs once then exits automatically.
 
 !!! warning "Critical"
-    Plan mode must **never** set `RALPH_DONE`. It should always set status to `IN_PROGRESS` when planning is complete, allowing build mode to execute the tasks.
+    Plan mode must **NEVER** set `RALPH_DONE` under any circumstances. It always sets status to `IN_PROGRESS` when planning is complete, signaling that build mode can begin.
 
 ### PROMPT_build.md
 
@@ -104,15 +107,18 @@ Used in `build` mode. Instructs Claude to:
 
 1. Read plan and progress files
 2. Select ONE uncompleted task
-3. Search codebase first (verify not already done)
+3. Use subagents to search codebase (verify not already done)
 4. Implement the task
 5. Run validation (tests, build, lint)
 6. Update progress file
 7. Commit changes
-8. Set `RALPH_DONE` if all tasks complete
+8. Count ALL tasks - only set `RALPH_DONE` if EVERY task is [x] complete and verified
 
 !!! info "Important"
     Build mode does **one task per iteration**.
+
+!!! warning "RALPH_DONE Rules"
+    Build mode must verify ALL tasks are complete before setting `RALPH_DONE`. When in doubt, leave status as `IN_PROGRESS`—it's better to run an extra iteration than exit prematurely.
 
 ## State Management
 

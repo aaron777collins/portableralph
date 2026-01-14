@@ -54,13 +54,13 @@ chmod +x ~/ralph/*.sh
 
 | Mode | Description |
 |------|-------------|
-| `build` | Implement tasks (default) |
-| `plan` | Analyze and create task list only |
+| `build` | Implement tasks until RALPH_DONE (default) |
+| `plan` | Analyze and create task list, then exit (runs once) |
 
 ```bash
 # Examples
 ~/ralph/ralph.sh ./feature.md           # Build until done
-~/ralph/ralph.sh ./feature.md plan      # Plan only
+~/ralph/ralph.sh ./feature.md plan      # Plan only (creates task list, exits)
 ~/ralph/ralph.sh ./feature.md build 20  # Build, max 20 iterations
 ```
 
@@ -128,14 +128,17 @@ See [Notifications Guide](https://aaron777collins.github.io/portableralph/notifi
 Invoke Ralph from another AI agent:
 
 ```bash
-# Plan first (analyzes codebase, creates task list, sets status to IN_PROGRESS)
+# Plan first (analyzes codebase, creates task list, exits after 1 iteration)
 ~/ralph/ralph.sh /absolute/path/to/plan.md plan
 
 # Then build (implements tasks one by one until RALPH_DONE)
 ~/ralph/ralph.sh /absolute/path/to/plan.md build
 ```
 
-**Important:** Only build mode should set `RALPH_DONE` (after all tasks complete). Plan mode should always set status to `IN_PROGRESS` when done.
+**Important:**
+- Plan mode runs once then exits automatically (sets status to `IN_PROGRESS`)
+- Build mode loops until all tasks are complete, then sets `RALPH_DONE`
+- Only build mode should ever set `RALPH_DONE`
 
 ## License
 

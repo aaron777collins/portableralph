@@ -33,10 +33,12 @@ ralph ./feature.md plan
 Plan mode is like asking a senior developer to review your feature request and create a task breakdown. Ralph will:
 
 1. **Read your plan** to understand what you want
-2. **Explore your codebase** to see what already exists
+2. **Explore your codebase** using subagents from multiple perspectives
 3. **Identify gaps** between current state and desired state
-4. **Create a task list** with logical ordering
-5. **Write everything down** in a progress file
+4. **Consider contingencies** - what could go wrong? What are the dependencies?
+5. **Create a task list** with logical ordering based on dependencies
+6. **Write everything down** in a progress file
+7. **Exit automatically** after creating the task list (runs once)
 
 **Why use it:**
 
@@ -47,8 +49,8 @@ Plan mode is like asking a senior developer to review your feature request and c
 | Want to review first | Check the approach before any code changes |
 | Estimating work | Get a task breakdown to understand effort |
 
-!!! tip "Plan mode is safe"
-    Plan mode makes **zero code changes**. It only reads files and writes a progress file. You can run it as many times as you want.
+!!! tip "Plan mode is safe and automatic"
+    Plan mode makes **zero code changes**. It only reads files and writes a progress file. It runs once then exits automatically—no need to press Ctrl+C or set max-iterations.
 
 **Example output** (in `feature_PROGRESS.md`):
 
@@ -191,8 +193,11 @@ The progress file is created in your **current directory** (not where the plan f
 | `IN_PROGRESS` | Ready for build mode | Plan mode | Run build mode |
 | `RALPH_DONE` | All tasks complete! | Build mode only | Review the changes |
 
-!!! warning "Important"
-    **Only build mode should set `RALPH_DONE`** — after ALL tasks are implemented and verified. Plan mode should always set status to `IN_PROGRESS` when complete, signaling that build mode can begin.
+!!! warning "Critical Status Rules"
+    - **Plan mode** always sets status to `IN_PROGRESS` and exits after 1 iteration
+    - **Build mode** only sets `RALPH_DONE` after ALL tasks are verified complete
+    - Plan mode should **NEVER** set `RALPH_DONE` under any circumstances
+    - When in doubt, build mode leaves status as `IN_PROGRESS`
 
 ### Editing the Progress File
 
@@ -210,10 +215,10 @@ You can manually edit the progress file before running build mode:
 ### Commands
 
 ```bash
-# Analyze and create task list (safe, no code changes)
+# Analyze and create task list (safe, runs once then exits)
 ralph ./plan.md plan
 
-# Implement all tasks autonomously
+# Implement all tasks autonomously until RALPH_DONE
 ralph ./plan.md build
 
 # Implement with a safety limit
