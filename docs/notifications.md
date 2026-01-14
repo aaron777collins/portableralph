@@ -1,27 +1,6 @@
----
-layout: default
-title: Notifications
-nav_order: 4
-description: "Set up Slack, Discord, Telegram, or custom notifications"
-permalink: /docs/NOTIFICATIONS
----
-
 # Notifications
-{: .no_toc }
 
 Get notified when Ralph starts, progresses, and completes work.
-{: .fs-6 .fw-300 }
-
-<details open markdown="block">
-  <summary>
-    Table of contents
-  </summary>
-  {: .text-delta }
-1. TOC
-{:toc}
-</details>
-
----
 
 ## Overview
 
@@ -35,12 +14,11 @@ Ralph supports four notification channels:
 | **Custom** | Varies | Proprietary systems |
 
 Notifications fire when:
+
 - Run **starts**
 - Every **5 iterations** (progress)
 - Work **completes** (RALPH_DONE)
 - **Max iterations** reached
-
----
 
 ## Quick Setup
 
@@ -55,8 +33,6 @@ Test your configuration:
 ```bash
 ~/ralph/ralph.sh --test-notify
 ```
-
----
 
 ## Platform Setup
 
@@ -83,8 +59,6 @@ export RALPH_SLACK_USERNAME="Ralph Bot"
 export RALPH_SLACK_ICON_EMOJI=":robot_face:"
 ```
 
----
-
 ### Discord
 
 1. Open your Discord server
@@ -104,8 +78,6 @@ export RALPH_DISCORD_USERNAME="Ralph"
 export RALPH_DISCORD_AVATAR_URL="https://example.com/avatar.png"
 ```
 
----
-
 ### Telegram
 
 **Step 1: Create a bot**
@@ -122,15 +94,13 @@ export RALPH_DISCORD_AVATAR_URL="https://example.com/avatar.png"
 3. Visit: `https://api.telegram.org/bot<TOKEN>/getUpdates`
 4. Find `"chat":{"id":YOUR_ID}` in the response
 
-{: .note }
-Group chat IDs are negative numbers (e.g., `-123456789`)
+!!! note
+    Group chat IDs are negative numbers (e.g., `-123456789`)
 
 ```bash
 export RALPH_TELEGRAM_BOT_TOKEN="123456789:ABCdefGHI..."
 export RALPH_TELEGRAM_CHAT_ID="987654321"
 ```
-
----
 
 ### Custom Script
 
@@ -154,10 +124,8 @@ docker exec db psql -c "INSERT INTO alerts (msg) VALUES ('$MESSAGE');"
 export RALPH_CUSTOM_NOTIFY_SCRIPT="/path/to/my-notify.sh"
 ```
 
-{: .important }
-Script must be executable (`chmod +x`). Exit code is ignored.
-
----
+!!! warning "Important"
+    Script must be executable (`chmod +x`). Exit code is ignored.
 
 ## Configuration Reference
 
@@ -174,8 +142,6 @@ Script must be executable (`chmod +x`). Exit code is ignored.
 | `RALPH_TELEGRAM_CHAT_ID` | Telegram | Target chat ID |
 | `RALPH_CUSTOM_NOTIFY_SCRIPT` | Custom | Path to script |
 
----
-
 ## Persisting Configuration
 
 The wizard saves to `~/.ralph.env`. Load automatically:
@@ -184,8 +150,6 @@ The wizard saves to `~/.ralph.env`. Load automatically:
 echo 'source ~/.ralph.env' >> ~/.bashrc
 source ~/.bashrc
 ```
-
----
 
 ## Multiple Platforms
 
@@ -197,8 +161,6 @@ export RALPH_DISCORD_WEBHOOK_URL="https://..."
 export RALPH_TELEGRAM_BOT_TOKEN="..."
 export RALPH_TELEGRAM_CHAT_ID="..."
 ```
-
----
 
 ## Message Format
 
@@ -216,8 +178,3 @@ Plan: auth-feature
 Iterations: 12
 Repo: my-project
 ```
-
----
-
-[← Writing Plans]({{ site.baseurl }}/docs/WRITING-PLANS){: .btn .fs-5 .mb-4 .mb-md-0 .mr-2 }
-[How It Works →]({{ site.baseurl }}/docs/HOW-IT-WORKS){: .btn .btn-primary .fs-5 .mb-4 .mb-md-0 }

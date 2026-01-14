@@ -12,12 +12,19 @@ Ralph reads your plan, breaks it into tasks, and implements them one by one unti
 
 ## Quick Start
 
+**One-liner install:**
 ```bash
-# Install
+curl -fsSL https://raw.githubusercontent.com/aaron777collins/portableralph/master/install.sh | bash
+```
+
+**Or manual:**
+```bash
 git clone https://github.com/aaron777collins/portableralph.git ~/ralph
 chmod +x ~/ralph/*.sh
+```
 
-# Run (from any repo)
+**Run:**
+```bash
 ~/ralph/ralph.sh ./my-plan.md
 ```
 
@@ -75,7 +82,7 @@ Add JWT-based authentication to the API.
 - Protected endpoints return 401 without valid token
 ```
 
-See [Writing Effective Plans](./docs/WRITING-PLANS.md) for more examples.
+See [Writing Effective Plans](https://aaron777collins.github.io/portableralph/writing-plans/) for more examples.
 
 ## Notifications
 
@@ -86,16 +93,16 @@ Get notified on Slack, Discord, Telegram, or custom integrations:
 ~/ralph/ralph.sh --test-notify   # Test your config
 ```
 
-See [Notifications Guide](./docs/NOTIFICATIONS.md) for setup details.
+See [Notifications Guide](https://aaron777collins.github.io/portableralph/notifications/) for setup details.
 
 ## Documentation
 
 | Document | Description |
 |----------|-------------|
-| [Usage Guide](./docs/USAGE.md) | Complete command reference |
-| [Writing Plans](./docs/WRITING-PLANS.md) | How to write effective plans |
-| [Notifications](./docs/NOTIFICATIONS.md) | Slack, Discord, Telegram setup |
-| [How It Works](./docs/HOW-IT-WORKS.md) | Technical architecture |
+| [Usage Guide](https://aaron777collins.github.io/portableralph/usage/) | Complete command reference |
+| [Writing Plans](https://aaron777collins.github.io/portableralph/writing-plans/) | How to write effective plans |
+| [Notifications](https://aaron777collins.github.io/portableralph/notifications/) | Slack, Discord, Telegram setup |
+| [How It Works](https://aaron777collins.github.io/portableralph/how-it-works/) | Technical architecture |
 
 ## Requirements
 

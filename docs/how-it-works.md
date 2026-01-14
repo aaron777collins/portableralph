@@ -1,27 +1,6 @@
----
-layout: default
-title: How It Works
-nav_order: 5
-description: "Technical architecture and internals of Ralph"
-permalink: /docs/HOW-IT-WORKS
----
-
 # How It Works
-{: .no_toc }
 
 Technical deep-dive into Ralph's architecture and execution model.
-{: .fs-6 .fw-300 }
-
-<details open markdown="block">
-  <summary>
-    Table of contents
-  </summary>
-  {: .text-delta }
-1. TOC
-{:toc}
-</details>
-
----
 
 ## Architecture
 
@@ -56,8 +35,6 @@ Technical deep-dive into Ralph's architecture and execution model.
 │   • RALPH_DONE signals completion                                │
 └─────────────────────────────────────────────────────────────────┘
 ```
-
----
 
 ## Execution Flow
 
@@ -102,8 +79,6 @@ Each iteration:
 | Max iterations | Limit reached |
 | `Ctrl+C` | Manual stop |
 
----
-
 ## Prompt Templates
 
 ### PROMPT_plan.md
@@ -116,8 +91,8 @@ Used in `plan` mode. Instructs Claude to:
 4. Create a prioritized task breakdown
 5. Update progress file with analysis
 
-{: .important }
-Plan mode makes **no code changes**—analysis only.
+!!! info "Important"
+    Plan mode makes **no code changes**—analysis only.
 
 ### PROMPT_build.md
 
@@ -132,10 +107,8 @@ Used in `build` mode. Instructs Claude to:
 7. Commit changes
 8. Set `RALPH_DONE` if all tasks complete
 
-{: .important }
-Build mode does **one task per iteration**.
-
----
+!!! info "Important"
+    Build mode does **one task per iteration**.
 
 ## State Management
 
@@ -166,8 +139,6 @@ IN_PROGRESS          ← Controls loop
 | **Explicit state** | Everything written down |
 | **Debuggable** | Progress shows what happened |
 
----
-
 ## Variable Substitution
 
 | Variable | Example |
@@ -175,8 +146,6 @@ IN_PROGRESS          ← Controls loop
 | `${PLAN_FILE}` | `/home/user/repo/feature.md` |
 | `${PROGRESS_FILE}` | `feature_PROGRESS.md` |
 | `${PLAN_NAME}` | `feature` |
-
----
 
 ## Notifications
 
@@ -201,8 +170,6 @@ $1 = "🚀 Ralph Started\nPlan: feature\nMode: build"
 
 Your script handles delivery. Exit code ignored.
 
----
-
 ## Files
 
 ```
@@ -216,8 +183,6 @@ Your script handles delivery. Exit code ignored.
 └── docs/                  # Documentation
 ```
 
----
-
 ## Security
 
 ### dangerously-skip-permissions
@@ -228,8 +193,8 @@ Ralph uses `claude -p --dangerously-skip-permissions`:
 - Skips confirmation prompts
 - Enables autonomous operation
 
-{: .warning }
-Use with caution. Review commits. Set max-iterations for unattended runs.
+!!! danger "Warning"
+    Use with caution. Review commits. Set max-iterations for unattended runs.
 
 ### Credential Protection
 
@@ -237,8 +202,3 @@ Use with caution. Review commits. Set max-iterations for unattended runs.
 - Config stored in `~/.ralph.env` (outside repo)
 - Wizard sets `chmod 600` on config
 - No credentials in prompt templates
-
----
-
-[← Notifications]({{ site.baseurl }}/docs/NOTIFICATIONS){: .btn .fs-5 .mb-4 .mb-md-0 .mr-2 }
-[Home]({{ site.baseurl }}/){: .btn .btn-primary .fs-5 .mb-4 .mb-md-0 }

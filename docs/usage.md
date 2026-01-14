@@ -1,27 +1,6 @@
----
-layout: default
-title: Usage Guide
-nav_order: 2
-description: "Complete command reference for PortableRalph"
-permalink: /docs/USAGE
----
-
 # Usage Guide
-{: .no_toc }
 
 Complete reference for using PortableRalph.
-{: .fs-6 .fw-300 }
-
-<details open markdown="block">
-  <summary>
-    Table of contents
-  </summary>
-  {: .text-delta }
-1. TOC
-{:toc}
-</details>
-
----
 
 ## Basic Usage
 
@@ -30,8 +9,6 @@ Complete reference for using PortableRalph.
 ```
 
 Ralph reads your plan file and autonomously implements it, one task at a time.
-
----
 
 ## Command Reference
 
@@ -70,8 +47,6 @@ Ralph reads your plan file and autonomously implements it, one task at a time.
 ~/ralph/ralph.sh --test-notify
 ```
 
----
-
 ## Modes
 
 ### Plan Mode
@@ -88,10 +63,11 @@ In plan mode, Ralph:
 4. Identifies dependencies between tasks
 5. Updates the progress file with the analysis
 
-{: .note }
-Plan mode does **not** make any code changes. Use it to review the approach before implementation.
+!!! note
+    Plan mode does **not** make any code changes. Use it to review the approach before implementation.
 
 **Use plan mode when:**
+
 - Starting a complex feature
 - You want to review the approach before implementation
 - You need to understand the scope of work
@@ -113,11 +89,10 @@ In build mode, Ralph:
 7. Loops back for the next task
 
 **Use build mode when:**
+
 - You have a clear plan ready
 - You want autonomous implementation
 - After reviewing a plan mode output
-
----
 
 ## Progress File
 
@@ -167,8 +142,6 @@ Brief analysis of existing code vs what's needed.
 | `[ ]` | Pending task |
 | `[x]` | Completed task |
 
----
-
 ## Exit Conditions
 
 The Ralph loop exits when any of these occur:
@@ -178,8 +151,6 @@ The Ralph loop exits when any of these occur:
 | `RALPH_DONE` | All tasks complete - normal successful exit |
 | Max iterations | Limit reached (if specified) |
 | `Ctrl+C` | Manual stop - progress is saved |
-
----
 
 ## Tips & Best Practices
 
@@ -201,12 +172,13 @@ cat ./feature_PROGRESS.md
 ### Watch the Output
 
 Ralph runs in your terminal. Watch for:
+
 - Unexpected file changes
 - Test failures
 - Going off-track
 
-{: .warning }
-Use `Ctrl+C` if Ralph goes in the wrong direction.
+!!! warning
+    Use `Ctrl+C` if Ralph goes in the wrong direction.
 
 ### Check Progress
 
@@ -238,8 +210,3 @@ Ralph commits after each task. Review the git log:
 git log --oneline -10
 git revert HEAD  # Undo last commit if needed
 ```
-
----
-
-[Writing Plans →]({{ site.baseurl }}/docs/WRITING-PLANS){: .btn .btn-primary .fs-5 .mb-4 .mb-md-0 .mr-2 }
-[Notifications →]({{ site.baseurl }}/docs/NOTIFICATIONS){: .btn .fs-5 .mb-4 .mb-md-0 }

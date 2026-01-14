@@ -1,27 +1,6 @@
----
-layout: default
-title: Writing Plans
-nav_order: 3
-description: "How to write effective plan files for Ralph"
-permalink: /docs/WRITING-PLANS
----
-
 # Writing Effective Plans
-{: .no_toc }
 
 How to write plan files that Ralph can execute successfully.
-{: .fs-6 .fw-300 }
-
-<details open markdown="block">
-  <summary>
-    Table of contents
-  </summary>
-  {: .text-delta }
-1. TOC
-{:toc}
-</details>
-
----
 
 ## Basic Structure
 
@@ -44,10 +23,8 @@ What you want to achieve in 1-2 sentences.
 - Technical decisions already made
 ```
 
-{: .highlight }
-The better your plan, the better Ralph's output.
-
----
+!!! tip "Pro Tip"
+    The better your plan, the better Ralph's output.
 
 ## Plan Types
 
@@ -148,14 +125,12 @@ Upgrade from React Router v5 to v6 for improved performance.
 - Deep links must resolve correctly
 ```
 
----
-
 ## Best Practices
 
 ### Be Specific
 
-{: .important }
-Vague plans produce vague results.
+!!! warning "Important"
+    Vague plans produce vague results.
 
 ```markdown
 # Bad
@@ -201,8 +176,6 @@ Vague plans produce vague results.
 - Multiple avatar sizes
 - Avatar deletion
 ```
-
----
 
 ## Tips for Complex Plans
 
@@ -250,8 +223,6 @@ file: <binary>
 }
 ```
 
----
-
 ## Common Mistakes
 
 | Mistake | Problem | Fix |
@@ -260,8 +231,6 @@ file: <binary>
 | Too large | Takes forever | Break into smaller plans |
 | No context | Reinvents patterns | Reference existing code |
 | No criteria | Can't verify completion | Add acceptance criteria |
-
----
 
 ## Template
 
@@ -291,8 +260,3 @@ Copy this to start a new plan:
 ## Out of Scope
 - [What this plan does NOT include]
 ```
-
----
-
-[← Usage Guide]({{ site.baseurl }}/docs/USAGE){: .btn .fs-5 .mb-4 .mb-md-0 .mr-2 }
-[Notifications →]({{ site.baseurl }}/docs/NOTIFICATIONS){: .btn .btn-primary .fs-5 .mb-4 .mb-md-0 }
