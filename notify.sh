@@ -25,6 +25,11 @@
 #                                  Use this for proprietary integrations
 #                                  (database bridges, internal APIs, etc.)
 #
+#   BEHAVIOR:
+#     RALPH_NOTIFY_FREQUENCY     - How often to send progress notifications
+#                                  1 = every iteration (default)
+#                                  5 = every 5th iteration (reduces noise)
+#
 # Usage:
 #   ./notify.sh "Your message here"
 #   ./notify.sh --test              # Send test notification to all configured platforms

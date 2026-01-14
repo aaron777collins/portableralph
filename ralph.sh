@@ -246,8 +246,9 @@ while true; do
     echo ""
     echo -e "${GREEN}Iteration $ITERATION complete${NC}"
 
-    # Send iteration notification to Slack (only every 5 iterations to reduce noise, or on first iteration)
-    if [ "$ITERATION" -eq 1 ] || [ $((ITERATION % 5)) -eq 0 ]; then
+    # Send iteration notification (configurable frequency via RALPH_NOTIFY_FREQUENCY, default: every iteration)
+    NOTIFY_FREQ="${RALPH_NOTIFY_FREQUENCY:-1}"
+    if [ "$NOTIFY_FREQ" -eq 1 ] || [ "$ITERATION" -eq 1 ] || [ $((ITERATION % NOTIFY_FREQ)) -eq 0 ]; then
         notify ":gear: *Ralph Progress*: Iteration $ITERATION completed\n\`Plan: $PLAN_BASENAME\`" ":gear:"
     fi
 
