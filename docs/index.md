@@ -1,33 +1,62 @@
 # PortableRalph
 
-An autonomous AI development loop that works in **any repo**.
+<p class="subtitle" style="font-size: 1.4em; opacity: 0.8; margin-top: -0.5em;">
+An autonomous AI development loop that works in <strong>any repo</strong>.
+</p>
+
+<div class="grid cards" markdown>
+
+-   :rocket:{ .lg .middle } **Quick Start**
+
+    ---
+
+    Get up and running in under a minute with our one-liner installer.
+
+    [:octicons-arrow-right-24: Installation](installation.md)
+
+-   :books:{ .lg .middle } **Write Plans**
+
+    ---
+
+    Learn how to write effective plans that Ralph can execute autonomously.
+
+    [:octicons-arrow-right-24: Writing Plans](writing-plans.md)
+
+-   :bell:{ .lg .middle } **Notifications**
+
+    ---
+
+    Get notified on Slack, Discord, Telegram, or custom integrations.
+
+    [:octicons-arrow-right-24: Notifications](notifications.md)
+
+-   :gear:{ .lg .middle } **How It Works**
+
+    ---
+
+    Deep dive into Ralph's architecture and execution model.
+
+    [:octicons-arrow-right-24: How It Works](how-it-works.md)
+
+</div>
 
 ---
 
-## :rocket: Quick Start
+## :zap: One-Line Install
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/aaron777collins/portableralph/master/install.sh | bash
 ```
 
-Or manually:
+Then run Ralph on any plan:
 
 ```bash
-git clone https://github.com/aaron777collins/portableralph.git ~/ralph
-chmod +x ~/ralph/*.sh
-```
-
-Then run:
-
-```bash
-~/ralph/ralph.sh ./feature-plan.md
+ralph ./my-feature.md
 ```
 
 ---
 
-## :gear: How It Works
-
-Ralph reads your plan, breaks it into tasks, and implements them one by one until done.
+## :sparkles: The Magic
 
 ```text
  Your Plan          Ralph Loop              Progress File
@@ -40,32 +69,54 @@ Ralph reads your plan, breaks it into tasks, and implements them one by one unti
                    +--------------+         +--------------+
 ```
 
-1. **You write** a plan file describing what to build
-2. **Ralph breaks it** into discrete tasks
-3. **Each iteration**: pick one task → implement → validate → commit
-4. **Loop exits** when `RALPH_DONE` appears in progress file
+<div class="grid" markdown>
 
----
+:material-file-document-edit:{ .lg } **You write** a plan file describing what to build
+{ .card }
 
-## :books: Documentation
+:material-scissors-cutting:{ .lg } **Ralph breaks it** into discrete, actionable tasks
+{ .card }
 
-| | Guide | Description |
-|:--|:------|:------------|
-| :octicons-download-24: | [Installation](installation.md) | Get up and running in under a minute |
-| :octicons-terminal-24: | [Usage Guide](usage.md) | Complete command reference |
-| :octicons-pencil-24: | [Writing Plans](writing-plans.md) | How to write effective plans |
-| :octicons-bell-24: | [Notifications](notifications.md) | Slack, Discord, Telegram setup |
-| :octicons-cpu-24: | [How It Works](how-it-works.md) | Technical architecture |
+:material-autorenew:{ .lg } **Each iteration**: pick task → implement → validate → commit
+{ .card }
+
+:material-flag-checkered:{ .lg } **Loop exits** when `RALPH_DONE` appears in progress file
+{ .card }
+
+</div>
 
 ---
 
 ## :white_check_mark: Requirements
 
-- [Claude Code CLI](https://docs.anthropic.com/en/docs/claude-code) installed and authenticated
-- Bash shell
-- Git (optional, for auto-commits)
+<div class="grid cards" markdown>
+
+-   :simple-anthropic:{ .lg .middle } **Claude Code CLI**
+
+    ---
+
+    Install and authenticate the [Claude Code CLI](https://docs.anthropic.com/en/docs/claude-code)
+
+-   :octicons-terminal-24:{ .lg .middle } **Bash Shell**
+
+    ---
+
+    Available on macOS, Linux, and WSL
+
+-   :octicons-git-branch-24:{ .lg .middle } **Git** *(optional)*
+
+    ---
+
+    For automatic commits after each task
+
+</div>
 
 ---
 
-[Get Started :octicons-arrow-right-24:](installation.md){ .md-button .md-button--primary }
-[View on GitHub :octicons-mark-github-24:](https://github.com/aaron777collins/portableralph){ .md-button }
+<div class="grid" markdown>
+
+[Get Started :octicons-arrow-right-24:](installation.md){ .md-button .md-button--primary .md-button--stretch }
+
+[View on GitHub :octicons-mark-github-24:](https://github.com/aaron777collins/portableralph){ .md-button .md-button--stretch }
+
+</div>

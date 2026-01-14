@@ -1,18 +1,78 @@
-/* Fix ASCII art alignment in code blocks */
-.md-typeset pre code,
-.md-typeset code {
-  font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
-  font-variant-ligatures: none;
-  -webkit-font-feature-settings: "liga" 0;
-  font-feature-settings: "liga" 0;
+/* PortableRalph Custom Styles */
+
+/* Hero section */
+.md-typeset h1 {
+  font-weight: 700;
+  margin-bottom: 0;
 }
 
+/* Card hover effects */
+.md-typeset .grid.cards > ul > li {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.md-typeset .grid.cards > ul > li:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+}
+
+/* Large icons in cards */
+.lg {
+  font-size: 2em;
+}
+
+.middle {
+  vertical-align: middle;
+}
+
+/* Button stretch for grid */
+.md-button--stretch {
+  width: 100%;
+  text-align: center;
+}
+
+/* Code block improvements */
 .md-typeset pre {
-  line-height: 1.4;
+  border-radius: 8px;
 }
 
-/* Ensure box-drawing characters align properly */
 .md-typeset pre code {
-  letter-spacing: 0;
-  word-spacing: 0;
+  font-family: "Roboto Mono", SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace;
+  font-variant-ligatures: none;
+}
+
+/* Better spacing */
+.md-typeset hr {
+  margin: 2em 0;
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Admonition improvements */
+.md-typeset .admonition {
+  border-radius: 8px;
+}
+
+/* Navigation hover */
+.md-nav__link:hover {
+  color: var(--md-accent-fg-color);
+}
+
+/* Footer styling */
+.md-footer {
+  margin-top: 3em;
+}
+
+/* Primary button gradient */
+.md-typeset .md-button--primary {
+  background: linear-gradient(135deg, #7c3aed 0%, #5b21b6 100%);
+  border: none;
+}
+
+.md-typeset .md-button--primary:hover {
+  background: linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%);
+}
+
+/* Card icon colors */
+.md-typeset .grid.cards .twemoji {
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
 }
