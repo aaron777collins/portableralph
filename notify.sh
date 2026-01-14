@@ -49,6 +49,9 @@ if [ -z "$MESSAGE" ]; then
     exit 0
 fi
 
+# Convert literal \n to actual newlines
+MESSAGE=$(printf '%b' "$MESSAGE")
+
 # Track if any notification was sent
 SENT_ANY=false
 
