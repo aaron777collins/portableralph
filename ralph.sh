@@ -25,7 +25,7 @@ YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
-VERSION="1.3.0"
+VERSION="1.4.0"
 
 # Notification helper (sends to all configured platforms: Slack, Discord, Telegram)
 notify() {

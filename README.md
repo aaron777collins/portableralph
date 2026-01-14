@@ -2,186 +2,61 @@
 
 A dead-simple autonomous AI development loop that works in **any repo**.
 
-Based on [The Ralph Playbook](https://github.com/ghuntley/how-to-ralph-wiggum) methodology.
+```bash
+~/ralph/ralph.sh ./feature-plan.md
+```
+
+Ralph reads your plan, breaks it into tasks, and implements them one by one until done.
 
 ## Quick Start
 
 ```bash
-# Install (one time)
+# Install
 git clone https://github.com/aaron777collins/portableralph.git ~/ralph
-chmod +x ~/ralph/ralph.sh
+chmod +x ~/ralph/*.sh
 
-# Use (from any repo)
+# Run (from any repo)
 ~/ralph/ralph.sh ./my-plan.md
 ```
-
-## For AI Agents
-
-**To invoke Ralph from another AI agent:**
-
-```bash
-# Run Ralph on a plan file (loops until RALPH_DONE in progress file)
-~/ralph/ralph.sh /path/to/plan.md build
-
-# Or plan-only mode (creates task list, doesn't implement)
-~/ralph/ralph.sh /path/to/plan.md plan
-```
-
-**Plan file format** - just markdown describing what to build:
-```markdown
-# Feature: Whatever You Want
-
-## Goal
-Clear description of the objective.
-
-## Requirements
-- Bullet points of what needs to happen
-- Be specific about acceptance criteria
-
-## Context (optional)
-- Relevant files or patterns to follow
-- Any constraints or preferences
-```
-
-**Exit signal**: Add `RALPH_DONE` to `<plan-name>_PROGRESS.md` when work is complete.
-
----
-
-## What is this?
-
-Ralph is an AI development loop that:
-1. Takes a plan file (your feature spec, bug description, whatever)
-2. Breaks it into tasks
-3. Implements each task one at a time
-4. Loops until done (or you stop it)
-
-**No setup required in your project.** Just point it at a plan file and go.
-
-## Installation
-
-```bash
-git clone https://github.com/aaron777collins/portableralph.git ~/ralph
-chmod +x ~/ralph/ralph.sh
-```
-
-## Usage
-
-```bash
-# From any repo directory:
-~/ralph/ralph.sh <plan-file> [mode] [max-iterations]
-```
-
-### Examples
-
-```bash
-# Build from a plan until complete
-~/ralph/ralph.sh ./docs/feature-spec.md
-
-# Plan mode only (analyze and create task list)
-~/ralph/ralph.sh ./docs/feature-spec.md plan
-
-# Build with max 20 iterations
-~/ralph/ralph.sh ./docs/feature-spec.md build 20
-
-# Plan with max 5 iterations
-~/ralph/ralph.sh ./docs/feature-spec.md plan 5
-```
-
-### Arguments
-
-| Argument | Required | Default | Description |
-|----------|----------|---------|-------------|
-| `plan-file` | Yes | - | Path to your plan/spec file |
-| `mode` | No | `build` | `plan` or `build` |
-| `max-iterations` | No | unlimited | Max loop iterations |
 
 ## How It Works
 
 ```
-┌─────────────────────────────────────────────────────────┐
-│                    YOUR PLAN FILE                        │
-│              (feature spec, bug report, etc)             │
-└────────────────────────┬────────────────────────────────┘
-                         │
-                         ▼
-┌─────────────────────────────────────────────────────────┐
-│                    RALPH LOOP                            │
-│                                                          │
-│  1. Read plan + progress file                            │
-│  2. Pick ONE task                                        │
-│  3. Search codebase (don't assume not implemented)       │
-│  4. Implement task                                       │
-│  5. Run tests/validation                                 │
-│  6. Update progress file                                 │
-│  7. Commit                                               │
-│  8. Loop back to 1 (fresh context)                       │
-│                                                          │
-└────────────────────────┬────────────────────────────────┘
-                         │
-                         ▼
-┌─────────────────────────────────────────────────────────┐
-│              <plan-name>_PROGRESS.md                     │
-│                                                          │
-│  - Task list with [x] / [ ] status                       │
-│  - Notes and discoveries                                 │
-│  - RALPH_DONE when complete                              │
-└─────────────────────────────────────────────────────────┘
+ Your Plan          Ralph Loop              Progress File
+┌──────────┐      ┌─────────────┐         ┌─────────────┐
+│ feature  │      │ 1. Read     │         │ - [x] Done  │
+│   .md    │ ───► │ 2. Pick task│ ◄─────► │ - [ ] Todo  │
+│          │      │ 3. Implement│         │ - [ ] Todo  │
+└──────────┘      │ 4. Commit   │         │             │
+                  │ 5. Repeat   │         │ RALPH_DONE  │
+                  └─────────────┘         └─────────────┘
 ```
 
-## Exit Conditions
+1. **You write** a plan file describing what to build
+2. **Ralph breaks it** into discrete tasks
+3. **Each iteration**: pick one task → implement → validate → commit
+4. **Loop exits** when `RALPH_DONE` appears in progress file
 
-The loop exits when:
-1. **`RALPH_DONE`** appears in the progress file (work complete)
-2. **Max iterations** reached (if specified)
-3. **Ctrl+C** to stop manually
+## Usage
 
-## Progress File
-
-Ralph creates `<plan-name>_PROGRESS.md` in your current directory.
-
-This is the **only artifact** left in your repo. It tracks:
-- Task list with completion status
-- What was done each iteration
-- Notes and discoveries
-
-Example:
-```markdown
-# Progress: my-feature
-
-## Status
-IN_PROGRESS
-
-## Task List
-- [x] Add user model
-- [x] Create API endpoint
-- [ ] Add validation
-- [ ] Write tests
-
-## Completed This Iteration
-- Create API endpoint: Added POST /users endpoint
-
-## Notes
-- Found existing validation helper in src/utils
+```bash
+~/ralph/ralph.sh <plan-file> [mode] [max-iterations]
 ```
 
-## Writing Plan Files
+| Mode | Description |
+|------|-------------|
+| `build` | Implement tasks (default) |
+| `plan` | Analyze and create task list only |
 
-### Simple Example
-```markdown
-# Fix: Login Button Not Working
-
-## Problem
-The login button on /login page doesn't submit the form.
-
-## Expected
-Clicking login should POST to /api/auth/login and redirect on success.
-
-## Files
-- src/pages/login.tsx
-- src/api/auth.ts
+```bash
+# Examples
+~/ralph/ralph.sh ./feature.md           # Build until done
+~/ralph/ralph.sh ./feature.md plan      # Plan only
+~/ralph/ralph.sh ./feature.md build 20  # Build, max 20 iterations
 ```
 
-### Feature Example
+## Plan File Format
+
 ```markdown
 # Feature: User Authentication
 
@@ -189,200 +64,69 @@ Clicking login should POST to /api/auth/login and redirect on success.
 Add JWT-based authentication to the API.
 
 ## Requirements
-- Login endpoint that returns JWT token
-- Middleware to validate tokens
-- Protected routes require valid token
-- Token expiry: 24 hours
+- Login endpoint returns JWT token
+- Middleware validates tokens on protected routes
+- Tokens expire after 24 hours
 
 ## Acceptance Criteria
 - POST /auth/login with valid credentials returns token
-- Protected endpoints return 401 without token
-- Tokens expire after 24 hours
+- Protected endpoints return 401 without valid token
 ```
 
-### Refactor Example
-```markdown
-# Refactor: Extract Database Layer
+See [Writing Effective Plans](./docs/WRITING-PLANS.md) for more examples.
 
-## Goal
-Move all database calls to a dedicated data access layer.
+## Notifications
 
-## Current State
-Database queries scattered throughout API handlers.
-
-## Target State
-- src/db/ folder with query functions
-- Handlers call db functions, not raw queries
-- All queries in one place for optimization
-
-## Constraints
-- Don't change API responses
-- Keep existing tests passing
-```
-
-## Tips
-
-### Use Plan Mode First
-For complex features, run plan mode first:
-```bash
-~/ralph/ralph.sh ./feature.md plan
-```
-Review the task list in the progress file, then run build mode:
-```bash
-~/ralph/ralph.sh ./feature.md build
-```
-
-### Watch It Work
-Ralph runs in your terminal - watch for issues and Ctrl+C if it goes off track.
-
-### Check Progress
-The progress file shows what Ralph is doing:
-```bash
-cat ./my-plan_PROGRESS.md
-```
-
-## Notifications (Optional)
-
-Ralph can send notifications to **Slack**, **Discord**, **Telegram**, and **Custom scripts** when:
-- A run starts
-- Progress updates (every 5 iterations)
-- Work completes (RALPH_DONE)
-- Max iterations reached
-
-### Quick Setup (Recommended)
-
-Run the interactive setup wizard:
-```bash
-~/ralph/setup-notifications.sh
-```
-
-The wizard will guide you through configuring one or more platforms and save your settings to `~/.ralph.env`.
-
-### Test Notifications
+Get notified on Slack, Discord, Telegram, or custom integrations:
 
 ```bash
-~/ralph/ralph.sh --test-notify
+~/ralph/setup-notifications.sh  # Interactive setup
+~/ralph/ralph.sh --test-notify   # Test your config
 ```
 
-### Manual Setup
+See [Notifications Guide](./docs/NOTIFICATIONS.md) for setup details.
 
-If you prefer manual configuration, set environment variables for the platforms you want:
+## Documentation
 
-#### Slack
-```bash
-export RALPH_SLACK_WEBHOOK_URL="https://hooks.slack.com/services/XXX/YYY/ZZZ"
-```
-
-To get a webhook URL:
-1. Go to [api.slack.com/apps](https://api.slack.com/apps)
-2. Create New App > From scratch
-3. Enable Incoming Webhooks
-4. Add webhook to workspace
-5. Copy the URL
-
-#### Discord
-```bash
-export RALPH_DISCORD_WEBHOOK_URL="https://discord.com/api/webhooks/XXX/YYY"
-```
-
-To get a webhook URL:
-1. Open Discord server settings
-2. Go to Integrations > Webhooks
-3. Create webhook, copy URL
-
-#### Telegram
-```bash
-export RALPH_TELEGRAM_BOT_TOKEN="123456789:ABCdefGHI..."
-export RALPH_TELEGRAM_CHAT_ID="123456789"
-```
-
-To set up:
-1. Message [@BotFather](https://t.me/BotFather) on Telegram
-2. Send `/newbot` and follow prompts
-3. Copy the bot token
-4. Start a chat with your bot, send any message
-5. Visit `https://api.telegram.org/bot<TOKEN>/getUpdates`
-6. Find your chat ID in the response
-
-#### Custom Script (Proprietary Integrations)
-```bash
-export RALPH_CUSTOM_NOTIFY_SCRIPT="/path/to/your/notify-script.sh"
-```
-
-For custom/proprietary integrations (database bridges, internal APIs, etc.).
-Your script receives the message as `$1` and handles delivery however you need.
-
-**Example script:**
-```bash
-#!/bin/bash
-MESSAGE="$1"
-# Insert into database that syncs to Slack
-docker exec mydb psql -c "INSERT INTO notifications (msg) VALUES ('$MESSAGE');"
-# Or call internal API
-curl -X POST -d "text=$MESSAGE" https://internal.api/notify
-```
-
-**Use cases:**
-- Database-to-Slack bridge (app polls DB and posts to Slack)
-- Internal company notification API
-- SMS/email gateway
-- Any custom webhook format
-
-### Configuration Reference
-
-| Variable | Platform | Description |
-|----------|----------|-------------|
-| `RALPH_SLACK_WEBHOOK_URL` | Slack | Incoming webhook URL |
-| `RALPH_SLACK_CHANNEL` | Slack | Override default channel |
-| `RALPH_SLACK_USERNAME` | Slack | Bot display name (default: Ralph) |
-| `RALPH_SLACK_ICON_EMOJI` | Slack | Bot icon (default: :robot_face:) |
-| `RALPH_DISCORD_WEBHOOK_URL` | Discord | Webhook URL |
-| `RALPH_DISCORD_USERNAME` | Discord | Bot display name (default: Ralph) |
-| `RALPH_DISCORD_AVATAR_URL` | Discord | Bot avatar image URL |
-| `RALPH_TELEGRAM_BOT_TOKEN` | Telegram | Bot token from @BotFather |
-| `RALPH_TELEGRAM_CHAT_ID` | Telegram | Chat/group/channel ID |
-| `RALPH_CUSTOM_NOTIFY_SCRIPT` | Custom | Path to your notification script |
-
-### Persisting Configuration
-
-Add to your shell profile (`~/.bashrc` or `~/.zshrc`):
-```bash
-source ~/.ralph.env
-```
-
-Or the wizard will offer to do this for you.
+| Document | Description |
+|----------|-------------|
+| [Usage Guide](./docs/USAGE.md) | Complete command reference |
+| [Writing Plans](./docs/WRITING-PLANS.md) | How to write effective plans |
+| [Notifications](./docs/NOTIFICATIONS.md) | Slack, Discord, Telegram setup |
+| [How It Works](./docs/HOW-IT-WORKS.md) | Technical architecture |
 
 ## Requirements
 
-- [Claude CLI](https://docs.anthropic.com/en/docs/claude-code) installed and authenticated
+- [Claude Code CLI](https://docs.anthropic.com/en/docs/claude-code) installed and authenticated
 - Bash shell
-- Git (optional, for commits)
-- curl (for notifications)
-- jq (optional, for better JSON handling)
+- Git (optional, for auto-commits)
 
 ## Files
 
 ```
 ~/ralph/
-├── ralph.sh               # Main script
-├── notify.sh              # Multi-platform notification helper
-├── setup-notifications.sh # Interactive setup wizard
-├── PROMPT_plan.md         # Plan mode prompt template
-├── PROMPT_build.md        # Build mode prompt template
-├── .env.example           # Configuration template
-└── README.md
+├── ralph.sh               # Main loop
+├── notify.sh              # Notification dispatcher
+├── setup-notifications.sh # Setup wizard
+├── PROMPT_plan.md         # Plan mode instructions
+├── PROMPT_build.md        # Build mode instructions
+├── .env.example           # Config template
+└── docs/                  # Documentation
 ```
 
-## How the Loop Works (Technical)
+## For AI Agents
 
-Each iteration:
-1. Script substitutes `${PLAN_FILE}`, `${PROGRESS_FILE}`, `${PLAN_NAME}` in prompt
-2. Prompt is piped to `claude -p --dangerously-skip-permissions`
-3. Claude reads plan/progress, does ONE task, updates progress file
-4. Script checks for `RALPH_DONE` in progress file
-5. If not done, loops back with fresh context
+Invoke Ralph from another AI agent:
 
-The progress file is the **shared state** between iterations. Each Claude invocation starts fresh but reads/writes the progress file to track state.
+```bash
+# Run until RALPH_DONE
+~/ralph/ralph.sh /absolute/path/to/plan.md build
+
+# Plan only
+~/ralph/ralph.sh /absolute/path/to/plan.md plan
+```
+
+Exit signal: Add `RALPH_DONE` to `<plan-name>_PROGRESS.md` when complete.
 
 ## License
 
@@ -390,4 +134,4 @@ MIT
 
 ---
 
-*Inspired by [@GeoffreyHuntley](https://x.com/GeoffreyHuntley)'s Ralph technique.*
+Based on [The Ralph Playbook](https://github.com/ghuntley/how-to-ralph-wiggum) by [@GeoffreyHuntley](https://x.com/GeoffreyHuntley).
