@@ -32,7 +32,7 @@ Technical deep-dive into Ralph's architecture and execution model.
 |                                                                   |
 |   - Shared state between iterations                               |
 |   - Task list with completion status                              |
-|   - RALPH_DONE signals build completion (set by AI only)          |
+|   - RALPH_DONE on its own line signals completion (build only)    |
 +------------------------------------------------------------------+
 ```
 
@@ -56,7 +56,7 @@ Each iteration:
 
 ```text
 1. Check exit conditions
-   |-- RALPH_DONE in progress file? -> Exit (build mode)
+   |-- RALPH_DONE on its own line in progress file? -> Exit (build mode)
    +-- Max iterations reached? -> Exit
 
 2. Build prompt
@@ -77,9 +77,12 @@ Each iteration:
 | Exit Condition | Mode | Meaning |
 |:---------------|:-----|:--------|
 | Plan mode complete | Plan | Success - task list created (exits after 1 iteration) |
-| `RALPH_DONE` | Build | Success - all tasks complete |
+| `RALPH_DONE` on own line | Build | Success - all tasks complete |
 | Max iterations | Both | Limit reached |
 | `Ctrl+C` | Both | Manual stop |
+
+!!! note "Detection"
+    The completion marker must appear on its own line in the progress file to be detected. This prevents false positives from instructional text like "do not write RALPH_DONE" being mistakenly matched.
 
 ## Prompt Templates
 
@@ -117,8 +120,8 @@ Used in `build` mode. Instructs Claude to:
 !!! info "Important"
     Build mode does **one task per iteration**.
 
-!!! warning "RALPH_DONE Rules"
-    Build mode must verify ALL tasks are complete before setting `RALPH_DONE`. When in doubt, leave status as `IN_PROGRESS`—it's better to run an extra iteration than exit prematurely.
+!!! warning "Completion Rules"
+    Build mode must verify ALL tasks are complete before writing `RALPH_DONE`. The marker must be written on its own line in the Status section. When in doubt, leave status as `IN_PROGRESS`—it's better to run an extra iteration than exit prematurely.
 
 ## State Management
 

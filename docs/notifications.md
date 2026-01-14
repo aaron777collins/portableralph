@@ -17,7 +17,7 @@ Notifications fire when:
 
 - Run **starts**
 - **Every 5 iterations** (configurable via `RALPH_NOTIFY_FREQUENCY`)
-- Work **completes** (RALPH_DONE)
+- Work **completes** (when `RALPH_DONE` is detected on its own line)
 - **Max iterations** reached
 
 ## Quick Setup

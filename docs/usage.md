@@ -195,9 +195,10 @@ The progress file is created in your **current directory** (not where the plan f
 
 !!! warning "Critical Status Rules"
     - **Plan mode** always sets status to `IN_PROGRESS` and exits after 1 iteration
-    - **Build mode** only sets `RALPH_DONE` after ALL tasks are verified complete
-    - Plan mode should **NEVER** set `RALPH_DONE` under any circumstances
+    - **Build mode** only writes `RALPH_DONE` after ALL tasks are verified complete
+    - Plan mode should **NEVER** write `RALPH_DONE` under any circumstances
     - When in doubt, build mode leaves status as `IN_PROGRESS`
+    - **The marker must be on its own line** to be detected (not inline with other text)
 
 ### Editing the Progress File
 

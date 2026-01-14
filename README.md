@@ -131,14 +131,15 @@ Invoke Ralph from another AI agent:
 # Plan first (analyzes codebase, creates task list, exits after 1 iteration)
 ~/ralph/ralph.sh /absolute/path/to/plan.md plan
 
-# Then build (implements tasks one by one until RALPH_DONE)
+# Then build (implements tasks one by one until completion)
 ~/ralph/ralph.sh /absolute/path/to/plan.md build
 ```
 
 **Important:**
 - Plan mode runs once then exits automatically (sets status to `IN_PROGRESS`)
-- Build mode loops until all tasks are complete, then sets `RALPH_DONE`
-- Only build mode should ever set `RALPH_DONE`
+- Build mode loops until all tasks are complete, then writes `RALPH_DONE` on its own line in the Status section
+- Only build mode should ever write the completion marker
+- The marker must be on its own line to be detected (not inline with other text)
 
 ## License
 

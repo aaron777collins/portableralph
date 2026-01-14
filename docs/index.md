@@ -80,7 +80,7 @@ ralph ./my-feature.md
 :material-autorenew:{ .lg } **Each iteration**: pick task → implement → validate → commit
 { .card }
 
-:material-flag-checkered:{ .lg } **Loop exits** when `RALPH_DONE` appears in progress file
+:material-flag-checkered:{ .lg } **Loop exits** when `RALPH_DONE` appears on its own line in progress file
 { .card }
 
 </div>

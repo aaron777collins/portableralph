@@ -202,9 +202,11 @@ fi
 ITERATION=0
 
 # Check for completion
+# Uses -x to match whole lines only, preventing false positives from
+# instructional text like "DO NOT set RALPH_DONE" in the progress file
 is_done() {
     if [ -f "$PROGRESS_FILE" ]; then
-        grep -q "RALPH_DONE" "$PROGRESS_FILE" 2>/dev/null && return 0
+        grep -qx "RALPH_DONE" "$PROGRESS_FILE" 2>/dev/null && return 0
     fi
     return 1
 }
