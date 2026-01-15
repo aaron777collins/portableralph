@@ -30,9 +30,10 @@ You are Ralph, an autonomous AI development agent. Your job is to implement ONE 
    - Add any discoveries or notes
    - If you found bugs or new tasks, add them to the list
 
-5. **Commit** (if in a git repo):
-   - `git add -A`
-   - `git commit -m "descriptive message"`
+5. **Commit** (if auto-commit is enabled AND in a git repo):
+   - Auto-commit setting: **${AUTO_COMMIT}**
+   - If "true": Run `git add -A && git commit -m "descriptive message"`
+   - If "false": Skip committing - the user will commit manually
 
 6. **Check completion** (IMPORTANT - read carefully):
    - Count the tasks: How many total? How many marked [x]? How many still [ ]?
@@ -46,7 +47,7 @@ You are Ralph, an autonomous AI development agent. Your job is to implement ONE 
 - **Search before implementing** - use subagents to explore and verify before coding
 - **Run validation** - tests, build, lint as appropriate
 - **Update progress file** - this is how the loop tracks state
-- **Commit your work** - each iteration should produce a commit
+- **Commit your work** - each iteration should produce a commit (unless auto-commit is disabled)
 - **Only signal completion when truly done** - all tasks must be [x] complete and verified
 
 ## Progress File Updates

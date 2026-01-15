@@ -19,8 +19,19 @@ set -euo pipefail
 
 RALPH_DIR="$(cd "$(dirname "$0")" && pwd)"
 
-# Load notification configuration
-if [ -f "$HOME/.ralph.env" ]; then
+# Validate config file syntax before sourcing
+validate_config() {
+    local config_file="$1"
+    if [ -f "$config_file" ] && ! bash -n "$config_file" 2>/dev/null; then
+        echo -e "${YELLOW}Warning: Syntax error in $config_file${NC}" >&2
+        echo -e "${YELLOW}Run: bash -n $config_file to see details${NC}" >&2
+        return 1
+    fi
+    return 0
+}
+
+# Load configuration
+if [ -f "$HOME/.ralph.env" ] && validate_config "$HOME/.ralph.env"; then
     source "$HOME/.ralph.env"
 fi
 
@@ -31,7 +42,27 @@ YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
-VERSION="1.4.0"
+VERSION="1.5.0"
+
+# Auto-commit setting (default: true)
+# Can be disabled via: ralph config commit off
+# Or by adding DO_NOT_COMMIT on its own line in the plan file
+RALPH_AUTO_COMMIT="${RALPH_AUTO_COMMIT:-true}"
+
+# Check if plan file contains DO_NOT_COMMIT directive
+# Skips content inside ``` code blocks to avoid false positives
+should_skip_commit_from_plan() {
+    local plan_file="$1"
+    [ ! -f "$plan_file" ] && return 1
+
+    # Use awk to skip code blocks and find DO_NOT_COMMIT on its own line
+    # Handles whitespace before/after the directive
+    awk '
+        /^```/ { in_code = !in_code; next }
+        !in_code && /^[[:space:]]*DO_NOT_COMMIT[[:space:]]*$/ { found=1; exit }
+        END { exit !found }
+    ' "$plan_file"
+}
 
 # Notification helper (sends to all configured platforms: Slack, Discord, Telegram)
 notify() {
@@ -52,6 +83,7 @@ usage() {
     echo ""
     echo -e "${YELLOW}Usage:${NC}"
     echo "  ralph <plan-file> [mode] [max-iterations]"
+    echo "  ralph config <setting>"
     echo "  ralph notify <setup|test>"
     echo "  ralph --help | -h"
     echo "  ralph --version | -v"
@@ -81,6 +113,14 @@ usage() {
     echo -e "${YELLOW}Progress File:${NC}"
     echo "  Created as <plan-name>_PROGRESS.md in current directory"
     echo "  This is the only artifact left in your repo"
+    echo ""
+    echo -e "${YELLOW}Configuration:${NC}"
+    echo "  ralph config commit on      Enable auto-commit (default)"
+    echo "  ralph config commit off     Disable auto-commit"
+    echo "  ralph config commit status  Show current setting"
+    echo ""
+    echo -e "${YELLOW}Plan File Directives:${NC}"
+    echo "  Add DO_NOT_COMMIT on its own line to disable commits for that plan"
     echo ""
     echo -e "${YELLOW}Notifications (optional):${NC}"
     echo "  Supports Slack, Discord, Telegram, and custom scripts"
@@ -140,6 +180,88 @@ if [ "$1" = "notify" ]; then
     esac
 fi
 
+# Handle config subcommand
+if [ "$1" = "config" ]; then
+    CONFIG_FILE="$HOME/.ralph.env"
+
+    # Helper to set a config value (handles both export and non-export patterns)
+    set_config_value() {
+        local key="$1"
+        local value="$2"
+        if [ -f "$CONFIG_FILE" ]; then
+            # Check if key exists (with or without export)
+            if grep -qE "^(export )?${key}=" "$CONFIG_FILE" 2>/dev/null; then
+                # Update existing (handle both patterns)
+                sed -i "s/^export ${key}=.*/export ${key}=\"${value}\"/" "$CONFIG_FILE"
+                sed -i "s/^${key}=.*/export ${key}=\"${value}\"/" "$CONFIG_FILE"
+            else
+                # Append to existing file (preserve content)
+                echo "" >> "$CONFIG_FILE"
+                echo "# Auto-commit setting" >> "$CONFIG_FILE"
+                echo "export ${key}=\"${value}\"" >> "$CONFIG_FILE"
+            fi
+        else
+            # Create new file
+            echo '# PortableRalph Configuration' > "$CONFIG_FILE"
+            echo "# Generated on $(date)" >> "$CONFIG_FILE"
+            echo "" >> "$CONFIG_FILE"
+            echo "export ${key}=\"${value}\"" >> "$CONFIG_FILE"
+            chmod 600 "$CONFIG_FILE"
+        fi
+    }
+
+    case "${2:-}" in
+        commit)
+            case "${3:-}" in
+                on|true|yes|1)
+                    set_config_value "RALPH_AUTO_COMMIT" "true"
+                    echo -e "${GREEN}Auto-commit enabled${NC}"
+                    echo "Ralph will commit after each iteration."
+                    ;;
+                off|false|no|0)
+                    set_config_value "RALPH_AUTO_COMMIT" "false"
+                    echo -e "${YELLOW}Auto-commit disabled${NC}"
+                    echo "Ralph will NOT commit after each iteration."
+                    echo "You can also add DO_NOT_COMMIT on its own line in your plan file."
+                    ;;
+                status|"")
+                    echo -e "${YELLOW}Auto-commit setting:${NC}"
+                    if [ "$RALPH_AUTO_COMMIT" = "true" ]; then
+                        echo -e "  Current: ${GREEN}enabled${NC} (commits after each iteration)"
+                    else
+                        echo -e "  Current: ${YELLOW}disabled${NC} (no automatic commits)"
+                    fi
+                    echo ""
+                    echo -e "${YELLOW}Usage:${NC}"
+                    echo "  ralph config commit on     Enable auto-commit (default)"
+                    echo "  ralph config commit off    Disable auto-commit"
+                    echo ""
+                    echo -e "${YELLOW}Plan file override:${NC}"
+                    echo "  Add DO_NOT_COMMIT on its own line to disable commits for that plan"
+                    ;;
+                *)
+                    echo -e "${RED}Unknown option: $3${NC}"
+                    echo "Usage: ralph config commit <on|off|status>"
+                    exit 1
+                    ;;
+            esac
+            exit 0
+            ;;
+        "")
+            echo -e "${YELLOW}Usage:${NC} ralph config <setting>"
+            echo ""
+            echo -e "${YELLOW}Settings:${NC}"
+            echo "  commit <on|off|status>    Configure auto-commit behavior"
+            exit 1
+            ;;
+        *)
+            echo -e "${RED}Unknown config setting: $2${NC}"
+            echo "Run 'ralph config' for available settings."
+            exit 1
+            ;;
+    esac
+fi
+
 PLAN_FILE="$1"
 MODE="${2:-build}"
 MAX_ITERATIONS="${3:-0}"
@@ -175,6 +297,18 @@ if [ ! -f "$PROMPT_TEMPLATE" ]; then
     exit 1
 fi
 
+# Compute commit setting (check env var and plan file)
+# DO_NOT_COMMIT in plan file takes precedence for that specific plan
+SHOULD_COMMIT="true"
+COMMIT_DISABLED_REASON=""
+if [ "$RALPH_AUTO_COMMIT" != "true" ]; then
+    SHOULD_COMMIT="false"
+    COMMIT_DISABLED_REASON="(disabled via config)"
+elif should_skip_commit_from_plan "$PLAN_FILE"; then
+    SHOULD_COMMIT="false"
+    COMMIT_DISABLED_REASON="(DO_NOT_COMMIT in plan)"
+fi
+
 # Print banner
 echo ""
 echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
@@ -184,6 +318,11 @@ echo -e "  Plan:      ${YELLOW}$PLAN_FILE${NC}"
 echo -e "  Mode:      ${YELLOW}$MODE${NC}"
 echo -e "  Progress:  ${YELLOW}$PROGRESS_FILE${NC}"
 [ "$MAX_ITERATIONS" -gt 0 ] && echo -e "  Max Iter:  ${YELLOW}$MAX_ITERATIONS${NC}"
+if [ "$SHOULD_COMMIT" = "true" ]; then
+    echo -e "  Commit:    ${GREEN}enabled${NC}"
+else
+    echo -e "  Commit:    ${YELLOW}disabled${NC} ${COMMIT_DISABLED_REASON}"
+fi
 if notifications_enabled; then
     PLATFORMS=""
     [ -n "${RALPH_SLACK_WEBHOOK_URL:-}" ] && PLATFORMS="${PLATFORMS}Slack "
@@ -266,7 +405,8 @@ while true; do
     PROMPT=$(cat "$PROMPT_TEMPLATE" | \
         sed "s|\${PLAN_FILE}|$PLAN_FILE_ABS|g" | \
         sed "s|\${PROGRESS_FILE}|$PROGRESS_FILE|g" | \
-        sed "s|\${PLAN_NAME}|$PLAN_BASENAME|g")
+        sed "s|\${PLAN_NAME}|$PLAN_BASENAME|g" | \
+        sed "s|\${AUTO_COMMIT}|$SHOULD_COMMIT|g")
 
     # Run Claude
     echo "$PROMPT" | claude -p \

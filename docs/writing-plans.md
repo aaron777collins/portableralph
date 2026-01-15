@@ -232,6 +232,37 @@ file: <binary>
 | No context | Reinvents patterns | Reference existing code |
 | No criteria | Can't verify completion | Add acceptance criteria |
 
+## Plan Directives
+
+### DO_NOT_COMMIT
+
+Add `DO_NOT_COMMIT` on its own line in your plan to disable automatic commits:
+
+```markdown
+# Feature: Experimental Widget
+
+DO_NOT_COMMIT
+
+## Goal
+Try out a new widget without cluttering git history.
+```
+
+!!! note "How it works"
+    - Must be on its own line (not inside a code block)
+    - Case-sensitive: use exactly `DO_NOT_COMMIT`
+    - Whitespace before/after is allowed
+    - Takes effect for the entire plan execution
+
+**When to use:**
+
+| Scenario | Why |
+|:---------|:----|
+| Experimental work | Try ideas without commits |
+| Large refactors | Commit manually with a meaningful message |
+| Learning/testing | Explore Ralph without affecting repo |
+
+---
+
 ## Template
 
 Copy this to start a new plan:

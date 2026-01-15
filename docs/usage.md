@@ -225,6 +225,11 @@ ralph ./plan.md build
 # Implement with a safety limit
 ralph ./plan.md build 20
 
+# Configuration commands
+ralph config commit on      # Enable auto-commit (default)
+ralph config commit off     # Disable auto-commit
+ralph config commit status  # Show current setting
+
 # Notification commands
 ralph notify setup    # Configure notifications
 ralph notify test     # Send a test notification
@@ -236,6 +241,51 @@ ralph notify test     # Send a test notification
 |:-----|:------------|
 | `--help`, `-h` | Show help message |
 | `--version`, `-v` | Show version |
+
+---
+
+## :gear: Configuration
+
+### Auto-Commit
+
+By default, Ralph commits after each iteration. You can disable this globally or per-plan.
+
+#### Global Setting
+
+```bash
+# Disable auto-commit globally
+ralph config commit off
+
+# Re-enable auto-commit
+ralph config commit on
+
+# Check current setting
+ralph config commit status
+```
+
+This setting is stored in `~/.ralph.env` and persists across sessions.
+
+#### Per-Plan Override
+
+Add `DO_NOT_COMMIT` on its own line anywhere in your plan file:
+
+```markdown
+# Feature: Experimental Widget
+
+DO_NOT_COMMIT
+
+## Goal
+Try out a new widget implementation without committing changes.
+
+## Requirements
+- Build the widget
+- Test locally
+```
+
+!!! tip "When to disable commits"
+    - **Experimental work** — Try ideas without cluttering git history
+    - **Large refactors** — Make many changes, then commit manually with a meaningful message
+    - **Learning/testing** — Explore Ralph's behavior without affecting your repo
 
 ---
 
