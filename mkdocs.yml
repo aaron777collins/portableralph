@@ -8,7 +8,7 @@ repo_url: https://github.com/aaron777collins/portableralph
 
 theme:
   name: material
-  favicon: assets/icon.svg
+  favicon: assets/icon-white.svg
   logo: assets/icon-white.svg
   palette:
     # Dark mode
