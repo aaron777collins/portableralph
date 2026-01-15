@@ -1,5 +1,7 @@
 # PortableRalph
 
+[![Deploy Documentation](https://github.com/aaron777collins/portableralph/actions/workflows/docs.yml/badge.svg)](https://github.com/aaron777collins/portableralph/actions/workflows/docs.yml)
+
 An autonomous AI development loop that works in **any repo**.
 
 [**View Documentation →**](https://aaron777collins.github.io/portableralph/)
