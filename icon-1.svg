@@ -1,6 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
-  <!-- Möbius strip / infinite loop stylized -->
-  <rect width="128" height="128" fill="#000"/>
-  <path d="M20 64 Q20 24 64 24 Q108 24 108 64 Q108 104 64 104 Q40 104 40 84 Q40 64 64 64 Q88 64 88 44 Q88 24 64 44"
-        stroke="#fff" stroke-width="10" stroke-linecap="round" fill="none"/>
-</svg>

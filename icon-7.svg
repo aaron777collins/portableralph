@@ -1,7 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
-  <!-- Yin-yang style loop -->
-  <circle cx="64" cy="64" r="60" fill="#fafafa"/>
-  <path d="M64 4 A60 60 0 0 1 64 124 A30 30 0 0 1 64 64 A30 30 0 0 0 64 4" fill="#09090b"/>
-  <circle cx="64" cy="34" r="12" fill="#fafafa"/>
-  <circle cx="64" cy="94" r="12" fill="#09090b"/>
-</svg>

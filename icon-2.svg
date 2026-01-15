@@ -1,8 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
-  <!-- Ouroboros-inspired - snake eating tail -->
-  <rect width="128" height="128" rx="20" fill="#0c0a09"/>
-  <circle cx="64" cy="64" r="36" stroke="#84cc16" stroke-width="14" stroke-linecap="round" stroke-dasharray="180 40" fill="none"/>
-  <!-- Head/arrow -->
-  <circle cx="64" cy="28" r="10" fill="#84cc16"/>
-  <circle cx="64" cy="28" r="4" fill="#0c0a09"/>
-</svg>

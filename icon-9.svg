@@ -1,9 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
-  <!-- Wrench/tool + loop concept -->
-  <rect width="128" height="128" rx="24" fill="#f59e0b"/>
-  <!-- Wrench shape forming an R -->
-  <path d="M40 100V36c0-8 8-16 20-16s20 8 20 16c0 6-4 12-12 14l28 50"
-        stroke="#000" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-  <!-- Wrench head detail -->
-  <circle cx="60" cy="36" r="8" stroke="#000" stroke-width="4" fill="#f59e0b"/>
-</svg>
