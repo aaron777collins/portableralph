@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
+  <!-- Shadow effect -->
+  <rect width="128" height="128" fill="#0f172a"/>
+  <rect x="32" y="40" width="64" height="64" rx="12" fill="#1e1b4b" opacity="0.5"/>
+  <rect x="26" y="32" width="64" height="64" rx="12" fill="#4c1d95" opacity="0.7"/>
+  <rect x="20" y="24" width="64" height="64" rx="12" fill="#a855f7"/>
+  <text x="52" y="66" font-family="system-ui" font-size="40" font-weight="900" fill="#fff">R</text>
+</svg>
