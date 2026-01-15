@@ -1,11 +1,11 @@
 #!/bin/bash
 # Ralph - Autonomous AI Development Loop
-# Usage: ~/ralph/ralph.sh <plan-file> [plan|build] [max-iterations]
+# Usage: ralph <plan-file> [plan|build] [max-iterations]
 #
 # Examples:
-#   ~/ralph/ralph.sh ./my-feature-plan.md           # Build mode (default), runs until RALPH_DONE
-#   ~/ralph/ralph.sh ./my-feature-plan.md plan      # Plan mode, generates implementation tasks
-#   ~/ralph/ralph.sh ./my-feature-plan.md build 20  # Build mode, max 20 iterations
+#   ralph ./my-feature-plan.md           # Build mode (default), runs until RALPH_DONE
+#   ralph ./my-feature-plan.md plan      # Plan mode, generates implementation tasks
+#   ralph ./my-feature-plan.md build 20  # Build mode, max 20 iterations
 #
 # Exit conditions:
 #   - Plan mode: Exits after 1 iteration (planning complete)
@@ -51,9 +51,11 @@ usage() {
     echo -e "${GREEN}PortableRalph${NC} v${VERSION} - Autonomous AI Development Loop"
     echo ""
     echo -e "${YELLOW}Usage:${NC}"
-    echo "  ~/ralph/ralph.sh <plan-file> [mode] [max-iterations]"
-    echo "  ~/ralph/ralph.sh --help | -h"
-    echo "  ~/ralph/ralph.sh --version | -v"
+    echo "  ralph <plan-file> [mode] [max-iterations]"
+    echo "  ralph --help | -h"
+    echo "  ralph --version | -v"
+    echo ""
+    echo -e "${YELLOW}Full path:${NC} ~/ralph/ralph.sh (alias: ralph)"
     echo ""
     echo -e "${YELLOW}Arguments:${NC}"
     echo "  plan-file       Path to your plan/spec file (required)"
@@ -65,9 +67,9 @@ usage() {
     echo "  build  Implement tasks one at a time until RALPH_DONE"
     echo ""
     echo -e "${YELLOW}Examples:${NC}"
-    echo "  ~/ralph/ralph.sh ./feature.md              # Build until done"
-    echo "  ~/ralph/ralph.sh ./feature.md plan         # Plan only (creates task list, exits)"
-    echo "  ~/ralph/ralph.sh ./feature.md build 20     # Build, max 20 iterations"
+    echo "  ralph ./feature.md              # Build until done"
+    echo "  ralph ./feature.md plan         # Plan only (creates task list, exits)"
+    echo "  ralph ./feature.md build 20     # Build, max 20 iterations"
     echo ""
     echo -e "${YELLOW}Exit Conditions:${NC}"
     echo "  - Plan mode: Exits after 1 iteration when task list is created"
@@ -85,7 +87,7 @@ usage() {
     echo "  Or set environment variables (see .env.example)"
     echo ""
     echo -e "${YELLOW}Test Notifications:${NC}"
-    echo "  ~/ralph/ralph.sh --test-notify"
+    echo "  ralph --test-notify"
     echo ""
     echo "More info: https://github.com/aaron777collins/portableralph"
     exit 0
@@ -261,7 +263,7 @@ while true; do
         echo -e "${GREEN}  Planning complete! Task list created in $PROGRESS_FILE${NC}"
         echo -e "${GREEN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
         echo ""
-        echo -e "Next step: Run ${YELLOW}~/ralph/ralph.sh $PLAN_FILE build${NC} to implement tasks"
+        echo -e "Next step: Run ${YELLOW}ralph $PLAN_FILE build${NC} to implement tasks"
         notify ":clipboard: *Ralph Planning Complete!*\n\`\`\`Plan: $PLAN_BASENAME\nTask list created in: $PROGRESS_FILE\nRepo: $REPO_NAME\`\`\`" ":clipboard:"
         break
     fi
