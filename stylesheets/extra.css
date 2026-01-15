@@ -1,3 +1,31 @@
+/* Custom theme colors matching icon (#6d28d9) */
+:root,
+[data-md-color-scheme="default"] {
+  --md-primary-fg-color: #6d28d9;
+  --md-primary-fg-color--light: #8b5cf6;
+  --md-primary-fg-color--dark: #4c1d95;
+  --md-accent-fg-color: #a78bfa;
+  --md-typeset-a-color: #8b5cf6;
+}
+
+[data-md-color-scheme="slate"] {
+  --md-primary-fg-color: #6d28d9;
+  --md-primary-fg-color--light: #8b5cf6;
+  --md-primary-fg-color--dark: #4c1d95;
+  --md-accent-fg-color: #a78bfa;
+  --md-typeset-a-color: #a78bfa;
+}
+
+/* Primary button gradient */
+.md-typeset .md-button--primary {
+  background: linear-gradient(135deg, #6d28d9 0%, #4c1d95 100%);
+  border: none;
+}
+
+.md-typeset .md-button--primary:hover {
+  background: linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%);
+}
+
 /* Fix ASCII art alignment in code blocks */
 .md-typeset pre code,
 .md-typeset code {
