@@ -37,7 +37,7 @@ echo ""
 # Load existing config if present
 if [ -f "$CONFIG_FILE" ]; then
     echo -e "${YELLOW}Existing configuration found.${NC}"
-    read -p "Do you want to reconfigure? (y/N): " RECONFIGURE
+    read -p "Do you want to reconfigure? (y/N): " RECONFIGURE < /dev/tty
     if [[ ! "$RECONFIGURE" =~ ^[Yy]$ ]]; then
         echo "Keeping existing configuration."
         echo ""
@@ -67,7 +67,7 @@ echo "  4) Custom script (for proprietary integrations)"
 echo "  5) All standard platforms (1-3)"
 echo "  6) Cancel"
 echo ""
-read -p "Enter your choice (1-6): " PLATFORM_CHOICE
+read -p "Enter your choice (1-6): " PLATFORM_CHOICE < /dev/tty
 
 case "$PLATFORM_CHOICE" in
     1) SETUP_SLACK=true; SETUP_DISCORD=false; SETUP_TELEGRAM=false; SETUP_CUSTOM=false ;;
@@ -99,7 +99,7 @@ if [ "$SETUP_SLACK" = true ]; then
     echo "  7. Select the channel and click 'Allow'"
     echo "  8. Copy the webhook URL"
     echo ""
-    read -p "Paste your Slack webhook URL (or press Enter to skip): " SLACK_URL
+    read -p "Paste your Slack webhook URL (or press Enter to skip): " SLACK_URL < /dev/tty
 
     if [ -n "$SLACK_URL" ]; then
         echo -e "${GREEN}Slack webhook configured.${NC}"
@@ -125,7 +125,7 @@ if [ "$SETUP_DISCORD" = true ]; then
     echo "  4. Click 'New Webhook'"
     echo "  5. Name it 'Ralph' and click 'Copy Webhook URL'"
     echo ""
-    read -p "Paste your Discord webhook URL (or press Enter to skip): " DISCORD_URL
+    read -p "Paste your Discord webhook URL (or press Enter to skip): " DISCORD_URL < /dev/tty
 
     if [ -n "$DISCORD_URL" ]; then
         echo -e "${GREEN}Discord webhook configured.${NC}"
@@ -150,7 +150,7 @@ if [ "$SETUP_TELEGRAM" = true ]; then
     echo "  2. Send /newbot and follow the prompts"
     echo "  3. Copy the bot token (looks like: 123456789:ABCdefGHI...)"
     echo ""
-    read -p "Paste your bot token (or press Enter to skip): " TELEGRAM_TOKEN
+    read -p "Paste your bot token (or press Enter to skip): " TELEGRAM_TOKEN < /dev/tty
 
     if [ -n "$TELEGRAM_TOKEN" ]; then
         echo ""
@@ -164,7 +164,7 @@ if [ "$SETUP_TELEGRAM" = true ]; then
         echo "  For group chats: Add the bot to the group, send a message,"
         echo "  then check getUpdates. Group IDs are negative numbers."
         echo ""
-        read -p "Paste your chat ID: " TELEGRAM_CHAT
+        read -p "Paste your chat ID: " TELEGRAM_CHAT < /dev/tty
 
         if [ -n "$TELEGRAM_CHAT" ]; then
             echo -e "${GREEN}Telegram configured.${NC}"
@@ -205,7 +205,7 @@ if [ "$SETUP_CUSTOM" = true ]; then
     echo "  - SMS or email gateway"
     echo "  - Custom webhook format"
     echo ""
-    read -p "Path to your notification script (or press Enter to skip): " CUSTOM_SCRIPT
+    read -p "Path to your notification script (or press Enter to skip): " CUSTOM_SCRIPT < /dev/tty
 
     if [ -n "$CUSTOM_SCRIPT" ]; then
         # Expand ~ to home directory
@@ -215,7 +215,7 @@ if [ "$SETUP_CUSTOM" = true ]; then
             echo -e "${GREEN}Custom script configured: $CUSTOM_SCRIPT${NC}"
         elif [ -f "$CUSTOM_SCRIPT" ]; then
             echo -e "${YELLOW}Warning: Script exists but is not executable.${NC}"
-            read -p "Make it executable? (Y/n): " MAKE_EXEC
+            read -p "Make it executable? (Y/n): " MAKE_EXEC < /dev/tty
             if [[ ! "$MAKE_EXEC" =~ ^[Nn]$ ]]; then
                 chmod +x "$CUSTOM_SCRIPT"
                 echo -e "${GREEN}Made executable. Custom script configured.${NC}"
@@ -289,7 +289,7 @@ echo -e "${BOLD}Loading configuration...${NC}"
 source "$CONFIG_FILE"
 
 echo ""
-read -p "Do you want to send a test notification? (Y/n): " TEST_NOW
+read -p "Do you want to send a test notification? (Y/n): " TEST_NOW < /dev/tty
 if [[ ! "$TEST_NOW" =~ ^[Nn]$ ]]; then
     echo ""
     "$RALPH_DIR/notify.sh" --test

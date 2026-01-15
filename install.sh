@@ -183,11 +183,11 @@ prompt() {
 
     if [[ -n "$default" ]]; then
         echo -en "${CYAN}?${NC} ${prompt_text} ${DIM}[$default]${NC}: "
-        read -r result
+        read -r result < /dev/tty
         echo "${result:-$default}"
     else
         echo -en "${CYAN}?${NC} ${prompt_text}: "
-        read -r result
+        read -r result < /dev/tty
         echo "$result"
     fi
 }
@@ -208,7 +208,7 @@ prompt_yn() {
     fi
 
     echo -en "${CYAN}?${NC} ${prompt_text} ${DIM}[$yn_hint]${NC}: "
-    read -r answer
+    read -r answer < /dev/tty
     answer="${answer:-$default}"
 
     [[ "$answer" =~ ^[Yy] ]]
@@ -417,7 +417,7 @@ setup_notifications() {
     echo ""
 
     local choice
-    read -rp "$(echo -e "${CYAN}?${NC} Enter choice (1-5): ")" choice
+    read -rp "$(echo -e "${CYAN}?${NC} Enter choice (1-5): ")" choice < /dev/tty
 
     case "$choice" in
         1)
