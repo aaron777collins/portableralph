@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
+  <!-- Terminal window -->
+  <rect width="128" height="128" rx="8" fill="#1a1a2e"/>
+  <!-- Title bar -->
+  <rect width="128" height="24" rx="8" fill="#16213e"/>
+  <circle cx="16" cy="12" r="5" fill="#ff5f56"/>
+  <circle cx="32" cy="12" r="5" fill="#ffbd2e"/>
+  <circle cx="48" cy="12" r="5" fill="#27ca40"/>
+  <!-- Prompt -->
+  <text x="64" y="78" font-family="Courier, monospace" font-size="48" font-weight="bold" fill="#6d28d9" text-anchor="middle" dominant-baseline="central">R&gt;</text>
+</svg>
