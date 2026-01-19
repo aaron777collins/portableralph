@@ -1,0 +1,50 @@
+# Docker Compose configuration for Ralph Sandbox
+#
+# Usage:
+#   1. Copy this file to your project directory or edit REPO_PATH below
+#   2. Run: docker-compose -f docker/docker-compose.yml up
+#
+# Or use environment variables:
+#   REPO_PATH=/path/to/repo docker-compose -f docker/docker-compose.yml up
+
+services:
+  ralph:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    image: ralph-sandbox
+    container_name: ralph-sandbox
+    stdin_open: true
+    tty: true
+
+    # Mount your repository (edit this path or set REPO_PATH env var)
+    volumes:
+      # Target repository to work on
+      - ${REPO_PATH:-.}:/workspace
+
+    environment:
+      # Git configuration for commits
+      - GIT_USER_NAME=${GIT_USER_NAME:-Ralph Bot}
+      - GIT_USER_EMAIL=${GIT_USER_EMAIL:-ralph@localhost}
+
+      # Ralph configuration
+      - RALPH_AUTO_COMMIT=${RALPH_AUTO_COMMIT:-true}
+
+      # Authentication (one of these is required)
+      # Option 1: OAuth token for Max subscription (run 'claude setup-token' first)
+      - CLAUDE_CODE_OAUTH_TOKEN=${CLAUDE_CODE_OAUTH_TOKEN:-}
+      # Option 2: API key for pay-per-use
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY:-}
+
+      # Notification settings (optional)
+      - RALPH_SLACK_WEBHOOK_URL=${RALPH_SLACK_WEBHOOK_URL:-}
+      - RALPH_DISCORD_WEBHOOK_URL=${RALPH_DISCORD_WEBHOOK_URL:-}
+      - RALPH_TELEGRAM_BOT_TOKEN=${RALPH_TELEGRAM_BOT_TOKEN:-}
+      - RALPH_TELEGRAM_CHAT_ID=${RALPH_TELEGRAM_CHAT_ID:-}
+
+    # Pass feature file, mode, and max iterations as command arguments
+    # Override with: docker-compose run ralph feature.md plan 10
+    command: ["${FEATURE_FILE:-}", "${MODE:-build}", "${MAX_ITER:-0}"]
+
+    # Security: run as non-root user (matches Dockerfile)
+    user: "1000:1000"
