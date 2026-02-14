@@ -354,14 +354,14 @@ test_script_can_use_constants() {
 
     # Create a test script that uses constants
     local test_script="$TEST_DIR/test-constants-usage.sh"
-    cat > "$test_script" << 'EOF'
+    cat > "$test_script" << EOF
 #!/bin/bash
 set -euo pipefail
 
-# Load constants
-SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
-RALPH_DIR="$(dirname "$SCRIPT_DIR")"
+# Load constants from the actual Ralph directory
 source "$RALPH_DIR/lib/constants.sh"
+EOF
+    cat >> "$test_script" << 'EOF'
 
 # Use a constant
 echo "HTTP_MAX_TIME=$HTTP_MAX_TIME"

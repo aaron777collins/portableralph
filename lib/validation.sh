@@ -67,27 +67,30 @@ validate_url() {
         return 0  # Empty is okay, just not configured
     fi
 
-    # Reject localhost/internal URLs (SSRF protection)
-    if [[ "$url" =~ ^https?://(localhost|127\.0\.0\.1|0\.0\.0\.0|\[::1\]) ]]; then
+    # Comprehensive localhost/internal URL rejection (SSRF protection)
+    # Reject: 
+    # - Localhost variations (localhost, 127.0.0.1, 0.0.0.0, ::1)
+    # - Private IP ranges
+    # - Link-local IPs
+    # - Internal domain names
+    if [[ "$url" =~ ^https?://(
+        localhost|                     # localhost
+        127\.0\.0\.1|                  # IPv4 loopback
+        0\.0\.0\.0|                    # unspecified address
+        \[?::1\]?|                     # IPv6 loopback
+        10\.[0-9]+\.[0-9]+\.[0-9]+|    # 10.0.0.0/8
+        172\.(1[6-9]|2[0-9]|3[0-1])\.[0-9]+\.[0-9]+| # 172.16.0.0/12
+        192\.168\.[0-9]+\.[0-9]+|      # 192.168.0.0/16
+        169\.254\.[0-9]+\.[0-9]+       # 169.254.0.0/16 (link-local)
+    ) ]] || [[ "$url" =~ ^https?://[^/]*\.(
+        internal|                      # .internal
+        local|                         # .local
+        localhost|                     # .localhost
+        corp|                          # .corp
+        intranet                       # .intranet
+    )(:|/|$) ]]; then
         if type log_error &>/dev/null; then
-            log_error "$name URL cannot be localhost: $url"
-        fi
-        return 1
-    fi
-
-    # Reject private IP ranges (RFC 1918)
-    # 10.0.0.0/8, 172.16.0.0/12, 192.168.0.0/16, 169.254.0.0/16 (link-local)
-    if [[ "$url" =~ ^https?://(10\.|192\.168\.|172\.(1[6-9]|2[0-9]|3[0-1])\.|169\.254\.) ]]; then
-        if type log_error &>/dev/null; then
-            log_error "$name URL cannot be a private IP: $url"
-        fi
-        return 1
-    fi
-
-    # Reject internal domain names (.local, .internal, .localhost, .corp, .intranet)
-    if [[ "$url" =~ ^https?://[^/]*\.(internal|local|localhost|corp|intranet)(:|/) ]] || [[ "$url" =~ ^https?://[^/]*\.(internal|local|localhost|corp|intranet)$ ]]; then
-        if type log_error &>/dev/null; then
-            log_error "$name URL cannot be an internal domain: $url"
+            log_error "$name URL cannot be a localhost/internal URL: $url"
         fi
         return 1
     fi

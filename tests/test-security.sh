@@ -358,8 +358,10 @@ test_no_eval_with_user_input() {
 
     # Check that scripts don't use eval with unsanitized input
     # Exclude pattern definitions (strings containing 'eval' as a pattern to match against)
+    # Note: grep returns 1 if no matches, which with pipefail causes script to exit
+    # Use a subshell with pipefail disabled to avoid this
     local eval_count
-    eval_count=$(grep -r "eval.*\$" "$RALPH_DIR"/*.sh 2>/dev/null | grep -v "^Binary" | grep -v "'eval" | grep -v '"eval' | wc -l)
+    eval_count=$(set +o pipefail; grep -r "eval.*\$" "$RALPH_DIR"/*.sh 2>/dev/null | grep -v "^Binary" | grep -v "'eval" | grep -v '"eval' | wc -l)
 
     # Should have 0 unsafe eval usages (eval with variables)
     TESTS_RUN=$((TESTS_RUN + 1))
@@ -396,7 +398,7 @@ test_no_sudo_in_scripts() {
     echo "Testing: No sudo usage in scripts"
 
     local sudo_count
-    sudo_count=$(grep -r "sudo " "$RALPH_DIR"/*.sh 2>/dev/null | grep -v "^Binary" | wc -l)
+    sudo_count=$(set +o pipefail; grep -r "sudo " "$RALPH_DIR"/*.sh 2>/dev/null | grep -v "^Binary" | wc -l)
 
     TESTS_RUN=$((TESTS_RUN + 1))
     if [ "$sudo_count" -eq 0 ]; then
@@ -412,7 +414,7 @@ test_no_chmod_777() {
     echo "Testing: No chmod 777 (insecure permissions)"
 
     local chmod777_count
-    chmod777_count=$(grep -r "chmod 777" "$RALPH_DIR"/*.sh 2>/dev/null | wc -l)
+    chmod777_count=$(set +o pipefail; grep -r "chmod 777" "$RALPH_DIR"/*.sh 2>/dev/null | wc -l)
 
     TESTS_RUN=$((TESTS_RUN + 1))
     if [ "$chmod777_count" -eq 0 ]; then
@@ -440,7 +442,6 @@ test_secure_temp_file_creation() {
         return 1
     }
     chmod 600 "$tmp_file"
-    trap 'rm -f "$tmp_file" 2>/dev/null' RETURN
 
     TESTS_RUN=$((TESTS_RUN + 1))
     if [ -f "$tmp_file" ]; then
@@ -448,6 +449,7 @@ test_secure_temp_file_creation() {
         TESTS_PASSED=$((TESTS_PASSED + 1))
         echo -e "${GREEN}✓${NC} mktemp creates secure temp files with proper error handling"
     else
+        rm -f "$tmp_file" 2>/dev/null
         TESTS_FAILED=$((TESTS_FAILED + 1))
         echo -e "${RED}✗${NC} mktemp failed to create temp file"
     fi

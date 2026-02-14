@@ -526,10 +526,11 @@ test_json_escape_combined() {
     output=$(json_escape "$input")
 
     # Should escape all special characters
+    # Note: '\n' in single quotes is literal backslash + n
     assert_contains "$output" '\"' "Escapes quotes"
-    assert_contains "$output" '\\n' "Escapes newlines"
-    assert_contains "$output" '\\t' "Escapes tabs"
-    assert_contains "$output" '\\r' "Escapes carriage returns"
+    assert_contains "$output" '\n' "Escapes newlines"
+    assert_contains "$output" '\t' "Escapes tabs"
+    assert_contains "$output" '\r' "Escapes carriage returns"
     # '\\' in shell = two backslashes for grep -F to match the escaped backslash
     assert_contains "$output" '\\' "Escapes backslashes"
 }
