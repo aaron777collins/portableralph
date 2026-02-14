@@ -1,0 +1,265 @@
+2026-02-14T22:41:08.727Z [DEBUG] Failed to check enabledPlatforms: TypeError: undefined is not an object (evaluating 'l7.join')
+2026-02-14T22:41:08.774Z [ERROR] Failed to save config with lock: Error: ENOENT: no such file or directory, lstat '/home/ubuntu/repos/portableralph/tests/test-output-security-fixes/.claude.json'
+2026-02-14T22:41:08.775Z [DEBUG] Writing to temp file: /home/ubuntu/repos/portableralph/tests/test-output-security-fixes/.claude.json.tmp.2625665.1771108868775
+2026-02-14T22:41:08.775Z [DEBUG] Setting permissions for new file: 600
+2026-02-14T22:41:08.796Z [DEBUG] Temp file written successfully, size: 82 bytes
+2026-02-14T22:41:08.796Z [DEBUG] Renaming /home/ubuntu/repos/portableralph/tests/test-output-security-fixes/.claude.json.tmp.2625665.1771108868775 to /home/ubuntu/repos/portableralph/tests/test-output-security-fixes/.claude.json
+2026-02-14T22:41:08.796Z [DEBUG] File /home/ubuntu/repos/portableralph/tests/test-output-security-fixes/.claude.json written atomically
+2026-02-14T22:41:08.806Z [DEBUG] Writing to temp file: /home/ubuntu/repos/portableralph/tests/test-output-security-fixes/.claude.json.tmp.2625665.1771108868806
+2026-02-14T22:41:08.807Z [DEBUG] Preserving file permissions: 100600
+2026-02-14T22:41:08.812Z [DEBUG] Temp file written successfully, size: 130 bytes
+2026-02-14T22:41:08.812Z [DEBUG] Applied original permissions to temp file
+2026-02-14T22:41:08.812Z [DEBUG] Renaming /home/ubuntu/repos/portableralph/tests/test-output-security-fixes/.claude.json.tmp.2625665.1771108868806 to /home/ubuntu/repos/portableralph/tests/test-output-security-fixes/.claude.json
+2026-02-14T22:41:08.812Z [DEBUG] File /home/ubuntu/repos/portableralph/tests/test-output-security-fixes/.claude.json written atomically
+2026-02-14T22:41:08.813Z [DEBUG] [init] configureGlobalMTLS starting
+2026-02-14T22:41:08.813Z [DEBUG] [init] configureGlobalMTLS complete
+2026-02-14T22:41:08.813Z [DEBUG] [init] configureGlobalAgents starting
+2026-02-14T22:41:08.813Z [DEBUG] [init] configureGlobalAgents complete
+2026-02-14T22:41:08.814Z [DEBUG] Writing to temp file: /home/ubuntu/repos/portableralph/tests/test-output-security-fixes/.claude.json.tmp.2625665.1771108868814
+2026-02-14T22:41:08.814Z [DEBUG] Preserving file permissions: 100600
+2026-02-14T22:41:08.820Z [DEBUG] Temp file written successfully, size: 167 bytes
+2026-02-14T22:41:08.820Z [DEBUG] Applied original permissions to temp file
+2026-02-14T22:41:08.820Z [DEBUG] Renaming /home/ubuntu/repos/portableralph/tests/test-output-security-fixes/.claude.json.tmp.2625665.1771108868814 to /home/ubuntu/repos/portableralph/tests/test-output-security-fixes/.claude.json
+2026-02-14T22:41:08.820Z [DEBUG] File /home/ubuntu/repos/portableralph/tests/test-output-security-fixes/.claude.json written atomically
+2026-02-14T22:41:08.821Z [DEBUG] Writing to temp file: /home/ubuntu/repos/portableralph/tests/test-output-security-fixes/.claude.json.tmp.2625665.1771108868821
+2026-02-14T22:41:08.821Z [DEBUG] Preserving file permissions: 100600
+2026-02-14T22:41:08.827Z [DEBUG] Temp file written successfully, size: 202 bytes
+2026-02-14T22:41:08.827Z [DEBUG] Applied original permissions to temp file
+2026-02-14T22:41:08.827Z [DEBUG] Renaming /home/ubuntu/repos/portableralph/tests/test-output-security-fixes/.claude.json.tmp.2625665.1771108868821 to /home/ubuntu/repos/portableralph/tests/test-output-security-fixes/.claude.json
+2026-02-14T22:41:08.827Z [DEBUG] File /home/ubuntu/repos/portableralph/tests/test-output-security-fixes/.claude.json written atomically
+2026-02-14T22:41:08.828Z [DEBUG] Writing to temp file: /home/ubuntu/repos/portableralph/tests/test-output-security-fixes/.claude.json.tmp.2625665.1771108868828
+2026-02-14T22:41:08.828Z [DEBUG] Preserving file permissions: 100600
+2026-02-14T22:41:08.833Z [DEBUG] Temp file written successfully, size: 238 bytes
+2026-02-14T22:41:08.833Z [DEBUG] Applied original permissions to temp file
+2026-02-14T22:41:08.833Z [DEBUG] Renaming /home/ubuntu/repos/portableralph/tests/test-output-security-fixes/.claude.json.tmp.2625665.1771108868828 to /home/ubuntu/repos/portableralph/tests/test-output-security-fixes/.claude.json
+2026-02-14T22:41:08.833Z [DEBUG] File /home/ubuntu/repos/portableralph/tests/test-output-security-fixes/.claude.json written atomically
+2026-02-14T22:41:08.834Z [DEBUG] Writing to temp file: /home/ubuntu/repos/portableralph/tests/test-output-security-fixes/.claude.json.tmp.2625665.1771108868834
+2026-02-14T22:41:08.834Z [DEBUG] Preserving file permissions: 100600
+2026-02-14T22:41:08.840Z [DEBUG] Temp file written successfully, size: 275 bytes
+2026-02-14T22:41:08.840Z [DEBUG] Applied original permissions to temp file
+2026-02-14T22:41:08.840Z [DEBUG] Renaming /home/ubuntu/repos/portableralph/tests/test-output-security-fixes/.claude.json.tmp.2625665.1771108868834 to /home/ubuntu/repos/portableralph/tests/test-output-security-fixes/.claude.json
+2026-02-14T22:41:08.840Z [DEBUG] File /home/ubuntu/repos/portableralph/tests/test-output-security-fixes/.claude.json written atomically
+2026-02-14T22:41:08.846Z [DEBUG] [STARTUP] Loading MCP configs...
+2026-02-14T22:41:08.848Z [DEBUG] Found 0 plugins (0 enabled, 0 disabled)
+2026-02-14T22:41:08.848Z [DEBUG] [claudeai-mcp] Checking gate (cached)...
+2026-02-14T22:41:08.848Z [DEBUG] [claudeai-mcp] Gate returned: false
+2026-02-14T22:41:08.848Z [DEBUG] [claudeai-mcp] Disabled via gate
+2026-02-14T22:41:08.911Z [DEBUG] [ToolSearch:optimistic] mode=tst-auto, ENABLE_TOOL_SEARCH=undefined, result=true
+2026-02-14T22:41:08.914Z [DEBUG] [STARTUP] Running setup()...
+2026-02-14T22:41:08.939Z [DEBUG] Loading skills from: managed=/etc/claude-code/.claude/skills, user=/home/ubuntu/repos/portableralph/tests/test-output-security-fixes/.claude/skills, project=[]
+2026-02-14T22:41:08.940Z [ERROR] Error: Error: ENOENT: no such file or directory, scandir '/etc/claude-code/.claude/skills'
+    at readdirSync (unknown)
+    at <anonymous> (/$bunfs/root/claude:12:2063)
+    at aJ (/$bunfs/root/claude:11:35454)
+    at readdirSync (/$bunfs/root/claude:12:2024)
+    at AZ$ (/$bunfs/root/claude:1756:380)
+    at AZ$ (/$bunfs/root/claude:1756:1350)
+    at <anonymous> (/$bunfs/root/claude:1756:4670)
+    at <anonymous> (/$bunfs/root/claude:1756:5401)
+    at A (/$bunfs/root/claude:11:7259)
+    at vS1 (/$bunfs/root/claude:4818:4342)
+2026-02-14T22:41:08.940Z [ERROR] Error: Error: ENOENT: no such file or directory, scandir '/home/ubuntu/repos/portableralph/tests/test-output-security-fixes/.claude/skills'
+    at readdirSync (unknown)
+    at <anonymous> (/$bunfs/root/claude:12:2063)
+    at aJ (/$bunfs/root/claude:11:35454)
+    at readdirSync (/$bunfs/root/claude:12:2024)
+    at AZ$ (/$bunfs/root/claude:1756:380)
+    at AZ$ (/$bunfs/root/claude:1756:1350)
+    at <anonymous> (/$bunfs/root/claude:1756:4713)
+    at <anonymous> (/$bunfs/root/claude:1756:5401)
+    at A (/$bunfs/root/claude:11:7259)
+    at vS1 (/$bunfs/root/claude:4818:4342)
+2026-02-14T22:41:08.940Z [DEBUG] Error log sink initialized
+2026-02-14T22:41:08.945Z [DEBUG] getPluginSkills: Processing 0 enabled plugins
+2026-02-14T22:41:08.945Z [DEBUG] Total plugin skills loaded: 0
+2026-02-14T22:41:08.945Z [DEBUG] Total plugin commands loaded: 0
+2026-02-14T22:41:08.945Z [DEBUG] Registered 0 hooks from 0 plugins
+2026-02-14T22:41:08.958Z [DEBUG] [STARTUP] setup() completed in 44ms
+2026-02-14T22:41:08.958Z [DEBUG] [STARTUP] Loading commands and agents...
+2026-02-14T22:41:08.965Z [DEBUG] Total plugin agents loaded: 0
+2026-02-14T22:41:08.965Z [DEBUG] Loaded 0 unique skills (managed: 0, user: 0, project: 0, legacy commands: 0)
+2026-02-14T22:41:08.966Z [DEBUG] getSkills returning: 0 skill dir commands, 0 plugin skills, 1 bundled skills
+2026-02-14T22:41:08.968Z [DEBUG] [STARTUP] Commands and agents loaded in 10ms
+2026-02-14T22:41:08.968Z [DEBUG] [LSP MANAGER] initializeLspServerManager() called
+2026-02-14T22:41:08.968Z [DEBUG] [LSP MANAGER] Created manager instance, state=pending
+2026-02-14T22:41:08.968Z [DEBUG] [LSP MANAGER] Starting async initialization (generation 1)
+2026-02-14T22:41:08.979Z [DEBUG] Total LSP servers loaded: 0
+2026-02-14T22:41:08.979Z [DEBUG] [STARTUP] MCP configs loaded in 133ms
+2026-02-14T22:41:08.979Z [DEBUG] [LSP SERVER MANAGER] getAllLspServers returned 0 server(s)
+2026-02-14T22:41:08.979Z [DEBUG] LSP manager initialized with 0 servers
+2026-02-14T22:41:08.980Z [DEBUG] LSP server manager initialized successfully
+2026-02-14T22:41:08.980Z [DEBUG] LSP notification handlers registered successfully for all 0 server(s)
+2026-02-14T22:41:08.986Z [DEBUG] installed_plugins.json doesn't exist, returning empty V2 object
+2026-02-14T22:41:08.986Z [DEBUG] Initialized versioned plugins system with 0 plugins
+2026-02-14T22:41:08.992Z [DEBUG] [Perfetto] initializePerfettoTracing called, env value: undefined
+2026-02-14T22:41:09.033Z [DEBUG] Writing to temp file: /home/ubuntu/repos/portableralph/tests/test-output-security-fixes/.claude/todos/847220cf-9dfd-4733-a665-c2bcbb3c2c86-agent-847220cf-9dfd-4733-a665-c2bcbb3c2c86.json.tmp.2625665.1771108869033
+2026-02-14T22:41:09.055Z [DEBUG] Temp file written successfully, size: 2 bytes
+2026-02-14T22:41:09.055Z [DEBUG] Renaming /home/ubuntu/repos/portableralph/tests/test-output-security-fixes/.claude/todos/847220cf-9dfd-4733-a665-c2bcbb3c2c86-agent-847220cf-9dfd-4733-a665-c2bcbb3c2c86.json.tmp.2625665.1771108869033 to /home/ubuntu/repos/portableralph/tests/test-output-security-fixes/.claude/todos/847220cf-9dfd-4733-a665-c2bcbb3c2c86-agent-847220cf-9dfd-4733-a665-c2bcbb3c2c86.json
+2026-02-14T22:41:09.055Z [DEBUG] File /home/ubuntu/repos/portableralph/tests/test-output-security-fixes/.claude/todos/847220cf-9dfd-4733-a665-c2bcbb3c2c86-agent-847220cf-9dfd-4733-a665-c2bcbb3c2c86.json written atomically
+2026-02-14T22:41:09.853Z [DEBUG] Getting matching hook commands for SessionStart with query: startup
+2026-02-14T22:41:09.853Z [DEBUG] Found 0 hook matchers in settings
+2026-02-14T22:41:09.853Z [DEBUG] Matched 0 unique hooks for query "startup" (0 before deduplication)
+2026-02-14T22:41:09.884Z [DEBUG] Total plugin output styles loaded: 0
+2026-02-14T22:41:09.909Z [DEBUG] Writing to temp file: /home/ubuntu/repos/portableralph/tests/test-output-security-fixes/.claude.json.tmp.2625665.1771108869909
+2026-02-14T22:41:09.909Z [DEBUG] Preserving file permissions: 100600
+2026-02-14T22:41:09.915Z [DEBUG] Temp file written successfully, size: 451 bytes
+2026-02-14T22:41:09.915Z [DEBUG] Applied original permissions to temp file
+2026-02-14T22:41:09.915Z [DEBUG] Renaming /home/ubuntu/repos/portableralph/tests/test-output-security-fixes/.claude.json.tmp.2625665.1771108869909 to /home/ubuntu/repos/portableralph/tests/test-output-security-fixes/.claude.json
+2026-02-14T22:41:09.915Z [DEBUG] File /home/ubuntu/repos/portableralph/tests/test-output-security-fixes/.claude.json written atomically
+2026-02-14T22:41:09.916Z [DEBUG] Writing to temp file: /home/ubuntu/repos/portableralph/tests/test-output-security-fixes/.claude.json.tmp.2625665.1771108869916
+2026-02-14T22:41:09.916Z [DEBUG] Preserving file permissions: 100600
+2026-02-14T22:41:09.922Z [DEBUG] Temp file written successfully, size: 487 bytes
+2026-02-14T22:41:09.922Z [DEBUG] Applied original permissions to temp file
+2026-02-14T22:41:09.922Z [DEBUG] Renaming /home/ubuntu/repos/portableralph/tests/test-output-security-fixes/.claude.json.tmp.2625665.1771108869916 to /home/ubuntu/repos/portableralph/tests/test-output-security-fixes/.claude.json
+2026-02-14T22:41:09.922Z [DEBUG] File /home/ubuntu/repos/portableralph/tests/test-output-security-fixes/.claude.json written atomically
+2026-02-14T22:41:09.923Z [DEBUG] Writing to temp file: /home/ubuntu/repos/portableralph/tests/test-output-security-fixes/.claude.json.tmp.2625665.1771108869923
+2026-02-14T22:41:09.923Z [DEBUG] Preserving file permissions: 100600
+2026-02-14T22:41:09.928Z [DEBUG] Temp file written successfully, size: 515 bytes
+2026-02-14T22:41:09.928Z [DEBUG] Applied original permissions to temp file
+2026-02-14T22:41:09.928Z [DEBUG] Renaming /home/ubuntu/repos/portableralph/tests/test-output-security-fixes/.claude.json.tmp.2625665.1771108869923 to /home/ubuntu/repos/portableralph/tests/test-output-security-fixes/.claude.json
+2026-02-14T22:41:09.928Z [DEBUG] File /home/ubuntu/repos/portableralph/tests/test-output-security-fixes/.claude.json written atomically
+2026-02-14T22:41:09.929Z [DEBUG] Writing to temp file: /home/ubuntu/repos/portableralph/tests/test-output-security-fixes/.claude.json.tmp.2625665.1771108869929
+2026-02-14T22:41:09.929Z [DEBUG] Preserving file permissions: 100600
+2026-02-14T22:41:09.940Z [DEBUG] Temp file written successfully, size: 548 bytes
+2026-02-14T22:41:09.940Z [DEBUG] Applied original permissions to temp file
+2026-02-14T22:41:09.940Z [DEBUG] Renaming /home/ubuntu/repos/portableralph/tests/test-output-security-fixes/.claude.json.tmp.2625665.1771108869929 to /home/ubuntu/repos/portableralph/tests/test-output-security-fixes/.claude.json
+2026-02-14T22:41:09.940Z [DEBUG] File /home/ubuntu/repos/portableralph/tests/test-output-security-fixes/.claude.json written atomically
+2026-02-14T22:41:09.941Z [DEBUG] Writing to temp file: /home/ubuntu/repos/portableralph/tests/test-output-security-fixes/.claude.json.tmp.2625665.1771108869941
+2026-02-14T22:41:09.941Z [DEBUG] Preserving file permissions: 100600
+2026-02-14T22:41:09.947Z [DEBUG] Temp file written successfully, size: 600 bytes
+2026-02-14T22:41:09.947Z [DEBUG] Applied original permissions to temp file
+2026-02-14T22:41:09.947Z [DEBUG] Renaming /home/ubuntu/repos/portableralph/tests/test-output-security-fixes/.claude.json.tmp.2625665.1771108869941 to /home/ubuntu/repos/portableralph/tests/test-output-security-fixes/.claude.json
+2026-02-14T22:41:09.947Z [DEBUG] File /home/ubuntu/repos/portableralph/tests/test-output-security-fixes/.claude.json written atomically
+2026-02-14T22:41:09.948Z [DEBUG] Writing to temp file: /home/ubuntu/repos/portableralph/tests/test-output-security-fixes/.claude.json.tmp.2625665.1771108869948
+2026-02-14T22:41:09.948Z [DEBUG] Preserving file permissions: 100600
+2026-02-14T22:41:09.953Z [DEBUG] Temp file written successfully, size: 643 bytes
+2026-02-14T22:41:09.953Z [DEBUG] Applied original permissions to temp file
+2026-02-14T22:41:09.953Z [DEBUG] Renaming /home/ubuntu/repos/portableralph/tests/test-output-security-fixes/.claude.json.tmp.2625665.1771108869948 to /home/ubuntu/repos/portableralph/tests/test-output-security-fixes/.claude.json
+2026-02-14T22:41:09.953Z [DEBUG] File /home/ubuntu/repos/portableralph/tests/test-output-security-fixes/.claude.json written atomically
+2026-02-14T22:41:09.954Z [DEBUG] Writing to temp file: /home/ubuntu/repos/portableralph/tests/test-output-security-fixes/.claude.json.tmp.2625665.1771108869954
+2026-02-14T22:41:09.954Z [DEBUG] Preserving file permissions: 100600
+2026-02-14T22:41:09.960Z [DEBUG] Temp file written successfully, size: 682 bytes
+2026-02-14T22:41:09.960Z [DEBUG] Applied original permissions to temp file
+2026-02-14T22:41:09.960Z [DEBUG] Renaming /home/ubuntu/repos/portableralph/tests/test-output-security-fixes/.claude.json.tmp.2625665.1771108869954 to /home/ubuntu/repos/portableralph/tests/test-output-security-fixes/.claude.json
+2026-02-14T22:41:09.960Z [DEBUG] File /home/ubuntu/repos/portableralph/tests/test-output-security-fixes/.claude.json written atomically
+2026-02-14T22:41:09.961Z [DEBUG] Writing to temp file: /home/ubuntu/repos/portableralph/tests/test-output-security-fixes/.claude.json.tmp.2625665.1771108869961
+2026-02-14T22:41:09.961Z [DEBUG] Preserving file permissions: 100600
+2026-02-14T22:41:09.967Z [DEBUG] Temp file written successfully, size: 714 bytes
+2026-02-14T22:41:09.967Z [DEBUG] Applied original permissions to temp file
+2026-02-14T22:41:09.967Z [DEBUG] Renaming /home/ubuntu/repos/portableralph/tests/test-output-security-fixes/.claude.json.tmp.2625665.1771108869961 to /home/ubuntu/repos/portableralph/tests/test-output-security-fixes/.claude.json
+2026-02-14T22:41:09.967Z [DEBUG] File /home/ubuntu/repos/portableralph/tests/test-output-security-fixes/.claude.json written atomically
+2026-02-14T22:41:09.968Z [DEBUG] Writing to temp file: /home/ubuntu/repos/portableralph/tests/test-output-security-fixes/.claude.json.tmp.2625665.1771108869968
+2026-02-14T22:41:09.968Z [DEBUG] Preserving file permissions: 100600
+2026-02-14T22:41:09.973Z [DEBUG] Temp file written successfully, size: 744 bytes
+2026-02-14T22:41:09.973Z [DEBUG] Applied original permissions to temp file
+2026-02-14T22:41:09.974Z [DEBUG] Renaming /home/ubuntu/repos/portableralph/tests/test-output-security-fixes/.claude.json.tmp.2625665.1771108869968 to /home/ubuntu/repos/portableralph/tests/test-output-security-fixes/.claude.json
+2026-02-14T22:41:09.974Z [DEBUG] File /home/ubuntu/repos/portableralph/tests/test-output-security-fixes/.claude.json written atomically
+2026-02-14T22:41:09.975Z [DEBUG] Writing to temp file: /home/ubuntu/repos/portableralph/tests/test-output-security-fixes/.claude.json.tmp.2625665.1771108869975
+2026-02-14T22:41:09.975Z [DEBUG] Preserving file permissions: 100600
+2026-02-14T22:41:09.980Z [DEBUG] Temp file written successfully, size: 777 bytes
+2026-02-14T22:41:09.980Z [DEBUG] Applied original permissions to temp file
+2026-02-14T22:41:09.980Z [DEBUG] Renaming /home/ubuntu/repos/portableralph/tests/test-output-security-fixes/.claude.json.tmp.2625665.1771108869975 to /home/ubuntu/repos/portableralph/tests/test-output-security-fixes/.claude.json
+2026-02-14T22:41:09.980Z [DEBUG] File /home/ubuntu/repos/portableralph/tests/test-output-security-fixes/.claude.json written atomically
+2026-02-14T22:41:09.981Z [DEBUG] Writing to temp file: /home/ubuntu/repos/portableralph/tests/test-output-security-fixes/.claude.json.tmp.2625665.1771108869981
+2026-02-14T22:41:09.981Z [DEBUG] Preserving file permissions: 100600
+2026-02-14T22:41:09.988Z [DEBUG] Temp file written successfully, size: 816 bytes
+2026-02-14T22:41:09.988Z [DEBUG] Applied original permissions to temp file
+2026-02-14T22:41:09.988Z [DEBUG] Renaming /home/ubuntu/repos/portableralph/tests/test-output-security-fixes/.claude.json.tmp.2625665.1771108869981 to /home/ubuntu/repos/portableralph/tests/test-output-security-fixes/.claude.json
+2026-02-14T22:41:09.989Z [DEBUG] File /home/ubuntu/repos/portableralph/tests/test-output-security-fixes/.claude.json written atomically
+2026-02-14T22:41:09.989Z [DEBUG] Writing to temp file: /home/ubuntu/repos/portableralph/tests/test-output-security-fixes/.claude.json.tmp.2625665.1771108869989
+2026-02-14T22:41:09.989Z [DEBUG] Preserving file permissions: 100600
+2026-02-14T22:41:09.995Z [DEBUG] Temp file written successfully, size: 854 bytes
+2026-02-14T22:41:09.995Z [DEBUG] Applied original permissions to temp file
+2026-02-14T22:41:09.995Z [DEBUG] Renaming /home/ubuntu/repos/portableralph/tests/test-output-security-fixes/.claude.json.tmp.2625665.1771108869989 to /home/ubuntu/repos/portableralph/tests/test-output-security-fixes/.claude.json
+2026-02-14T22:41:09.995Z [DEBUG] File /home/ubuntu/repos/portableralph/tests/test-output-security-fixes/.claude.json written atomically
+2026-02-14T22:41:09.996Z [DEBUG] Writing to temp file: /home/ubuntu/repos/portableralph/tests/test-output-security-fixes/.claude.json.tmp.2625665.1771108869996
+2026-02-14T22:41:09.996Z [DEBUG] Preserving file permissions: 100600
+2026-02-14T22:41:10.002Z [DEBUG] Temp file written successfully, size: 906 bytes
+2026-02-14T22:41:10.002Z [DEBUG] Applied original permissions to temp file
+2026-02-14T22:41:10.002Z [DEBUG] Renaming /home/ubuntu/repos/portableralph/tests/test-output-security-fixes/.claude.json.tmp.2625665.1771108869996 to /home/ubuntu/repos/portableralph/tests/test-output-security-fixes/.claude.json
+2026-02-14T22:41:10.002Z [DEBUG] File /home/ubuntu/repos/portableralph/tests/test-output-security-fixes/.claude.json written atomically
+2026-02-14T22:41:10.003Z [DEBUG] Writing to temp file: /home/ubuntu/repos/portableralph/tests/test-output-security-fixes/.claude.json.tmp.2625665.1771108870003
+2026-02-14T22:41:10.003Z [DEBUG] Preserving file permissions: 100600
+2026-02-14T22:41:10.008Z [DEBUG] Temp file written successfully, size: 936 bytes
+2026-02-14T22:41:10.008Z [DEBUG] Applied original permissions to temp file
+2026-02-14T22:41:10.008Z [DEBUG] Renaming /home/ubuntu/repos/portableralph/tests/test-output-security-fixes/.claude.json.tmp.2625665.1771108870003 to /home/ubuntu/repos/portableralph/tests/test-output-security-fixes/.claude.json
+2026-02-14T22:41:10.009Z [DEBUG] File /home/ubuntu/repos/portableralph/tests/test-output-security-fixes/.claude.json written atomically
+2026-02-14T22:41:10.009Z [DEBUG] Writing to temp file: /home/ubuntu/repos/portableralph/tests/test-output-security-fixes/.claude.json.tmp.2625665.1771108870009
+2026-02-14T22:41:10.009Z [DEBUG] Preserving file permissions: 100600
+2026-02-14T22:41:10.015Z [DEBUG] Temp file written successfully, size: 981 bytes
+2026-02-14T22:41:10.015Z [DEBUG] Applied original permissions to temp file
+2026-02-14T22:41:10.015Z [DEBUG] Renaming /home/ubuntu/repos/portableralph/tests/test-output-security-fixes/.claude.json.tmp.2625665.1771108870009 to /home/ubuntu/repos/portableralph/tests/test-output-security-fixes/.claude.json
+2026-02-14T22:41:10.015Z [DEBUG] File /home/ubuntu/repos/portableralph/tests/test-output-security-fixes/.claude.json written atomically
+2026-02-14T22:41:10.093Z [DEBUG] Writing to temp file: /home/ubuntu/repos/portableralph/tests/test-output-security-fixes/.claude.json.tmp.2625665.1771108870093
+2026-02-14T22:41:10.093Z [DEBUG] Preserving file permissions: 100600
+2026-02-14T22:41:10.099Z [DEBUG] Temp file written successfully, size: 1012 bytes
+2026-02-14T22:41:10.099Z [DEBUG] Applied original permissions to temp file
+2026-02-14T22:41:10.099Z [DEBUG] Renaming /home/ubuntu/repos/portableralph/tests/test-output-security-fixes/.claude.json.tmp.2625665.1771108870093 to /home/ubuntu/repos/portableralph/tests/test-output-security-fixes/.claude.json
+2026-02-14T22:41:10.099Z [DEBUG] File /home/ubuntu/repos/portableralph/tests/test-output-security-fixes/.claude.json written atomically
+2026-02-14T22:41:10.122Z [DEBUG] LSP Diagnostics: getLSPDiagnosticAttachments called
+2026-02-14T22:41:10.122Z [DEBUG] LSP Diagnostics: Checking registry - 0 pending
+2026-02-14T22:41:10.122Z [DEBUG] Hooks: Found 0 total hooks in registry
+2026-02-14T22:41:10.122Z [DEBUG] Hooks: checkForNewResponses returning 0 responses
+2026-02-14T22:41:10.128Z [DEBUG] Writing to temp file: /home/ubuntu/repos/portableralph/tests/test-output-security-fixes/.claude.json.tmp.2625665.1771108870128
+2026-02-14T22:41:10.128Z [DEBUG] Preserving file permissions: 100600
+2026-02-14T22:41:10.139Z [DEBUG] Temp file written successfully, size: 1050 bytes
+2026-02-14T22:41:10.139Z [DEBUG] Applied original permissions to temp file
+2026-02-14T22:41:10.139Z [DEBUG] Renaming /home/ubuntu/repos/portableralph/tests/test-output-security-fixes/.claude.json.tmp.2625665.1771108870128 to /home/ubuntu/repos/portableralph/tests/test-output-security-fixes/.claude.json
+2026-02-14T22:41:10.139Z [DEBUG] File /home/ubuntu/repos/portableralph/tests/test-output-security-fixes/.claude.json written atomically
+2026-02-14T22:41:10.140Z [DEBUG] Getting matching hook commands for UserPromptSubmit with query: undefined
+2026-02-14T22:41:10.140Z [DEBUG] Found 0 hook matchers in settings
+2026-02-14T22:41:10.140Z [DEBUG] Matched 0 unique hooks for query "no match query" (0 before deduplication)
+2026-02-14T22:41:10.149Z [DEBUG] Writing to temp file: /home/ubuntu/repos/portableralph/tests/test-output-security-fixes/.claude.json.tmp.2625665.1771108870149
+2026-02-14T22:41:10.149Z [DEBUG] Preserving file permissions: 100600
+2026-02-14T22:41:10.155Z [DEBUG] Temp file written successfully, size: 1088 bytes
+2026-02-14T22:41:10.155Z [DEBUG] Applied original permissions to temp file
+2026-02-14T22:41:10.155Z [DEBUG] Renaming /home/ubuntu/repos/portableralph/tests/test-output-security-fixes/.claude.json.tmp.2625665.1771108870149 to /home/ubuntu/repos/portableralph/tests/test-output-security-fixes/.claude.json
+2026-02-14T22:41:10.155Z [DEBUG] File /home/ubuntu/repos/portableralph/tests/test-output-security-fixes/.claude.json written atomically
+2026-02-14T22:41:10.156Z [DEBUG] Writing to temp file: /home/ubuntu/repos/portableralph/tests/test-output-security-fixes/.claude.json.tmp.2625665.1771108870156
+2026-02-14T22:41:10.156Z [DEBUG] Preserving file permissions: 100600
+2026-02-14T22:41:10.170Z [DEBUG] Temp file written successfully, size: 1134 bytes
+2026-02-14T22:41:10.170Z [DEBUG] Applied original permissions to temp file
+2026-02-14T22:41:10.170Z [DEBUG] Renaming /home/ubuntu/repos/portableralph/tests/test-output-security-fixes/.claude.json.tmp.2625665.1771108870156 to /home/ubuntu/repos/portableralph/tests/test-output-security-fixes/.claude.json
+2026-02-14T22:41:10.170Z [DEBUG] File /home/ubuntu/repos/portableralph/tests/test-output-security-fixes/.claude.json written atomically
+2026-02-14T22:41:10.191Z [DEBUG] Writing to temp file: /home/ubuntu/repos/portableralph/tests/test-output-security-fixes/.claude.json.tmp.2625665.1771108870191
+2026-02-14T22:41:10.191Z [DEBUG] Preserving file permissions: 100600
+2026-02-14T22:41:10.197Z [DEBUG] Temp file written successfully, size: 1201 bytes
+2026-02-14T22:41:10.197Z [DEBUG] Applied original permissions to temp file
+2026-02-14T22:41:10.197Z [DEBUG] Renaming /home/ubuntu/repos/portableralph/tests/test-output-security-fixes/.claude.json.tmp.2625665.1771108870191 to /home/ubuntu/repos/portableralph/tests/test-output-security-fixes/.claude.json
+2026-02-14T22:41:10.198Z [DEBUG] File /home/ubuntu/repos/portableralph/tests/test-output-security-fixes/.claude.json written atomically
+2026-02-14T22:41:10.198Z [DEBUG] Skills and commands included in Skill tool:
+2026-02-14T22:41:10.203Z [DEBUG] Writing to temp file: /home/ubuntu/repos/portableralph/tests/test-output-security-fixes/.claude.json.tmp.2625665.1771108870203
+2026-02-14T22:41:10.203Z [DEBUG] Preserving file permissions: 100600
+2026-02-14T22:41:10.210Z [DEBUG] Temp file written successfully, size: 1233 bytes
+2026-02-14T22:41:10.210Z [DEBUG] Applied original permissions to temp file
+2026-02-14T22:41:10.210Z [DEBUG] Renaming /home/ubuntu/repos/portableralph/tests/test-output-security-fixes/.claude.json.tmp.2625665.1771108870203 to /home/ubuntu/repos/portableralph/tests/test-output-security-fixes/.claude.json
+2026-02-14T22:41:10.211Z [DEBUG] File /home/ubuntu/repos/portableralph/tests/test-output-security-fixes/.claude.json written atomically
+2026-02-14T22:41:10.211Z [DEBUG] Writing to temp file: /home/ubuntu/repos/portableralph/tests/test-output-security-fixes/.claude.json.tmp.2625665.1771108870211
+2026-02-14T22:41:10.212Z [DEBUG] Preserving file permissions: 100600
+2026-02-14T22:41:10.221Z [DEBUG] Temp file written successfully, size: 1269 bytes
+2026-02-14T22:41:10.221Z [DEBUG] Applied original permissions to temp file
+2026-02-14T22:41:10.221Z [DEBUG] Renaming /home/ubuntu/repos/portableralph/tests/test-output-security-fixes/.claude.json.tmp.2625665.1771108870211 to /home/ubuntu/repos/portableralph/tests/test-output-security-fixes/.claude.json
+2026-02-14T22:41:10.221Z [DEBUG] File /home/ubuntu/repos/portableralph/tests/test-output-security-fixes/.claude.json written atomically
+2026-02-14T22:41:10.225Z [DEBUG] attribution header x-anthropic-billing-header: cc_version=2.1.21.5a5; cc_entrypoint=sdk-cli;
+2026-02-14T22:41:10.225Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: false, has Authorization header: false
+2026-02-14T22:41:10.225Z [DEBUG] [API:auth] OAuth token check starting
+2026-02-14T22:41:10.226Z [DEBUG] Writing to temp file: /home/ubuntu/repos/portableralph/tests/test-output-security-fixes/.claude.json.tmp.2625665.1771108870226
+2026-02-14T22:41:10.226Z [DEBUG] Preserving file permissions: 100600
+2026-02-14T22:41:10.236Z [DEBUG] Temp file written successfully, size: 1308 bytes
+2026-02-14T22:41:10.236Z [DEBUG] Applied original permissions to temp file
+2026-02-14T22:41:10.236Z [DEBUG] Renaming /home/ubuntu/repos/portableralph/tests/test-output-security-fixes/.claude.json.tmp.2625665.1771108870226 to /home/ubuntu/repos/portableralph/tests/test-output-security-fixes/.claude.json
+2026-02-14T22:41:10.236Z [DEBUG] File /home/ubuntu/repos/portableralph/tests/test-output-security-fixes/.claude.json written atomically
+2026-02-14T22:41:10.242Z [DEBUG] [API:auth] OAuth token check complete
+2026-02-14T22:41:10.250Z [ERROR] Error in non-streaming fallback: Could not resolve authentication method. Expected either apiKey or authToken to be set. Or for one of the "X-Api-Key" or "Authorization" headers to be explicitly omitted
+2026-02-14T22:41:10.250Z [ERROR] Error: Error: Could not resolve authentication method. Expected either apiKey or authToken to be set. Or for one of the "X-Api-Key" or "Authorization" headers to be explicitly omitted
+    at validateHeaders (/$bunfs/root/claude:161:1013)
+    at buildHeaders (/$bunfs/root/claude:161:8517)
+    at async buildRequest (/$bunfs/root/claude:161:7583)
+    at async makeRequest (/$bunfs/root/claude:161:3411)
+    at processTicksAndRejections (native:7:39)
+2026-02-14T22:41:10.265Z [DEBUG] Getting matching hook commands for Stop with query: undefined
+2026-02-14T22:41:10.265Z [DEBUG] Found 0 hook matchers in settings
+2026-02-14T22:41:10.265Z [DEBUG] Matched 0 unique hooks for query "no match query" (0 before deduplication)
+2026-02-14T22:41:10.267Z [DEBUG] Getting matching hook commands for SessionEnd with query: other
+2026-02-14T22:41:10.267Z [DEBUG] Found 0 hook matchers in settings
+2026-02-14T22:41:10.267Z [DEBUG] Matched 0 unique hooks for query "other" (0 before deduplication)
