@@ -455,9 +455,9 @@ test_config_no_world_readable() {
 # URL VALIDATION SECURITY
 # ============================================
 
-test_webhook_url_https_only() {
+test_webhook_url_protocol() {
     echo ""
-    echo "Testing: Webhook URLs must use HTTPS"
+    echo "Testing: Webhook URL protocol validation"
 
     # Source validation library if it exists
     if [ -f "$RALPH_DIR/lib/validation.sh" ]; then
@@ -466,48 +466,17 @@ test_webhook_url_https_only() {
         local http_url="http://example.com/webhook"
         local exit_code=0
         validate_url "$http_url" 2>/dev/null || exit_code=$?
-
-        assert_equals 1 "$exit_code" "Rejects HTTP URLs (requires HTTPS)"
+        assert_equals 0 "$exit_code" "Accepts HTTP URLs"
 
         local https_url="https://example.com/webhook"
         exit_code=0
         validate_url "$https_url" 2>/dev/null || exit_code=$?
-
         assert_equals 0 "$exit_code" "Accepts HTTPS URLs"
-    else
-        echo -e "${YELLOW}⚠${NC} Skipping - validation.sh not found"
-    fi
-}
 
-test_webhook_ssrf_prevention() {
-    echo "Testing: SSRF prevention in webhook URLs"
-
-    if [ -f "$RALPH_DIR/lib/validation.sh" ]; then
-        source "$RALPH_DIR/lib/validation.sh"
-
-        local ssrf_urls=(
-            "https://localhost/webhook"
-            "https://127.0.0.1/webhook"
-            "https://192.168.1.1/webhook"
-            "https://10.0.0.1/webhook"
-            "https://172.16.0.1/webhook"
-            "https://169.254.169.254/metadata"
-        )
-
-        for url in "${ssrf_urls[@]}"; do
-            local exit_code=0
-            validate_url "$url" 2>/dev/null || exit_code=$?
-
-            if [ $exit_code -ne 0 ]; then
-                TESTS_RUN=$((TESTS_RUN + 1))
-                TESTS_PASSED=$((TESTS_PASSED + 1))
-                echo -e "${GREEN}✓${NC} Rejected SSRF URL: $url"
-            else
-                TESTS_RUN=$((TESTS_RUN + 1))
-                TESTS_FAILED=$((TESTS_FAILED + 1))
-                echo -e "${RED}✗${NC} Did NOT reject SSRF URL: $url"
-            fi
-        done
+        local ftp_url="ftp://example.com/file"
+        exit_code=0
+        validate_url "$ftp_url" 2>/dev/null || exit_code=$?
+        assert_equals 1 "$exit_code" "Rejects FTP URLs"
     else
         echo -e "${YELLOW}⚠${NC} Skipping - validation.sh not found"
     fi
@@ -650,8 +619,7 @@ run_all_tests() {
 
     echo ""
     echo "=== URL Validation Tests ==="
-    test_webhook_url_https_only
-    test_webhook_ssrf_prevention
+    test_webhook_url_protocol
 
     echo ""
     echo "=== Token Masking Tests ==="

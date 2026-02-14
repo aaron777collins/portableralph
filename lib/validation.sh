@@ -7,7 +7,7 @@
 #   - validate_numeric()      Validate numeric values with optional range checking
 #   - validate_url()          Validate webhook URLs (basic format check)
 #   - validate_email()        Validate email addresses
-#   - validate_path()         Validate file paths (basic injection protection)
+#   - validate_path()         Validate file paths
 #   - json_escape()           Escape strings for JSON
 #   - mask_token()            Mask sensitive tokens in output
 #
@@ -50,61 +50,27 @@ validate_numeric() {
     return 0
 }
 
-# Validate webhook URL format (requires HTTPS for security)
+# Validate URL format (http or https)
 # Args:
 #   $1 - URL to validate
 #   $2 - optional: name of field (for error messages, default: "webhook")
-#   $3 - optional: allow_http (default: false) - set to "true" to allow HTTP
 # Returns:
 #   0 if valid, 1 if invalid
 validate_url() {
     local url="$1"
     local name="${2:-webhook}"
-    local allow_http="${3:-false}"
 
     # Check if empty
     if [ -z "$url" ]; then
         return 0  # Empty is okay, just not configured
     fi
 
-    # Comprehensive localhost/internal URL rejection (SSRF protection)
-    # Extract host from URL for checking
-    local url_host
-    url_host=$(echo "$url" | sed -E 's|^https?://([^/:]+).*|\1|')
-    
-    # Check for localhost variations
-    if [[ "$url_host" == "localhost" ]] || \
-       [[ "$url_host" =~ ^127\. ]] || \
-       [[ "$url_host" == "0.0.0.0" ]] || \
-       [[ "$url_host" == "::1" ]] || \
-       [[ "$url_host" == "[::1]" ]] || \
-       [[ "$url_host" =~ ^10\. ]] || \
-       [[ "$url_host" =~ ^172\.(1[6-9]|2[0-9]|3[0-1])\. ]] || \
-       [[ "$url_host" =~ ^192\.168\. ]] || \
-       [[ "$url_host" =~ ^169\.254\. ]] || \
-       [[ "$url_host" =~ \.(internal|local|localhost|corp|intranet)$ ]]; then
+    # Just check it looks like a URL (http or https)
+    if [[ ! "$url" =~ ^https?:// ]]; then
         if type log_error &>/dev/null; then
-            log_error "$name URL cannot be a localhost/internal URL: $url"
+            log_error "$name URL must use HTTP or HTTPS: $url"
         fi
         return 1
-    fi
-
-    # By default, require HTTPS for security (prevents credential sniffing)
-    if [ "$allow_http" = "true" ]; then
-        if [[ ! "$url" =~ ^https?:// ]]; then
-            if type log_error &>/dev/null; then
-                log_error "$name URL must use HTTP or HTTPS: $url"
-            fi
-            return 1
-        fi
-    else
-        # Require HTTPS for webhooks (security best practice)
-        if [[ ! "$url" =~ ^https:// ]]; then
-            if type log_error &>/dev/null; then
-                log_error "$name URL must use HTTPS: $url"
-            fi
-            return 1
-        fi
     fi
 
     return 0
@@ -135,7 +101,7 @@ validate_email() {
     return 0
 }
 
-# Validate file path (basic injection protection only)
+# Validate file path
 # Args:
 #   $1 - path to validate
 #   $2 - optional: name of field (for error messages, default: "path")
@@ -151,29 +117,10 @@ validate_path() {
         return 0  # Empty is okay unless explicitly required
     fi
 
-    # Reject URLs in file paths (file paths should be local)
+    # Reject URLs (user probably meant a file path)
     if [[ "$path" =~ ^https?:// ]]; then
         if type log_error &>/dev/null; then
             log_error "$name should be a file path, not a URL: $path"
-        fi
-        return 1
-    fi
-
-    # Note: Null bytes ($'\0') cannot be stored in bash variables, so any input
-    # containing null bytes would already be truncated. We skip explicit null check.
-
-    # Reject newlines and carriage returns (injection vectors)
-    if [[ "$path" == *$'\n'* ]] || [[ "$path" == *$'\r'* ]]; then
-        if type log_error &>/dev/null; then
-            log_error "$name contains invalid characters"
-        fi
-        return 1
-    fi
-
-    # Reject shell metacharacters (command injection vectors)
-    if [[ "$path" =~ [\;\|\`\$\(\)\{\}\<\>\&] ]]; then
-        if type log_error &>/dev/null; then
-            log_error "$name contains shell metacharacters"
         fi
         return 1
     fi

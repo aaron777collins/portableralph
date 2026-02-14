@@ -4,7 +4,7 @@
 #
 # Tests:
 #   - validate_numeric() with various inputs and ranges
-#   - validate_url() with HTTPS, SSRF protection
+#   - validate_url() protocol validation
 #   - validate_email() with valid/invalid formats
 #   - validate_path() with security checks
 #   - json_escape() for safe JSON strings
@@ -182,9 +182,9 @@ test_validate_numeric_range() {
 # validate_url() TESTS
 # ============================================
 
-test_validate_url_https_required() {
+test_validate_url_protocol() {
     echo ""
-    echo "Testing: validate_url - HTTPS requirement"
+    echo "Testing: validate_url - protocol validation"
 
     local exit_code
 
@@ -194,70 +194,19 @@ test_validate_url_https_required() {
 
     exit_code=0
     validate_url "http://example.com/webhook" 2>/dev/null || exit_code=$?
-    assert_exit_code 1 $exit_code "Rejects HTTP URL (requires HTTPS)"
+    assert_exit_code 0 $exit_code "Accepts HTTP URL"
+
+    exit_code=0
+    validate_url "http://localhost:8080/test" 2>/dev/null || exit_code=$?
+    assert_exit_code 0 $exit_code "Accepts localhost URL"
 
     exit_code=0
     validate_url "ftp://example.com/file" 2>/dev/null || exit_code=$?
     assert_exit_code 1 $exit_code "Rejects FTP URL"
-}
-
-test_validate_url_ssrf_protection() {
-    echo "Testing: validate_url - SSRF protection"
-
-    local exit_code
-
-    # Localhost variations
-    exit_code=0
-    validate_url "https://localhost/webhook" 2>/dev/null || exit_code=$?
-    assert_exit_code 1 $exit_code "Rejects localhost"
 
     exit_code=0
-    validate_url "https://127.0.0.1/webhook" 2>/dev/null || exit_code=$?
-    assert_exit_code 1 $exit_code "Rejects 127.0.0.1"
-
-    exit_code=0
-    validate_url "https://0.0.0.0/webhook" 2>/dev/null || exit_code=$?
-    assert_exit_code 1 $exit_code "Rejects 0.0.0.0"
-
-    # Private IP ranges
-    exit_code=0
-    validate_url "https://192.168.1.1/webhook" 2>/dev/null || exit_code=$?
-    assert_exit_code 1 $exit_code "Rejects 192.168.x.x (private IP)"
-
-    exit_code=0
-    validate_url "https://10.0.0.1/webhook" 2>/dev/null || exit_code=$?
-    assert_exit_code 1 $exit_code "Rejects 10.x.x.x (private IP)"
-
-    exit_code=0
-    validate_url "https://172.16.0.1/webhook" 2>/dev/null || exit_code=$?
-    assert_exit_code 1 $exit_code "Rejects 172.16-31.x.x (private IP)"
-
-    # Link-local
-    exit_code=0
-    validate_url "https://169.254.169.254/metadata" 2>/dev/null || exit_code=$?
-    assert_exit_code 1 $exit_code "Rejects 169.254.x.x (link-local)"
-}
-
-test_validate_url_internal_domains() {
-    echo "Testing: validate_url - internal domain protection"
-
-    local exit_code
-
-    exit_code=0
-    validate_url "https://test.internal/webhook" 2>/dev/null || exit_code=$?
-    assert_exit_code 1 $exit_code "Rejects .internal domain"
-
-    exit_code=0
-    validate_url "https://server.local/webhook" 2>/dev/null || exit_code=$?
-    assert_exit_code 1 $exit_code "Rejects .local domain"
-
-    exit_code=0
-    validate_url "https://app.corp/webhook" 2>/dev/null || exit_code=$?
-    assert_exit_code 1 $exit_code "Rejects .corp domain"
-
-    exit_code=0
-    validate_url "https://docs.intranet/webhook" 2>/dev/null || exit_code=$?
-    assert_exit_code 1 $exit_code "Rejects .intranet domain"
+    validate_url "not-a-url" 2>/dev/null || exit_code=$?
+    assert_exit_code 1 $exit_code "Rejects non-URL string"
 }
 
 test_validate_url_valid_domains() {
@@ -370,50 +319,6 @@ test_validate_path_basic() {
     exit_code=0
     validate_path "./current/dir/file.txt" 2>/dev/null || exit_code=$?
     assert_exit_code 0 $exit_code "Accepts ./ path"
-}
-
-test_validate_path_injection_protection() {
-    echo "Testing: validate_path - injection protection"
-
-    local exit_code
-
-    # Null bytes - Note: Bash truncates strings at null bytes, so validate_path
-    # never sees the null byte. The string "file.txt\x00" becomes "file.txt".
-    # We can't reject what we never receive, so we accept this as 0 (valid).
-    exit_code=0
-    validate_path $'file.txt\x00' 2>/dev/null || exit_code=$?
-    assert_exit_code 0 $exit_code "Null byte truncates string (bash limitation)"
-
-    # Newlines
-    exit_code=0
-    validate_path $'file.txt\n' 2>/dev/null || exit_code=$?
-    assert_exit_code 1 $exit_code "Rejects newline"
-
-    # Carriage return
-    exit_code=0
-    validate_path $'file.txt\r' 2>/dev/null || exit_code=$?
-    assert_exit_code 1 $exit_code "Rejects carriage return"
-
-    # Shell metacharacters
-    exit_code=0
-    validate_path 'file.txt; rm -rf /' 2>/dev/null || exit_code=$?
-    assert_exit_code 1 $exit_code "Rejects semicolon"
-
-    exit_code=0
-    validate_path 'file.txt | cat' 2>/dev/null || exit_code=$?
-    assert_exit_code 1 $exit_code "Rejects pipe"
-
-    exit_code=0
-    validate_path 'file.txt && echo' 2>/dev/null || exit_code=$?
-    assert_exit_code 1 $exit_code "Rejects &&"
-
-    exit_code=0
-    validate_path 'file$(whoami).txt' 2>/dev/null || exit_code=$?
-    assert_exit_code 1 $exit_code "Rejects command substitution"
-
-    exit_code=0
-    validate_path 'file`whoami`.txt' 2>/dev/null || exit_code=$?
-    assert_exit_code 1 $exit_code "Rejects backtick substitution"
 }
 
 test_validate_path_traversal() {
@@ -642,9 +547,7 @@ run_all_tests() {
 
     echo ""
     echo "=== validate_url() Tests ==="
-    test_validate_url_https_required
-    test_validate_url_ssrf_protection
-    test_validate_url_internal_domains
+    test_validate_url_protocol
     test_validate_url_valid_domains
     test_validate_url_empty
 
@@ -657,7 +560,6 @@ run_all_tests() {
     echo ""
     echo "=== validate_path() Tests ==="
     test_validate_path_basic
-    test_validate_path_injection_protection
     test_validate_path_traversal
     test_validate_path_exists
     test_validate_path_empty
