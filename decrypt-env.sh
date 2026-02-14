@@ -2,6 +2,8 @@
 # decrypt-env.sh - Decrypt environment variables
 # This script is sourced by ralph.sh and notify.sh to decrypt sensitive values
 
+set -euo pipefail
+
 # Decrypt value (if it's encrypted)
 decrypt_value() {
     local value="$1"

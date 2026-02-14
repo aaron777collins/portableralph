@@ -258,15 +258,19 @@ DO_NOT_COMMIT
 - Do something
 EOF
 
-    # Source ralph.sh to get the function (without running main)
+    # Extract just the function from ralph.sh (avoid running main code)
+    local func_def
+    func_def=$(sed -n '/^should_skip_commit_from_plan()/,/^}/p' "$RALPH_DIR/ralph.sh")
+    
     (
-        source "$RALPH_DIR/ralph.sh" 2>/dev/null || true
+        # Define the function in a subshell
+        eval "$func_def"
         if declare -f should_skip_commit_from_plan >/dev/null 2>&1; then
             should_skip_commit_from_plan "$test_plan" && echo "SKIP" || echo "COMMIT"
         else
             echo "FUNCTION_NOT_FOUND"
         fi
-    ) > "$TEST_DIR/directive-result.txt"
+    ) > "$TEST_DIR/directive-result.txt" 2>/dev/null
 
     local result
     result=$(cat "$TEST_DIR/directive-result.txt")

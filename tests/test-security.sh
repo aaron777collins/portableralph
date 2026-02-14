@@ -332,12 +332,21 @@ test_numeric_input_validation() {
 test_file_path_validation() {
     echo "Testing: File path validation concept"
 
+    # Source the validation library
+    source "$RALPH_DIR/lib/validation.sh"
+
     local valid_path="/home/user/plan.md"
     local invalid_path="http://evil.com/plan.md"
 
-    # URLs should not be accepted as file paths
-    assert_not_contains "$invalid_path" "http://" "File paths should not be URLs (this one is)"
-    # This is a demonstration - the actual validation should be in ralph.sh
+    # Valid path should pass
+    local exit_code=0
+    validate_path "$valid_path" 2>/dev/null || exit_code=$?
+    assert_equals 0 "$exit_code" "Should accept valid file path"
+
+    # URL should be rejected as a file path
+    exit_code=0
+    validate_path "$invalid_path" 2>/dev/null || exit_code=$?
+    assert_equals 1 "$exit_code" "File paths should not be URLs (this one is)"
 }
 
 # ============================================
@@ -348,8 +357,9 @@ test_no_eval_with_user_input() {
     echo "Testing: No eval() with user input"
 
     # Check that scripts don't use eval with unsanitized input
+    # Exclude pattern definitions (strings containing 'eval' as a pattern to match against)
     local eval_count
-    eval_count=$(grep -r "eval.*\$" "$RALPH_DIR"/*.sh 2>/dev/null | grep -v "^Binary" | wc -l || echo "0")
+    eval_count=$(grep -r "eval.*\$" "$RALPH_DIR"/*.sh 2>/dev/null | grep -v "^Binary" | grep -v "'eval" | grep -v '"eval' | wc -l)
 
     # Should have 0 unsafe eval usages (eval with variables)
     TESTS_RUN=$((TESTS_RUN + 1))
@@ -386,7 +396,7 @@ test_no_sudo_in_scripts() {
     echo "Testing: No sudo usage in scripts"
 
     local sudo_count
-    sudo_count=$(grep -r "sudo " "$RALPH_DIR"/*.sh 2>/dev/null | grep -v "^Binary" | wc -l || echo "0")
+    sudo_count=$(grep -r "sudo " "$RALPH_DIR"/*.sh 2>/dev/null | grep -v "^Binary" | wc -l)
 
     TESTS_RUN=$((TESTS_RUN + 1))
     if [ "$sudo_count" -eq 0 ]; then
@@ -402,7 +412,7 @@ test_no_chmod_777() {
     echo "Testing: No chmod 777 (insecure permissions)"
 
     local chmod777_count
-    chmod777_count=$(grep -r "chmod 777" "$RALPH_DIR"/*.sh 2>/dev/null | wc -l || echo "0")
+    chmod777_count=$(grep -r "chmod 777" "$RALPH_DIR"/*.sh 2>/dev/null | wc -l)
 
     TESTS_RUN=$((TESTS_RUN + 1))
     if [ "$chmod777_count" -eq 0 ]; then

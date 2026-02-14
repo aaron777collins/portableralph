@@ -377,10 +377,12 @@ test_validate_path_injection_protection() {
 
     local exit_code
 
-    # Null bytes
+    # Null bytes - Note: Bash truncates strings at null bytes, so validate_path
+    # never sees the null byte. The string "file.txt\x00" becomes "file.txt".
+    # We can't reject what we never receive, so we accept this as 0 (valid).
     exit_code=0
     validate_path $'file.txt\x00' 2>/dev/null || exit_code=$?
-    assert_exit_code 1 $exit_code "Rejects null byte"
+    assert_exit_code 0 $exit_code "Null byte truncates string (bash limitation)"
 
     # Newlines
     exit_code=0
@@ -481,7 +483,9 @@ test_json_escape_backslashes() {
     local output
     output=$(json_escape "$input")
 
-    assert_contains "$output" '\\\\' "Escapes backslashes"
+    # '\\' in shell = one backslash in the pattern
+    # The escaped output has \\ (two backslashes) so grep -F '\\' should match
+    assert_contains "$output" '\\' "Escapes backslashes"
 }
 
 test_json_escape_newlines() {
@@ -526,7 +530,8 @@ test_json_escape_combined() {
     assert_contains "$output" '\\n' "Escapes newlines"
     assert_contains "$output" '\\t' "Escapes tabs"
     assert_contains "$output" '\\r' "Escapes carriage returns"
-    assert_contains "$output" '\\\\' "Escapes backslashes"
+    # '\\' in shell = two backslashes for grep -F to match the escaped backslash
+    assert_contains "$output" '\\' "Escapes backslashes"
 }
 
 test_json_escape_empty() {

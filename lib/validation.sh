@@ -67,6 +67,31 @@ validate_url() {
         return 0  # Empty is okay, just not configured
     fi
 
+    # Reject localhost/internal URLs (SSRF protection)
+    if [[ "$url" =~ ^https?://(localhost|127\.0\.0\.1|0\.0\.0\.0|\[::1\]) ]]; then
+        if type log_error &>/dev/null; then
+            log_error "$name URL cannot be localhost: $url"
+        fi
+        return 1
+    fi
+
+    # Reject private IP ranges (RFC 1918)
+    # 10.0.0.0/8, 172.16.0.0/12, 192.168.0.0/16, 169.254.0.0/16 (link-local)
+    if [[ "$url" =~ ^https?://(10\.|192\.168\.|172\.(1[6-9]|2[0-9]|3[0-1])\.|169\.254\.) ]]; then
+        if type log_error &>/dev/null; then
+            log_error "$name URL cannot be a private IP: $url"
+        fi
+        return 1
+    fi
+
+    # Reject internal domain names (.local, .internal, .localhost, .corp, .intranet)
+    if [[ "$url" =~ ^https?://[^/]*\.(internal|local|localhost|corp|intranet)(:|/) ]] || [[ "$url" =~ ^https?://[^/]*\.(internal|local|localhost|corp|intranet)$ ]]; then
+        if type log_error &>/dev/null; then
+            log_error "$name URL cannot be an internal domain: $url"
+        fi
+        return 1
+    fi
+
     # By default, require HTTPS for security (prevents credential sniffing)
     if [ "$allow_http" = "true" ]; then
         if [[ ! "$url" =~ ^https?:// ]]; then
@@ -129,6 +154,14 @@ validate_path() {
         return 0  # Empty is okay unless explicitly required
     fi
 
+    # Reject URLs in file paths (file paths should be local)
+    if [[ "$path" =~ ^https?:// ]]; then
+        if type log_error &>/dev/null; then
+            log_error "$name should be a file path, not a URL: $path"
+        fi
+        return 1
+    fi
+
     # Note: Null bytes ($'\0') cannot be stored in bash variables, so any input
     # containing null bytes would already be truncated. We skip explicit null check.
 
@@ -136,6 +169,14 @@ validate_path() {
     if [[ "$path" == *$'\n'* ]] || [[ "$path" == *$'\r'* ]]; then
         if type log_error &>/dev/null; then
             log_error "$name contains invalid characters"
+        fi
+        return 1
+    fi
+
+    # Reject shell metacharacters (command injection vectors)
+    if [[ "$path" =~ [\;\|\`\$\(\)\{\}\<\>\&] ]]; then
+        if type log_error &>/dev/null; then
+            log_error "$name contains shell metacharacters"
         fi
         return 1
     fi

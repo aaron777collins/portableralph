@@ -231,10 +231,11 @@ export RALPH_AUTO_COMMIT="true
 EOF
 
     # Ralph should detect this and warn, but not crash
+    # bash -n returns 2 for syntax errors
     local exit_code=0
     bash -n "$config" 2>/dev/null || exit_code=$?
 
-    assert_equals 1 "$exit_code" "Should detect syntax errors in config"
+    assert_equals 2 "$exit_code" "Should detect syntax errors in config"
 }
 
 test_missing_webhook_graceful_degradation() {

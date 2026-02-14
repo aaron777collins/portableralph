@@ -1254,10 +1254,8 @@ if $TEST_MODE; then
     fi
 fi
 
-# Exit with error if all configured platforms failed
-if ! $SENT_ANY && ([ -n "${RALPH_SLACK_WEBHOOK_URL:-}" ] || [ -n "${RALPH_DISCORD_WEBHOOK_URL:-}" ] || \
-   [ -n "${RALPH_TELEGRAM_BOT_TOKEN:-}" ] || [ -n "${RALPH_CUSTOM_NOTIFY_SCRIPT:-}" ]); then
-    exit 1
-fi
+# Note: We exit 0 even if notifications fail to avoid blocking the main script.
+# The main ralph.sh script should continue even if notifications are down.
+# Errors are logged but don't cause a fatal exit.
 
 exit 0

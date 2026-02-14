@@ -492,7 +492,8 @@ fi
 # Validate mode
 if [ "$MODE" != "plan" ] && [ "$MODE" != "build" ]; then
     log_error "Mode must be 'plan' or 'build', got: $MODE"
-    usage
+    echo "Run 'ralph --help' for usage information."
+    exit 1
 fi
 
 # Validate max iterations

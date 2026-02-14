@@ -105,7 +105,8 @@ assert_exported() {
     TESTS_RUN=$((TESTS_RUN + 1))
 
     # Check if variable is in export list
-    if export -p | grep -q "declare -x $var_name"; then
+    # Note: readonly exported vars show as "declare -rx" not "declare -x"
+    if export -p | grep -qE "declare -[a-z]*x[a-z]* $var_name="; then
         TESTS_PASSED=$((TESTS_PASSED + 1))
         echo -e "${GREEN}✓${NC} $message"
         return 0

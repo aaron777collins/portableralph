@@ -210,8 +210,9 @@ EOF
     export RALPH_CUSTOM_NOTIFY_SCRIPT="$script"
 
     # Should fail because script is not executable
+    # Use --test mode to get diagnostic output
     local output
-    output=$("$RALPH_DIR/notify.sh" "Test message" 2>&1) || true
+    output=$("$RALPH_DIR/notify.sh" --test 2>&1) || true
 
     assert_contains "$output" "not executable" "Detects non-executable custom script"
 }
@@ -222,11 +223,13 @@ test_custom_script_path_traversal() {
     # Try path traversal in script path
     export RALPH_CUSTOM_NOTIFY_SCRIPT="../../../etc/passwd"
 
+    # Use --test mode to get diagnostic output
     local output
-    output=$("$RALPH_DIR/notify.sh" "Test message" 2>&1) || true
+    output=$("$RALPH_DIR/notify.sh" --test 2>&1) || true
 
-    # Should not execute /etc/passwd
-    assert_contains "$output" "not found\|not executable\|FAILED" "Prevents path traversal in custom script"
+    # Should not execute /etc/passwd, should fail validation
+    # Note: assert_contains uses grep -F (fixed string), so use a simple pattern
+    assert_contains "$output" "FAILED" "Prevents path traversal in custom script"
 }
 
 test_custom_script_shell_injection() {
@@ -235,12 +238,14 @@ test_custom_script_shell_injection() {
     # Try to inject shell commands via script path
     export RALPH_CUSTOM_NOTIFY_SCRIPT='test.sh; rm -rf /tmp/test; echo'
 
+    # Use --test mode to get diagnostic output
     local output
-    output=$("$RALPH_DIR/notify.sh" "Test message" 2>&1) || true
+    output=$("$RALPH_DIR/notify.sh" --test 2>&1) || true
 
     # Should not execute the injected commands
     # The path validation should reject this
-    assert_contains "$output" "FAILED\|not found" "Prevents shell injection in script path"
+    # Note: assert_contains uses grep -F (fixed string)
+    assert_contains "$output" "FAILED" "Prevents shell injection in script path"
 }
 
 test_custom_script_timeout() {

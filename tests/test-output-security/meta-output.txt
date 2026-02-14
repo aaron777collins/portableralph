@@ -1,0 +1,1 @@
+MSG: Test; rm -rf /tmp/test; echo Done
