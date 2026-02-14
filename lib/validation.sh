@@ -68,27 +68,21 @@ validate_url() {
     fi
 
     # Comprehensive localhost/internal URL rejection (SSRF protection)
-    # Reject: 
-    # - Localhost variations (localhost, 127.0.0.1, 0.0.0.0, ::1)
-    # - Private IP ranges
-    # - Link-local IPs
-    # - Internal domain names
-    if [[ "$url" =~ ^https?://(
-        localhost|                     # localhost
-        127\.0\.0\.1|                  # IPv4 loopback
-        0\.0\.0\.0|                    # unspecified address
-        \[?::1\]?|                     # IPv6 loopback
-        10\.[0-9]+\.[0-9]+\.[0-9]+|    # 10.0.0.0/8
-        172\.(1[6-9]|2[0-9]|3[0-1])\.[0-9]+\.[0-9]+| # 172.16.0.0/12
-        192\.168\.[0-9]+\.[0-9]+|      # 192.168.0.0/16
-        169\.254\.[0-9]+\.[0-9]+       # 169.254.0.0/16 (link-local)
-    ) ]] || [[ "$url" =~ ^https?://[^/]*\.(
-        internal|                      # .internal
-        local|                         # .local
-        localhost|                     # .localhost
-        corp|                          # .corp
-        intranet                       # .intranet
-    )(:|/|$) ]]; then
+    # Extract host from URL for checking
+    local url_host
+    url_host=$(echo "$url" | sed -E 's|^https?://([^/:]+).*|\1|')
+    
+    # Check for localhost variations
+    if [[ "$url_host" == "localhost" ]] || \
+       [[ "$url_host" =~ ^127\. ]] || \
+       [[ "$url_host" == "0.0.0.0" ]] || \
+       [[ "$url_host" == "::1" ]] || \
+       [[ "$url_host" == "[::1]" ]] || \
+       [[ "$url_host" =~ ^10\. ]] || \
+       [[ "$url_host" =~ ^172\.(1[6-9]|2[0-9]|3[0-1])\. ]] || \
+       [[ "$url_host" =~ ^192\.168\. ]] || \
+       [[ "$url_host" =~ ^169\.254\. ]] || \
+       [[ "$url_host" =~ \.(internal|local|localhost|corp|intranet)$ ]]; then
         if type log_error &>/dev/null; then
             log_error "$name URL cannot be a localhost/internal URL: $url"
         fi
