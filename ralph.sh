@@ -141,13 +141,15 @@ if [ -f "$RALPH_CONFIG_FILE" ] && validate_config "$RALPH_CONFIG_FILE"; then
     fi
 
     if [ -n "${RALPH_NOTIFY_FREQUENCY:-}" ]; then
-        local notify_min="${NOTIFY_FREQUENCY_MIN:-1}"
-        local notify_max="${NOTIFY_FREQUENCY_MAX:-100}"
-        local notify_default="${NOTIFY_FREQUENCY_DEFAULT:-5}"
-        if ! validate_numeric "$RALPH_NOTIFY_FREQUENCY" "RALPH_NOTIFY_FREQUENCY" "$notify_min" "$notify_max"; then
-            echo -e "${YELLOW}Warning: Invalid RALPH_NOTIFY_FREQUENCY, using default: ${notify_default}${NC}" >&2
-            export RALPH_NOTIFY_FREQUENCY="$notify_default"
+        # Note: Not using 'local' here since we're at top level, not in a function
+        _notify_min="${NOTIFY_FREQUENCY_MIN:-1}"
+        _notify_max="${NOTIFY_FREQUENCY_MAX:-100}"
+        _notify_default="${NOTIFY_FREQUENCY_DEFAULT:-5}"
+        if ! validate_numeric "$RALPH_NOTIFY_FREQUENCY" "RALPH_NOTIFY_FREQUENCY" "$_notify_min" "$_notify_max"; then
+            echo -e "${YELLOW}Warning: Invalid RALPH_NOTIFY_FREQUENCY, using default: ${_notify_default}${NC}" >&2
+            export RALPH_NOTIFY_FREQUENCY="$_notify_default"
         fi
+        unset _notify_min _notify_max _notify_default
     fi
 fi
 
