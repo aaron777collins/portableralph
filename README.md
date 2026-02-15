@@ -144,6 +144,32 @@ ralph .\feature.md plan      # Plan only (creates task list, exits)
 ralph .\feature.md build 20  # Build, max 20 iterations
 ```
 
+## Configuration
+
+Ralph is configured via `~/.ralph.env`. Available settings:
+
+```bash
+# Claude model to use (default: sonnet)
+export RALPH_MODEL="sonnet"
+# Other options: claude-opus-4-6, claude-haiku-4-5-20251001, etc.
+
+# Auto-commit after each iteration (default: true)
+export RALPH_AUTO_COMMIT="true"
+```
+
+You can also override the model per-run via environment variable:
+
+```bash
+RALPH_MODEL=claude-opus-4-6 ralph ./plan.md
+```
+
+Or use the config command for auto-commit:
+
+```bash
+ralph config commit off   # Disable auto-commit
+ralph config commit on    # Enable auto-commit
+```
+
 ## Plan File Format
 
 ```markdown
