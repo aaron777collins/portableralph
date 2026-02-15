@@ -788,11 +788,28 @@ while true; do
         }
         chmod 600 "$claude_output_file" "$claude_error_file"
 
-        # Run Claude (stream output to terminal via tee while capturing to file)
-        echo "$PROMPT" | claude -p \
-            --dangerously-skip-permissions \
-            --model "$RALPH_MODEL" \
-            --verbose 2>"$claude_error_file" | tee "$claude_output_file" || claude_exit_code=$?
+        # Run Claude with streaming output
+        if command -v jq &>/dev/null; then
+            # Stream JSON events, display text content in real-time
+            echo "$PROMPT" | claude -p \
+                --dangerously-skip-permissions \
+                --model "$RALPH_MODEL" \
+                --verbose \
+                --output-format stream-json 2>"$claude_error_file" | \
+                tee "$claude_output_file" | \
+                jq --unbuffered -r '
+                    select(.type == "assistant") |
+                    .message.content[]? |
+                    select(.type == "text") |
+                    .text // empty
+                ' || claude_exit_code=$?
+        else
+            # No jq available: capture output, no streaming display
+            echo "$PROMPT" | claude -p \
+                --dangerously-skip-permissions \
+                --model "$RALPH_MODEL" \
+                --verbose 2>"$claude_error_file" > "$claude_output_file" || claude_exit_code=$?
+        fi
 
         # Capture any error output
         claude_errors=""
