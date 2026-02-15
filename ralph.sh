@@ -800,8 +800,15 @@ while true; do
                 jq --unbuffered -r '
                     select(.type == "assistant") |
                     .message.content[]? |
-                    select(.type == "text") |
-                    .text // empty
+                    if .type == "text" then .text
+                    elif .type == "tool_use" then
+                        "  \u001b[0;34m→ " + .name +
+                        (if .input.file_path then ": " + .input.file_path
+                         elif .input.pattern then " /" + .input.pattern + "/"
+                         elif .input.command then ": " + (.input.command | .[0:80])
+                         elif .input.prompt then ": " + (.input.prompt | .[0:80])
+                         else "" end) + "\u001b[0m"
+                    else empty end
                 ' || claude_exit_code=$?
         else
             # No jq available: capture output, no streaming display
