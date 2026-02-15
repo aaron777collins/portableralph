@@ -142,7 +142,16 @@ if [ -f "$RALPH_CONFIG_FILE" ]; then
         # Config is valid, source it
         source "$RALPH_CONFIG_FILE"
 
-        # Validate loaded configuration values
+        # Decrypt encrypted environment variables BEFORE validation
+        if [ -f "$RALPH_DIR/decrypt-env.sh" ]; then
+            source "$RALPH_DIR/decrypt-env.sh"
+            if ! decrypt_ralph_env; then
+                echo -e "${YELLOW}Warning: Failed to decrypt some environment variables${NC}" >&2
+                echo "Some notification platforms may not work correctly" >&2
+            fi
+        fi
+
+        # Validate loaded configuration values (now with decrypted values)
         if [ -n "${RALPH_SLACK_WEBHOOK_URL:-}" ]; then
             if ! validate_webhook_url "$RALPH_SLACK_WEBHOOK_URL" "RALPH_SLACK_WEBHOOK_URL"; then
                 echo -e "${YELLOW}Warning: Invalid RALPH_SLACK_WEBHOOK_URL, disabling Slack notifications${NC}" >&2
@@ -192,23 +201,16 @@ if [ -f "$RALPH_CONFIG_FILE" ]; then
     fi
 fi
 
-# Decrypt encrypted environment variables
-if [ -f "$RALPH_DIR/decrypt-env.sh" ]; then
-    source "$RALPH_DIR/decrypt-env.sh"
-    if ! decrypt_ralph_env 2>&1 | grep -q "^Error:"; then
-        : # Decryption succeeded or no encrypted values
-    else
-        echo -e "${YELLOW}Warning: Failed to decrypt some environment variables${NC}" >&2
-        echo "Run 'ralph notify setup' if you have notification issues" >&2
-    fi
-fi
-
 VERSION="1.7.0"
 
 # Auto-commit setting (default: true)
 # Can be disabled via: ralph config commit off
 # Or by adding DO_NOT_COMMIT on its own line in the plan file
 RALPH_AUTO_COMMIT="${RALPH_AUTO_COMMIT:-true}"
+
+# Model setting (default: sonnet)
+# Can be set via: export RALPH_MODEL="claude-opus-4-6" in ~/.ralph.env
+RALPH_MODEL="${RALPH_MODEL:-sonnet}"
 
 # Check if plan file contains DO_NOT_COMMIT directive
 # Skips content inside ``` code blocks to avoid false positives
@@ -585,6 +587,7 @@ echo -e "  Plan:      ${YELLOW}$PLAN_FILE${NC}"
 echo -e "  Mode:      ${YELLOW}$MODE${NC}"
 echo -e "  Progress:  ${YELLOW}$PROGRESS_FILE${NC}"
 [ "$MAX_ITERATIONS" -gt 0 ] && echo -e "  Max Iter:  ${YELLOW}$MAX_ITERATIONS${NC}"
+echo -e "  Model:     ${YELLOW}$RALPH_MODEL${NC}"
 if [ "$SHOULD_COMMIT" = "true" ]; then
     echo -e "  Commit:    ${GREEN}enabled${NC}"
 else
@@ -785,19 +788,11 @@ while true; do
         }
         chmod 600 "$claude_output_file" "$claude_error_file"
 
-            #            --model sonnet \
-        # Run Claude
+        # Run Claude (stream output to terminal via tee while capturing to file)
         echo "$PROMPT" | claude -p \
             --dangerously-skip-permissions \
-                        --model claude-opus-4-5 \
-            --verbose > "$claude_output_file" 2>"$claude_error_file" || claude_exit_code=$?
-
-        # Display output on first attempt or final retry
-        if [ $claude_attempt -eq 1 ] || [ $claude_attempt -eq $max_claude_retries ]; then
-            if [ -f "$claude_output_file" ]; then
-                cat "$claude_output_file"
-            fi
-        fi
+            --model "$RALPH_MODEL" \
+            --verbose 2>"$claude_error_file" | tee "$claude_output_file" || claude_exit_code=$?
 
         # Capture any error output
         claude_errors=""

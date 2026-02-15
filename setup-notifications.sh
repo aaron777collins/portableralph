@@ -580,7 +580,6 @@ echo "" >> "$CONFIG_FILE"
 
 if [ -n "$SLACK_URL" ]; then
     echo "# Slack" >> "$CONFIG_FILE"
-    local encrypted_slack
     encrypted_slack=$(encrypt_value "$SLACK_URL")
     echo "export RALPH_SLACK_WEBHOOK_URL=\"$encrypted_slack\"" >> "$CONFIG_FILE"
     echo "" >> "$CONFIG_FILE"
@@ -588,7 +587,6 @@ fi
 
 if [ -n "$DISCORD_URL" ]; then
     echo "# Discord" >> "$CONFIG_FILE"
-    local encrypted_discord
     encrypted_discord=$(encrypt_value "$DISCORD_URL")
     echo "export RALPH_DISCORD_WEBHOOK_URL=\"$encrypted_discord\"" >> "$CONFIG_FILE"
     echo "" >> "$CONFIG_FILE"
@@ -596,8 +594,6 @@ fi
 
 if [ -n "$TELEGRAM_TOKEN" ]; then
     echo "# Telegram" >> "$CONFIG_FILE"
-    local encrypted_token
-    local encrypted_chat
     encrypted_token=$(encrypt_value "$TELEGRAM_TOKEN")
     encrypted_chat=$(encrypt_value "$TELEGRAM_CHAT")
     echo "export RALPH_TELEGRAM_BOT_TOKEN=\"$encrypted_token\"" >> "$CONFIG_FILE"
@@ -611,7 +607,7 @@ if [ -n "$EMAIL_TO" ]; then
     echo "export RALPH_EMAIL_FROM=\"$EMAIL_FROM\"" >> "$CONFIG_FILE"
 
     if [ "$EMAIL_METHOD" = "smtp" ]; then
-        local encrypted_pass
+        encrypted_pass
         encrypted_pass=$(encrypt_value "$SMTP_PASS")
         echo "export RALPH_SMTP_HOST=\"$SMTP_HOST\"" >> "$CONFIG_FILE"
         echo "export RALPH_SMTP_PORT=\"$SMTP_PORT\"" >> "$CONFIG_FILE"
@@ -619,11 +615,11 @@ if [ -n "$EMAIL_TO" ]; then
         echo "export RALPH_SMTP_PASSWORD=\"$encrypted_pass\"" >> "$CONFIG_FILE"
         echo "export RALPH_SMTP_TLS=\"true\"" >> "$CONFIG_FILE"
     elif [ "$EMAIL_METHOD" = "sendgrid" ]; then
-        local encrypted_key
+        encrypted_key
         encrypted_key=$(encrypt_value "$SENDGRID_KEY")
         echo "export RALPH_SENDGRID_API_KEY=\"$encrypted_key\"" >> "$CONFIG_FILE"
     elif [ "$EMAIL_METHOD" = "ses" ]; then
-        local encrypted_secret
+        encrypted_secret
         encrypted_secret=$(encrypt_value "$AWS_SECRET")
         echo "export RALPH_AWS_SES_REGION=\"$AWS_REGION\"" >> "$CONFIG_FILE"
         echo "export RALPH_AWS_ACCESS_KEY_ID=\"$AWS_KEY\"" >> "$CONFIG_FILE"
@@ -632,8 +628,8 @@ if [ -n "$EMAIL_TO" ]; then
 
     # Email options
     echo "export RALPH_EMAIL_HTML=\"true\"" >> "$CONFIG_FILE"
-    local batch_delay="${EMAIL_BATCH_DELAY_DEFAULT:-300}"
-    local batch_max="${EMAIL_BATCH_MAX_DEFAULT:-10}"
+    batch_delay="${EMAIL_BATCH_DELAY_DEFAULT:-300}"
+    batch_max="${EMAIL_BATCH_MAX_DEFAULT:-10}"
     echo "export RALPH_EMAIL_BATCH_DELAY=\"$batch_delay\"  # $(($batch_delay / 60)) minutes" >> "$CONFIG_FILE"
     echo "export RALPH_EMAIL_BATCH_MAX=\"$batch_max\"" >> "$CONFIG_FILE"
     echo "" >> "$CONFIG_FILE"

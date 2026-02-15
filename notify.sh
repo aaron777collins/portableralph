@@ -84,9 +84,9 @@ fi
 # Load and decrypt environment variables
 if [ -f "$RALPH_DIR/decrypt-env.sh" ]; then
     source "$RALPH_DIR/decrypt-env.sh"
-    if ! decrypt_ralph_env 2>&1 | grep -q "^Error:"; then
-        : # Decryption succeeded or no encrypted values
-    else
+    # Call decrypt_ralph_env directly to allow variable updates
+    # Don't pipe the output which would run in a subshell
+    if ! decrypt_ralph_env; then
         # Only show warning in test mode, otherwise notifications might spam
         if [ "${1:-}" = "--test" ]; then
             echo "Warning: Failed to decrypt some environment variables" >&2
@@ -325,13 +325,15 @@ send_discord() {
     local username="${RALPH_DISCORD_USERNAME:-Ralph}"
     local avatar_url="${RALPH_DISCORD_AVATAR_URL:-}"
 
-    # Convert Slack-style formatting to Discord markdown safely
-    # Avoid sed for user input - use bash substitution
-    local discord_msg="$msg"
-    # Replace *text* with **text** for Discord bold
-    while [[ "$discord_msg" =~ \*([^*]+)\* ]]; do
-        discord_msg="${discord_msg/\*${BASH_REMATCH[1]}\*/**${BASH_REMATCH[1]}**}"
+    # Convert Slack-style *bold* to Discord **bold** in a single left-to-right pass
+    # (A while loop replacing *x* with **x** loops forever since **x** still matches *x*)
+    local discord_msg=""
+    local remaining="$msg"
+    while [[ "$remaining" =~ ^([^*]*)\*([^*]+)\*(.*) ]]; do
+        discord_msg+="${BASH_REMATCH[1]}**${BASH_REMATCH[2]}**"
+        remaining="${BASH_REMATCH[3]}"
     done
+    discord_msg+="$remaining"
 
     local payload
     if command -v jq &> /dev/null; then
@@ -1337,7 +1339,7 @@ if ! $TEST_MODE; then
 fi
 
 # Track errors for better reporting
-declare -A SEND_ERRORS
+declare -A SEND_ERRORS=()
 
 # Send to all configured platforms with individual error tracking
 if ! send_slack "$MESSAGE"; then
@@ -1367,7 +1369,7 @@ if $TEST_MODE; then
     echo ""
     if $SENT_ANY; then
         echo "Test complete! Check your notification channels."
-        if [[ "$(declare -p SEND_ERRORS 2>/dev/null)" == *"="* ]]; then
+        if [ ${#SEND_ERRORS[@]} -gt 0 ] 2>/dev/null; then
             echo ""
             echo "Note: Some platforms failed to send. Check configuration."
         fi
