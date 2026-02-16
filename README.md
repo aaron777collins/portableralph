@@ -170,6 +170,19 @@ ralph config commit off   # Disable auto-commit
 ralph config commit on    # Enable auto-commit
 ```
 
+### Guardrails (Lessons Learned)
+
+Ralph maintains a `RALPH_GUARDRAILS.md` file in your project directory that captures project-specific lessons learned across iterations. This prevents Claude from repeating the same mistakes (wrong test commands, style violations, broken patterns).
+
+- **Created automatically** — Claude creates and appends to it when discovering project gotchas
+- **Persists across iterations** — each new Claude session reads it at startup
+- **You can seed it manually** — add your own rules before running Ralph:
+  ```markdown
+  - Always run `pytest -x` not `python -m pytest`
+  - Use tabs for indentation (project convention)
+  ```
+- **Self-maintaining** — Claude consolidates entries when the file grows past ~50 lines
+
 ## Plan File Format
 
 ```markdown

@@ -550,6 +550,7 @@ fi
 # Derive progress file name from plan file
 PLAN_BASENAME=$(basename "$PLAN_FILE" .md)
 PROGRESS_FILE="${PLAN_BASENAME}_PROGRESS.md"
+GUARDRAILS_FILE="RALPH_GUARDRAILS.md"
 PLAN_FILE_ABS=$(realpath "$PLAN_FILE")
 
 # Select prompt template
@@ -604,6 +605,17 @@ if notifications_enabled; then
 else
     echo -e "  Notify:    ${YELLOW}disabled${NC} (run 'ralph notify setup')"
 fi
+if [ -f "$GUARDRAILS_FILE" ]; then
+    GUARDRAILS_LINES=$(wc -l < "$GUARDRAILS_FILE")
+    guardrails_warn="${GUARDRAILS_WARN_LIMIT:-100}"
+    if [ "$GUARDRAILS_LINES" -gt "$guardrails_warn" ]; then
+        echo -e "  Guardrails:${YELLOW} $GUARDRAILS_FILE ($GUARDRAILS_LINES lines - consider consolidating)${NC}"
+    else
+        echo -e "  Guardrails:${GREEN} $GUARDRAILS_FILE ($GUARDRAILS_LINES lines)${NC}"
+    fi
+else
+    echo -e "  Guardrails:${YELLOW} none (created when needed)${NC}"
+fi
 echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
 echo ""
 echo -e "${YELLOW}Exit conditions:${NC}"
@@ -635,6 +647,43 @@ if [ ! -f "$PROGRESS_FILE" ]; then
 fi
 
 ITERATION=0
+
+# Extract a short summary from the progress file (task counts + last completed task)
+get_progress_summary() {
+    if [ ! -f "$PROGRESS_FILE" ]; then
+        echo ""
+        return
+    fi
+
+    local done_count=0
+    local total_count=0
+    local last_done=""
+
+    while IFS= read -r line; do
+        if [[ "$line" =~ ^-\ \[x\]\ (.+) ]]; then
+            total_count=$((total_count + 1))
+            done_count=$((done_count + 1))
+            last_done="${BASH_REMATCH[1]}"
+        elif [[ "$line" =~ ^-\ \[\ \]\ (.+) ]]; then
+            total_count=$((total_count + 1))
+        fi
+    done < "$PROGRESS_FILE"
+
+    if [ "$total_count" -eq 0 ]; then
+        echo ""
+        return
+    fi
+
+    local summary="Tasks: ${done_count}/${total_count}"
+    if [ -n "$last_done" ]; then
+        # Truncate long task names
+        if [ "${#last_done}" -gt 60 ]; then
+            last_done="${last_done:0:57}..."
+        fi
+        summary="${summary}\nLast: ${last_done}"
+    fi
+    echo "$summary"
+}
 
 # Check for completion
 # Uses -x to match whole lines only, preventing false positives from
@@ -696,7 +745,10 @@ while true; do
         echo -e "${GREEN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
         echo -e "${GREEN}  RALPH_DONE - Work complete!${NC}"
         echo -e "${GREEN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
-        notify ":white_check_mark: *Ralph Complete!*\n\`\`\`Plan: $PLAN_BASENAME\nIterations: $ITERATION\nRepo: $REPO_NAME\`\`\`" ":white_check_mark:"
+        SUMMARY=$(get_progress_summary)
+        SUMMARY_BLOCK=""
+        [ -n "$SUMMARY" ] && SUMMARY_BLOCK="\n$SUMMARY"
+        notify ":white_check_mark: *Ralph Complete!*\n\`\`\`Plan: $PLAN_BASENAME\nIterations: $ITERATION\nRepo: $REPO_NAME${SUMMARY_BLOCK}\`\`\`" ":white_check_mark:"
         break
     fi
 
@@ -705,7 +757,10 @@ while true; do
         echo -e "${YELLOW}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
         echo -e "${YELLOW}  Max iterations reached: $MAX_ITERATIONS${NC}"
         echo -e "${YELLOW}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
-        notify ":warning: *Ralph Stopped*\n\`\`\`Plan: $PLAN_BASENAME\nReason: Max iterations reached ($MAX_ITERATIONS)\nRepo: $REPO_NAME\`\`\`" ":warning:"
+        SUMMARY=$(get_progress_summary)
+        SUMMARY_BLOCK=""
+        [ -n "$SUMMARY" ] && SUMMARY_BLOCK="\n$SUMMARY"
+        notify ":warning: *Ralph Stopped*\n\`\`\`Plan: $PLAN_BASENAME\nReason: Max iterations reached ($MAX_ITERATIONS)\nRepo: $REPO_NAME${SUMMARY_BLOCK}\`\`\`" ":warning:"
         break
     fi
 
@@ -730,12 +785,16 @@ while true; do
     safe_progress_file=$(escape_sed "$PROGRESS_FILE")
     safe_plan_name=$(escape_sed "$PLAN_BASENAME")
     safe_should_commit=$(escape_sed "$SHOULD_COMMIT")
+    safe_guardrails_file=$(escape_sed "$GUARDRAILS_FILE")
+    safe_guardrails_soft_limit=$(escape_sed "${GUARDRAILS_SOFT_LIMIT:-50}")
 
     PROMPT=$(cat "$PROMPT_TEMPLATE" | \
         sed "s|\${PLAN_FILE}|$safe_plan_file|g" | \
         sed "s|\${PROGRESS_FILE}|$safe_progress_file|g" | \
         sed "s|\${PLAN_NAME}|$safe_plan_name|g" | \
-        sed "s|\${AUTO_COMMIT}|$safe_should_commit|g")
+        sed "s|\${AUTO_COMMIT}|$safe_should_commit|g" | \
+        sed "s|\${GUARDRAILS_FILE}|$safe_guardrails_file|g" | \
+        sed "s|\${GUARDRAILS_SOFT_LIMIT}|$safe_guardrails_soft_limit|g")
 
     # Validate prerequisites before calling Claude
     if [ -n "${CLAUDE_API_KEY:-}" ]; then
@@ -904,7 +963,10 @@ while true; do
 
         # Send error notification and log
         log_error "Stopping Ralph due to Claude CLI failure at iteration $ITERATION after $claude_attempt attempts"
-        notify ":x: *Ralph Error*\n\`\`\`Plan: $PLAN_BASENAME\nIteration: $ITERATION\nError: $error_type (after $claude_attempt retries)\nRepo: $REPO_NAME\`\`\`" ":x:"
+        SUMMARY=$(get_progress_summary)
+        SUMMARY_BLOCK=""
+        [ -n "$SUMMARY" ] && SUMMARY_BLOCK="\n$SUMMARY"
+        notify ":x: *Ralph Error*\n\`\`\`Plan: $PLAN_BASENAME\nIteration: $ITERATION\nError: $error_type (after $claude_attempt retries)\nRepo: $REPO_NAME${SUMMARY_BLOCK}\`\`\`" ":x:"
         exit $claude_exit_code
     fi
 
@@ -934,7 +996,10 @@ while true; do
         log_error "Invalid RALPH_NOTIFY_FREQUENCY, using default: $notify_default"
     fi
     if [ "$ITERATION" -eq 1 ] || [ $((ITERATION % NOTIFY_FREQ)) -eq 0 ]; then
-        notify ":gear: *Ralph Progress*: Iteration $ITERATION completed\n\`Plan: $PLAN_BASENAME\`" ":gear:"
+        SUMMARY=$(get_progress_summary)
+        SUMMARY_BLOCK=""
+        [ -n "$SUMMARY" ] && SUMMARY_BLOCK="\n$SUMMARY"
+        notify ":gear: *Ralph Progress*: Iteration $ITERATION completed\n\`\`\`Plan: $PLAN_BASENAME\nRepo: $REPO_NAME${SUMMARY_BLOCK}\`\`\`" ":gear:"
     fi
 
     # Small delay between iterations
