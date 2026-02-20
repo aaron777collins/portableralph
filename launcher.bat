@@ -15,7 +15,16 @@ set "SCRIPT_DIR=%SCRIPT_DIR:~0,-1%"
 
 REM Get command to run
 set "COMMAND=%~1"
+
+REM Handle help flags
+if "%COMMAND%"=="--help" goto :show_help
+if "%COMMAND%"=="-h" goto :show_help
+if "%COMMAND%"=="-?" goto :show_help
+if "%COMMAND%"=="/?" goto :show_help
+if "%COMMAND%"=="help" goto :show_help
+
 if "%COMMAND%"=="" (
+    :show_help
     echo Usage: %~nx0 ^<command^> [args...]
     echo.
     echo Commands:
@@ -23,7 +32,10 @@ if "%COMMAND%"=="" (
     echo   update  - Update PortableRalph
     echo   notify  - Configure notifications
     echo   monitor - Monitor progress
-    exit /b 1
+    echo.
+    echo Options:
+    echo   --help, -h, -?  - Show this help message
+    exit /b 0
 )
 
 REM Remove first argument
