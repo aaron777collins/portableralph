@@ -1,5 +1,8 @@
 name: Windows Compatibility Testing
 
+# Comprehensive Windows testing workflow for PortableRalph
+# Tests PowerShell scripts, batch files, and integration workflows
+
 on:
   push:
     branches: [ main, master, develop ]
