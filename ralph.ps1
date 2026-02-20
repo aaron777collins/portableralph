@@ -141,7 +141,8 @@ function Test-NotificationsEnabled {
     return ($env:RALPH_SLACK_WEBHOOK_URL -or
             $env:RALPH_DISCORD_WEBHOOK_URL -or
             ($env:RALPH_TELEGRAM_BOT_TOKEN -and $env:RALPH_TELEGRAM_CHAT_ID) -or
-            $env:RALPH_CUSTOM_NOTIFY_SCRIPT)
+            $env:RALPH_CUSTOM_NOTIFY_SCRIPT -or
+            ($env:RALPH_EMAIL_TO -and $env:RALPH_EMAIL_FROM))
 }
 
 function Show-Usage {
@@ -418,6 +419,7 @@ if (Test-NotificationsEnabled) {
     if ($env:RALPH_DISCORD_WEBHOOK_URL) { $platforms += "Discord" }
     if ($env:RALPH_TELEGRAM_BOT_TOKEN -and $env:RALPH_TELEGRAM_CHAT_ID) { $platforms += "Telegram" }
     if ($env:RALPH_CUSTOM_NOTIFY_SCRIPT) { $platforms += "Custom" }
+    if ($env:RALPH_EMAIL_TO -and $env:RALPH_EMAIL_FROM) { $platforms += "Email" }
     Write-Host "  Notify:    " -NoNewline
     Write-Host ($platforms -join " ") -ForegroundColor Green
 } else {

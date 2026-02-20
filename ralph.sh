@@ -248,7 +248,8 @@ notifications_enabled() {
     [ -n "${RALPH_SLACK_WEBHOOK_URL:-}" ] || \
     [ -n "${RALPH_DISCORD_WEBHOOK_URL:-}" ] || \
     ([ -n "${RALPH_TELEGRAM_BOT_TOKEN:-}" ] && [ -n "${RALPH_TELEGRAM_CHAT_ID:-}" ]) || \
-    [ -n "${RALPH_CUSTOM_NOTIFY_SCRIPT:-}" ]
+    [ -n "${RALPH_CUSTOM_NOTIFY_SCRIPT:-}" ] || \
+    ([ -n "${RALPH_EMAIL_TO:-}" ] && [ -n "${RALPH_EMAIL_FROM:-}" ])
 }
 
 usage() {
@@ -558,6 +559,7 @@ if notifications_enabled; then
     [ -n "${RALPH_DISCORD_WEBHOOK_URL:-}" ] && PLATFORMS="${PLATFORMS}Discord "
     [ -n "${RALPH_TELEGRAM_BOT_TOKEN:-}" ] && [ -n "${RALPH_TELEGRAM_CHAT_ID:-}" ] && PLATFORMS="${PLATFORMS}Telegram "
     [ -n "${RALPH_CUSTOM_NOTIFY_SCRIPT:-}" ] && PLATFORMS="${PLATFORMS}Custom "
+    [ -n "${RALPH_EMAIL_TO:-}" ] && [ -n "${RALPH_EMAIL_FROM:-}" ] && PLATFORMS="${PLATFORMS}Email "
     echo -e "  Notify:    ${GREEN}${PLATFORMS}${NC}"
 else
     echo -e "  Notify:    ${YELLOW}disabled${NC} (run 'ralph notify setup')"
@@ -719,10 +721,11 @@ while true; do
         }
         chmod 600 "$claude_output_file" "$claude_error_file"
 
+            #            --model sonnet \
         # Run Claude
         echo "$PROMPT" | claude -p \
             --dangerously-skip-permissions \
-            --model sonnet \
+                        --model claude-opus-4-5 \
             --verbose > "$claude_output_file" 2>"$claude_error_file" || claude_exit_code=$?
 
         # Display output on first attempt or final retry

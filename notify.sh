@@ -577,16 +577,20 @@ send_batched_email() {
     local batch_count
     batch_count=$(echo "$batch_content" | wc -l)
 
-    local batched_msgs=""
-    while IFS='|' read -r timestamp msg; do
-        local msg_time
-        msg_time=$(date -d "@$timestamp" "+%Y-%m-%d %H:%M:%S" 2>/dev/null || date -r "$timestamp" "+%Y-%m-%d %H:%M:%S" 2>/dev/null || echo "$timestamp")
-        batched_msgs="${batched_msgs}[${msg_time}] ${msg}\n\n"
-    done <<< "$batch_content"
+    # Get the first message as the main message
+    local first_line
+    first_line=$(echo "$batch_content" | head -n1)
+    local first_timestamp="${first_line%%|*}"
+    local first_msg="${first_line#*|}"
+
+    # Get remaining messages for the batched items section (skip first line)
+    local remaining_content
+    remaining_content=$(echo "$batch_content" | tail -n +2)
 
     # Send as a single email with batched content
-    local combined_msg="Batched notifications (${batch_count} messages):\n\n${batched_msgs}"
-    send_email_direct "$combined_msg" "info" "$batch_count"
+    # First message goes in MESSAGE, rest go in BATCHED_ITEMS
+    local remaining_count=$((batch_count - 1))
+    send_email_direct "$first_msg" "info" "$remaining_count" "$remaining_content"
 }
 
 # Escape HTML special characters to prevent XSS
@@ -620,6 +624,7 @@ render_email_template() {
     local message="$2"
     local type="${3:-info}"
     local batch_count="${4:-0}"
+    local batched_items_data="${5:-}"  # Format: "timestamp1|msg1\ntimestamp2|msg2\n..."
 
     local timestamp
     timestamp=$(date "+%Y-%m-%d %H:%M:%S %Z")
@@ -669,12 +674,73 @@ render_email_template() {
     if [ "$batch_count" -gt 0 ]; then
         content="${content//\{\{#HAS_BATCHED\}\}/}"
         content="${content//\{\{\/HAS_BATCHED\}\}/}"
+
+        # Expand {{#BATCHED_ITEMS}}...{{/BATCHED_ITEMS}} loop
+        if [ -n "$batched_items_data" ]; then
+            content=$(expand_batched_items "$content" "$batched_items_data" "$template_file")
+        else
+            # No batched items data provided, remove the section
+            content=$(remove_template_section "$content" "{{#BATCHED_ITEMS}}" "{{/BATCHED_ITEMS}}")
+        fi
     else
         # Remove batched sections using bash pattern matching
         content=$(remove_template_section "$content" "{{#HAS_BATCHED}}" "{{/HAS_BATCHED}}")
     fi
 
     echo "$content"
+}
+
+# Expand batched items loop in template
+expand_batched_items() {
+    local content="$1"
+    local batched_items_data="$2"
+    local template_file="$3"
+
+    # Extract the template block between {{#BATCHED_ITEMS}} and {{/BATCHED_ITEMS}}
+    local start_tag="{{#BATCHED_ITEMS}}"
+    local end_tag="{{/BATCHED_ITEMS}}"
+
+    # Find the item template
+    if [[ "$content" =~ $start_tag(.*?)$end_tag ]]; then
+        # Bash regex doesn't support non-greedy, use a different approach
+        :
+    fi
+
+    # Extract item template using parameter expansion
+    local before_items="${content%%${start_tag}*}"
+    local after_start="${content#*${start_tag}}"
+    local item_template="${after_start%%${end_tag}*}"
+    local after_items="${content#*${end_tag}}"
+
+    # Generate expanded items
+    local expanded_items=""
+    while IFS='|' read -r item_timestamp item_msg; do
+        [ -z "$item_timestamp" ] && continue
+
+        # Format the timestamp
+        local item_time
+        item_time=$(date -d "@$item_timestamp" "+%Y-%m-%d %H:%M:%S" 2>/dev/null || \
+                   date -r "$item_timestamp" "+%Y-%m-%d %H:%M:%S" 2>/dev/null || \
+                   echo "$item_timestamp")
+
+        # Escape for HTML if needed
+        local escaped_item_msg="$item_msg"
+        local escaped_item_time="$item_time"
+        if [[ "$template_file" == *.html ]]; then
+            escaped_item_msg=$(html_escape "$item_msg")
+            escaped_item_time=$(html_escape "$item_time")
+        fi
+
+        # Replace placeholders in item template
+        local item_content="$item_template"
+        item_content="${item_content//\{\{ITEM_TIME\}\}/$escaped_item_time}"
+        item_content="${item_content//\{\{ITEM_MESSAGE\}\}/$escaped_item_msg}"
+
+        expanded_items="${expanded_items}${item_content}"
+    done <<< "$batched_items_data"
+
+    # Reassemble the content
+    printf '%s%s%s' "$before_items" "$expanded_items" "$after_items"
 }
 
 # Send email via SMTP
@@ -707,7 +773,6 @@ send_email_smtp() {
         return 1
     }
     chmod 600 "$email_file"
-    trap 'rm -f "$email_file" 2>/dev/null' RETURN
 
     cat > "$email_file" << EOF
 From: $from
@@ -857,6 +922,7 @@ send_email_direct() {
     local msg="$1"
     local type="${2:-info}"
     local batch_count="${3:-0}"
+    local batched_items_data="${4:-}"  # Format: "timestamp1|msg1\ntimestamp2|msg2\n..."
 
     local to="${RALPH_EMAIL_TO}"
     local from="${RALPH_EMAIL_FROM}"
@@ -897,11 +963,11 @@ send_email_direct() {
     local text_body=""
 
     if [ "$use_html" = true ] && [ -f "$RALPH_DIR/templates/email-notification.html" ]; then
-        html_body=$(render_email_template "$RALPH_DIR/templates/email-notification.html" "$msg" "$type" "$batch_count")
+        html_body=$(render_email_template "$RALPH_DIR/templates/email-notification.html" "$msg" "$type" "$batch_count" "$batched_items_data")
     fi
 
     if [ -f "$RALPH_DIR/templates/email-notification.txt" ]; then
-        text_body=$(render_email_template "$RALPH_DIR/templates/email-notification.txt" "$msg" "$type" "$batch_count")
+        text_body=$(render_email_template "$RALPH_DIR/templates/email-notification.txt" "$msg" "$type" "$batch_count" "$batched_items_data")
     else
         # Fallback to plain message
         text_body="$msg"
@@ -1183,7 +1249,7 @@ if $TEST_MODE; then
 
     # Email configuration check
     if [ -n "${RALPH_EMAIL_TO:-}" ] && [ -n "${RALPH_EMAIL_FROM:-}" ]; then
-        local email_method="unknown"
+        email_method="unknown"
         if [ -n "${RALPH_SENDGRID_API_KEY:-}" ]; then
             email_method="SendGrid API"
         elif [ -n "${RALPH_AWS_SES_REGION:-}" ]; then
@@ -1244,7 +1310,7 @@ if $TEST_MODE; then
     echo ""
     if $SENT_ANY; then
         echo "Test complete! Check your notification channels."
-        if [ ${#SEND_ERRORS[@]} -gt 0 ]; then
+        if [[ "$(declare -p SEND_ERRORS 2>/dev/null)" == *"="* ]]; then
             echo ""
             echo "Note: Some platforms failed to send. Check configuration."
         fi
