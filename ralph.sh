@@ -70,13 +70,22 @@ log_error() {
     echo -e "${RED}Error: $message${NC}" >&2
 }
 
-# Source shared validation library
+# Source shared libraries
 source "${RALPH_DIR}/lib/validation.sh"
+source "${RALPH_DIR}/lib/error-handling.sh"
 
-# The following validation functions are now loaded from lib/validation.sh:
+# Initialize enhanced error handling
+setup_error_handling "ralph.sh" "$LOG_DIR"
+
+# The following functions are now loaded from lib/validation.sh:
 # - validate_webhook_url() / validate_url()
 # - validate_numeric()
 # - validate_email()
+#
+# Enhanced error handling functions from lib/error-handling.sh:
+# - retry_command() - retry with exponential backoff
+# - validate_api_key() - validate Claude API key format
+# - validate_network_connectivity() - check network access
 # - validate_file_path() / validate_path()
 # - json_escape()
 # - mask_token()
@@ -482,13 +491,10 @@ PLAN_FILE="$1"
 MODE="${2:-build}"
 MAX_ITERATIONS="${3:-${MAX_ITERATIONS_DEFAULT:-0}}"
 
-# Validate plan file path and existence
-if ! validate_file_path "$PLAN_FILE" "Plan file"; then
+# Enhanced validation of input parameters
+if ! validate_file_enhanced "$PLAN_FILE" "Plan file"; then
     exit 1
 fi
-
-if [ ! -f "$PLAN_FILE" ]; then
-    log_error "Plan file not found: $PLAN_FILE"
     exit 1
 fi
 
@@ -499,11 +505,12 @@ if [ "$MODE" != "plan" ] && [ "$MODE" != "build" ]; then
     exit 1
 fi
 
-# Validate max iterations
+# Validate max iterations with enhanced error handling
 if [ "$MAX_ITERATIONS" != "0" ]; then
     max_iter_min="${MAX_ITERATIONS_MIN:-1}"
     max_iter_max="${MAX_ITERATIONS_MAX:-10000}"
     if ! validate_numeric "$MAX_ITERATIONS" "Max iterations" "$max_iter_min" "$max_iter_max"; then
+        suggest_recovery "Use a number between $max_iter_min and $max_iter_max, or use 0 for unlimited iterations"
         exit 1
     fi
 fi
@@ -689,6 +696,26 @@ while true; do
         sed "s|\${PROGRESS_FILE}|$safe_progress_file|g" | \
         sed "s|\${PLAN_NAME}|$safe_plan_name|g" | \
         sed "s|\${AUTO_COMMIT}|$safe_should_commit|g")
+
+    # Validate prerequisites before calling Claude
+    if [ -n "${CLAUDE_API_KEY:-}" ]; then
+        if ! validate_api_key "$CLAUDE_API_KEY"; then
+            log_error "Invalid Claude API key format"
+            exit 1
+        fi
+    fi
+    
+    # Check network connectivity
+    if ! validate_network_connectivity "api.anthropic.com" 10; then
+        log_error "Cannot reach Anthropic API servers"
+        suggest_recovery "Check your internet connection and firewall settings"
+        exit 1
+    fi
+    
+    # Check available disk space (require 50MB minimum)
+    if ! validate_disk_space 50 "."; then
+        exit 1
+    fi
 
     # Run Claude with retry logic (configurable attempts with exponential backoff)
     max_claude_retries="${CLAUDE_MAX_RETRIES:-3}"

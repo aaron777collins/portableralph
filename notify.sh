@@ -75,6 +75,12 @@ if [ -f "$RALPH_DIR/lib/platform-utils.sh" ]; then
     source "$RALPH_DIR/lib/platform-utils.sh"
 fi
 
+# Load enhanced error handling
+if [ -f "$RALPH_DIR/lib/error-handling.sh" ]; then
+    source "$RALPH_DIR/lib/error-handling.sh"
+    setup_error_handling "notify.sh"
+fi
+
 # Load and decrypt environment variables
 if [ -f "$RALPH_DIR/decrypt-env.sh" ]; then
     source "$RALPH_DIR/decrypt-env.sh"
