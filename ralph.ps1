@@ -31,53 +31,66 @@ param(
     [switch]$TestNotifications
 )
 
-# Handle Help and Version early, before any initialization that might fail
+# Handle Help and Version IMMEDIATELY before any processing that might fail
+# This ensures help always works regardless of script state or dependencies
+try {
+    # Check for Help/Version first, before any variables or operations
+    foreach ($arg in $args) {
+        if ($arg -eq "-Help" -or $arg -eq "--help" -or $arg -eq "-h" -or $arg -eq "-?" -or $arg -eq "/?") {
+            Write-Host "PortableRalph v1.6.0 - Autonomous AI Development Loop" -ForegroundColor Green
+            Write-Host ""
+            Write-Host "Usage:" -ForegroundColor Yellow
+            Write-Host "  .\ralph.ps1 <plan-file> [mode] [max-iterations]"
+            Write-Host "  .\ralph.ps1 -Help"
+            Write-Host "  .\ralph.ps1 -Version"
+            Write-Host ""
+            Write-Host "Arguments:" -ForegroundColor Yellow
+            Write-Host "  plan-file       Path to your plan/spec file (required)"
+            Write-Host "  mode            'plan' or 'build' (default: build)"
+            Write-Host "  max-iterations  Maximum loop iterations (default: unlimited)"
+            Write-Host ""
+            Write-Host "Examples:" -ForegroundColor Yellow
+            Write-Host "  .\ralph.ps1 .\feature.md              # Build until done"
+            Write-Host "  .\ralph.ps1 .\feature.md plan         # Plan only"
+            Write-Host "  .\ralph.ps1 .\feature.md build 20     # Build, max 20 iterations"
+            Write-Host ""
+            Write-Host "More info: https://github.com/aaron777collins/portableralph"
+            exit 0
+        }
+        if ($arg -eq "-Version" -or $arg -eq "--version" -or $arg -eq "-v") {
+            Write-Host "PortableRalph v1.6.0"
+            exit 0
+        }
+    }
+
+    # Also handle parameter-based flags
+    if ($Help) {
+        Write-Host "PortableRalph v1.6.0 - Autonomous AI Development Loop" -ForegroundColor Green
+        Write-Host ""
+        Write-Host "Usage:" -ForegroundColor Yellow
+        Write-Host "  .\ralph.ps1 <plan-file> [mode] [max-iterations]"
+        Write-Host ""
+        Write-Host "More info: https://github.com/aaron777collins/portableralph"
+        exit 0
+    }
+    if ($Version) {
+        Write-Host "PortableRalph v1.6.0"
+        exit 0
+    }
+} catch {
+    # If anything fails in help handling, at least show basic help
+    Write-Host "PortableRalph v1.6.0"
+    Write-Host "Usage: .\ralph.ps1 <plan-file> [mode] [max-iterations]"
+    exit 0
+}
+
+# Now set up variables for the rest of the script
 $VERSION = "1.6.0"
-$RALPH_DIR = Split-Path -Parent $MyInvocation.MyCommand.Path
-
-function Show-Usage {
-    Write-Host "PortableRalph v$VERSION - Autonomous AI Development Loop" -ForegroundColor Green
-    Write-Host ""
-    Write-Host "Usage:" -ForegroundColor Yellow
-    Write-Host "  .\ralph.ps1 <plan-file> [mode] [max-iterations]"
-    Write-Host "  .\ralph.ps1 -Help"
-    Write-Host "  .\ralph.ps1 -Version"
-    Write-Host ""
-    Write-Host "Arguments:" -ForegroundColor Yellow
-    Write-Host "  plan-file       Path to your plan/spec file (required)"
-    Write-Host "  mode            'plan' or 'build' (default: build)"
-    Write-Host "  max-iterations  Maximum loop iterations (default: unlimited)"
-    Write-Host ""
-    Write-Host "Modes:" -ForegroundColor Yellow
-    Write-Host "  plan   Analyze codebase, create task list (runs once, then exits)"
-    Write-Host "  build  Implement tasks one at a time until RALPH_DONE"
-    Write-Host ""
-    Write-Host "Examples:" -ForegroundColor Yellow
-    Write-Host "  .\ralph.ps1 .\feature.md              # Build until done"
-    Write-Host "  .\ralph.ps1 .\feature.md plan         # Plan only (creates task list, exits)"
-    Write-Host "  .\ralph.ps1 .\feature.md build 20     # Build, max 20 iterations"
-    Write-Host ""
-    Write-Host "Exit Conditions:" -ForegroundColor Yellow
-    Write-Host "  - Plan mode: Exits after 1 iteration when task list is created"
-    Write-Host "  - Build mode: RALPH_DONE appears in <plan-name>_PROGRESS.md"
-    Write-Host "  - Max iterations reached (if specified)"
-    Write-Host "  - Ctrl+C"
-    Write-Host ""
-    Write-Host "Progress File:" -ForegroundColor Yellow
-    Write-Host "  Created as <plan-name>_PROGRESS.md in current directory"
-    Write-Host ""
-    Write-Host "More info: https://github.com/aaron777collins/portableralph"
-    exit 0
+try {
+    $RALPH_DIR = Split-Path -Parent $MyInvocation.MyCommand.Path
+} catch {
+    $RALPH_DIR = "."
 }
-
-function Show-Version {
-    Write-Host "PortableRalph v$VERSION"
-    exit 0
-}
-
-# Handle flags immediately, before any other initialization
-if ($Help) { Show-Usage }
-if ($Version) { Show-Version }
 
 $ErrorActionPreference = "Stop"
 
