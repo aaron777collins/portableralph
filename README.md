@@ -357,7 +357,19 @@ The `.gitattributes` file ensures proper line endings across platforms (LF for `
 
 PortableRalph is fully cross-platform with **CI-verified native Windows support**:
 
-> **✅ CI Verified:** Windows compatibility is automatically tested on every push via GitHub Actions. See the [Windows Compatibility](https://github.com/aaron777collins/portableralph/actions/workflows/windows-test.yml) workflow badge above.
+> **✅ CI Verified:** Windows compatibility is automatically tested on every push via GitHub Actions with **31/31 tests passing**. See the [Windows Compatibility](https://github.com/aaron777collins/portableralph/actions/workflows/windows-test.yml) workflow badge above.
+
+### Windows CI Testing
+
+The [`windows-test.yml`](.github/workflows/windows-test.yml) GitHub Actions workflow provides comprehensive Windows validation:
+
+- **PowerShell Script Testing:** Syntax validation, help/version parameters, dependency verification for all `.ps1` files
+- **Batch File Testing:** `launcher.bat` functionality and Windows CMD environment compatibility  
+- **Integration Testing:** Batch-to-PowerShell interop and end-to-end workflow simulation
+- **Notification System:** Dry-run notification tests and status reporting verification
+- **Windows-Specific Features:** Registry access, services, environment variables, file system operations
+
+The CI generates a detailed compatibility report artifact documenting test results and platform information.
 
 ### Installation Options
 
@@ -376,9 +388,12 @@ PortableRalph is fully cross-platform with **CI-verified native Windows support*
 ### Windows Requirements
 
 - **PowerShell 5.1+** (pre-installed on Windows 10/11)
+  - Tested on PowerShell 5.1, Windows PowerShell, and PowerShell 7+
+  - JSON handling, web requests, and file system operations verified
 - **Execution Policy:** Run `Set-ExecutionPolicy RemoteSigned -Scope CurrentUser` if scripts are blocked
-- **Claude Code CLI:** Must be installed and authenticated
+- **Claude Code CLI:** Must be installed and authenticated  
 - **Git for Windows:** Recommended for version control features
+- **Windows Features:** Registry access, services query, and environment variables (automatically tested in CI)
 
 ### Path Handling
 
