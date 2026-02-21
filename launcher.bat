@@ -84,11 +84,13 @@ if "%COMMAND%"=="" (
     REM Accept exit code 0 (success) or 1 (expected for help display) as valid
     if %HELP_EXIT_CODE% EQU 0 (
         echo ✅ ralph.ps1 help works
-    ) else if %HELP_EXIT_CODE% EQU 1 (
-        echo ✅ ralph.ps1 help works (exit code 1 - normal for help display)
     ) else (
-        echo ❌ ralph.ps1 help failed (exit code: %HELP_EXIT_CODE%)
-        set "TEST_FAILED=1"
+        if %HELP_EXIT_CODE% EQU 1 (
+            echo ✅ ralph.ps1 help works (exit code 1 - normal for help display)
+        ) else (
+            echo ❌ ralph.ps1 help failed (exit code: %HELP_EXIT_CODE%)
+            set "TEST_FAILED=1"
+        )
     )
     
     echo.
