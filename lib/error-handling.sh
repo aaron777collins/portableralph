@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/bash
 # error-handling.sh - Enhanced error handling library for PortableRalph
 # Provides standardized error handling, retry logic, and recovery mechanisms
 #

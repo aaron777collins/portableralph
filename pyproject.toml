@@ -1,0 +1,123 @@
+[build-system]
+requires = ["setuptools>=45", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "portableralph"
+version = "1.7.0"
+description = "Autonomous AI Development Loop"
+authors = [
+    {name = "Aaron Collins", email = "contact@aaroncollins.info"}
+]
+readme = "README.md"
+requires-python = ">=3.8"
+license = {text = "MIT"}
+
+[project.urls]
+Homepage = "https://github.com/aaron777collins/portableralph"
+Repository = "https://github.com/aaron777collins/portableralph"
+Issues = "https://github.com/aaron777collins/portableralph/issues"
+
+# Python linting configuration (for test scripts)
+[tool.pylint]
+[tool.pylint.main]
+load-plugins = [
+    "pylint.extensions.code_style",
+    "pylint.extensions.typing",
+]
+
+[tool.pylint.format]
+max-line-length = 120
+indent-string = "    "
+
+[tool.pylint.messages_control]
+disable = [
+    "too-few-public-methods",
+    "too-many-arguments", 
+    "too-many-locals",
+    "too-many-branches",
+    "import-error",  # May not have all deps in test environment
+]
+
+[tool.pylint.design]
+max-complexity = 15
+max-args = 8
+max-locals = 20
+
+[tool.pylint.basic]
+good-names = ["i", "j", "k", "ex", "Run", "_", "f", "e"]
+variable-rgx = "[a-z_][a-z0-9_]{2,30}$"
+function-rgx = "[a-z_][a-z0-9_]{2,30}$"
+const-rgx = "(([A-Z_][A-Z0-9_]*)|(__.*__))$"
+
+# Black code formatting
+[tool.black]
+line-length = 120
+target-version = ['py38', 'py39', 'py310', 'py311']
+include = '\.pyi?$'
+extend-exclude = '''
+/(
+  # directories
+  \.eggs
+  | \.git
+  | \.hg
+  | \.mypy_cache
+  | \.tox
+  | \.venv
+  | build
+  | dist
+)/
+'''
+
+# isort import sorting
+[tool.isort]
+profile = "black"
+line_length = 120
+multi_line_output = 3
+include_trailing_comma = true
+force_grid_wrap = 0
+use_parentheses = true
+ensure_newline_before_comments = true
+
+# pytest configuration
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = "test-*.py"
+python_functions = "test_*"
+addopts = "-v --tb=short"
+filterwarnings = [
+    "ignore::DeprecationWarning",
+    "ignore::PendingDeprecationWarning"
+]
+
+# Shell script quality standards (documentation only - enforced by quality tests)
+[tool.portableralph]
+[tool.portableralph.bash]
+# Bash scripting standards
+naming_convention = "snake_case"  # Functions and variables
+constant_naming = "UPPER_CASE"    # Constants and environment variables
+quote_style = "double"            # Prefer double quotes for variables
+shebang = "#!/bin/bash"           # Required shebang
+error_handling = "set -euo pipefail"  # Required error handling
+
+[tool.portableralph.powershell]
+# PowerShell scripting standards  
+function_naming = "Verb-Noun"     # Approved PowerShell verbs
+variable_naming = "PascalCase"    # Variables and parameters
+quote_style = "double"            # Prefer double quotes
+error_handling = '$ErrorActionPreference = "Stop"'  # Required error handling
+
+[tool.portableralph.quality]
+# Quality thresholds
+max_function_complexity = 15      # Cyclomatic complexity limit
+min_documentation_coverage = 80   # Percentage of functions documented  
+max_file_lines = 500             # Maximum lines per file
+max_function_lines = 50          # Maximum lines per function
+
+[tool.portableralph.validation]
+# Validation requirements
+input_validation = true          # All external inputs must be validated
+path_validation = true           # All paths must be validated  
+url_validation = true            # All URLs must be validated
+shared_libraries = true          # Use shared validation libraries
+error_logging = true             # Use shared error logging functions

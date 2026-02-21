@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/bash
 # validation.sh - Shared validation functions for Ralph
 # This library provides common validation utilities used across Ralph scripts
 # to reduce code duplication and ensure consistent validation logic.
