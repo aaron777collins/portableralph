@@ -166,7 +166,7 @@ test_invalid_iteration_parameter() {
     output=$("$RALPH_DIR/ralph.sh" "$TEST_DIR/test-plan.md" "build" "-5" 2>&1) || exit_code=$?
     
     assert_exit_code 1 "${exit_code:-0}" "Negative iteration count"
-    assert_contains "Invalid\|must be positive\|greater than" "$output" "Negative number error message"
+    assert_contains "must be.*positive\|positive integer" "$output" "Negative number error message"
 }
 
 test_network_failure_simulation() {
