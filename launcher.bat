@@ -57,32 +57,32 @@ REM Test PowerShell availability
 echo Testing PowerShell availability...
 where powershell.exe >nul 2>&1
 if %ERRORLEVEL% EQU 0 (
-    echo ✅ PowerShell is available
+    echo [OK] PowerShell is available
 ) else (
-    echo ❌ PowerShell is not available
+    echo [FAIL] PowerShell is not available
     set "TEST_FAILED=1"
 )
 
 REM Test core scripts exist
 echo Testing core script files...
 if exist "%SCRIPT_DIR%\ralph.ps1" (
-    echo ✅ ralph.ps1 found
+    echo [OK] ralph.ps1 found
 ) else (
-    echo ❌ ralph.ps1 not found
+    echo [FAIL] ralph.ps1 not found
     set "TEST_FAILED=1"
 )
 
 if exist "%SCRIPT_DIR%\install.ps1" (
-    echo ✅ install.ps1 found
+    echo [OK] install.ps1 found
 ) else (
-    echo ❌ install.ps1 not found
+    echo [FAIL] install.ps1 not found
     set "TEST_FAILED=1"
 )
 
 if exist "%SCRIPT_DIR%\notify.ps1" (
-    echo ✅ notify.ps1 found
+    echo [OK] notify.ps1 found
 ) else (
-    echo ❌ notify.ps1 not found
+    echo [FAIL] notify.ps1 not found
     set "TEST_FAILED=1"
 )
 
@@ -92,22 +92,22 @@ powershell.exe -ExecutionPolicy Bypass -File "%SCRIPT_DIR%\ralph.ps1" -Help >nul
 set "HELP_EXIT_CODE=%ERRORLEVEL%"
 REM Accept exit code 0 (success) or 1 (expected for help display) as valid
 if %HELP_EXIT_CODE% EQU 0 (
-    echo ✅ ralph.ps1 help works
+    echo [OK] ralph.ps1 help works
 ) else (
     if %HELP_EXIT_CODE% EQU 1 (
-        echo ✅ ralph.ps1 help works (exit code 1 - normal for help display)
+        echo [OK] ralph.ps1 help works (exit code 1 - normal for help display)
     ) else (
-        echo ❌ ralph.ps1 help failed (exit code: %HELP_EXIT_CODE%)
+        echo [FAIL] ralph.ps1 help failed (exit code: %HELP_EXIT_CODE%)
         set "TEST_FAILED=1"
     )
 )
 
 echo.
 if defined TEST_FAILED (
-    echo ❌ SYSTEM TEST FAILED - Some components are not working
+    echo [FAIL] SYSTEM TEST FAILED - Some components are not working
     exit /b 1
 ) else (
-    echo ✅ SYSTEM TEST PASSED - All components are working
+    echo [PASS] SYSTEM TEST PASSED - All components are working
     exit /b 0
 )
 
