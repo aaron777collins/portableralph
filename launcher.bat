@@ -53,65 +53,62 @@ echo Running PortableRalph system test...
 echo.
 echo === Testing System Components ===
 
-REM Clear any previous test state
-set "TEST_FAILED="
+REM Use a pass counter approach - count successful tests
+set /a PASS_COUNT=0
+set /a EXPECTED_TESTS=5
 
 REM Test PowerShell availability
 echo Testing PowerShell availability...
 where powershell.exe >nul 2>&1
-if %ERRORLEVEL% EQU 0 (
+if !ERRORLEVEL! EQU 0 (
     echo [OK] PowerShell is available
+    set /a PASS_COUNT+=1
 ) else (
     echo [FAIL] PowerShell is not available
-    set "TEST_FAILED=1"
 )
 
 REM Test core scripts exist
 echo Testing core script files...
 if exist "%SCRIPT_DIR%\ralph.ps1" (
     echo [OK] ralph.ps1 found
+    set /a PASS_COUNT+=1
 ) else (
     echo [FAIL] ralph.ps1 not found
-    set "TEST_FAILED=1"
 )
 
 if exist "%SCRIPT_DIR%\install.ps1" (
     echo [OK] install.ps1 found
+    set /a PASS_COUNT+=1
 ) else (
     echo [FAIL] install.ps1 not found
-    set "TEST_FAILED=1"
 )
 
 if exist "%SCRIPT_DIR%\notify.ps1" (
     echo [OK] notify.ps1 found
+    set /a PASS_COUNT+=1
 ) else (
     echo [FAIL] notify.ps1 not found
-    set "TEST_FAILED=1"
 )
 
 REM Test ralph.ps1 help functionality
 echo Testing ralph.ps1 help functionality...
 REM Simplified test - just check if file is readable by PowerShell
 powershell.exe -ExecutionPolicy Bypass -Command "Get-Content '%SCRIPT_DIR%\ralph.ps1' -TotalCount 1" >nul 2>&1
-set "HELP_EXIT_CODE=%ERRORLEVEL%"
-if %HELP_EXIT_CODE% EQU 0 (
+if !ERRORLEVEL! EQU 0 (
     echo [OK] ralph.ps1 is accessible
+    set /a PASS_COUNT+=1
 ) else (
-    echo [FAIL] ralph.ps1 not accessible (exit code: %HELP_EXIT_CODE%)
-    set "TEST_FAILED=1"
+    echo [FAIL] ralph.ps1 not accessible
 )
 
 echo.
-echo DEBUG: TEST_FAILED value is [%TEST_FAILED%]
-echo DEBUG: Checking if TEST_FAILED is defined...
-if defined TEST_FAILED (
-    echo DEBUG: TEST_FAILED IS defined
-    echo [FAIL] SYSTEM TEST FAILED - Some components are not working
-    exit /b 1
-) else (
-    echo DEBUG: TEST_FAILED is NOT defined
+echo Tests passed: !PASS_COUNT! / !EXPECTED_TESTS!
+if !PASS_COUNT! EQU !EXPECTED_TESTS! (
     echo [PASS] SYSTEM TEST PASSED - All components are working
     exit /b 0
+) else (
+    echo [FAIL] SYSTEM TEST FAILED - Some components are not working
+    exit /b 1
 )
 
 :parse_command
