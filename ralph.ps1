@@ -15,37 +15,7 @@
 #
 # Progress is tracked in: <plan-name>_PROGRESS.md (in current directory)
 
-# CRITICAL: Handle Help and Version IMMEDIATELY before param() or any other operations
-# This prevents any dependency loading or variable setup from interfering with help display
-if ($args.Count -gt 0) {
-    foreach ($arg in $args) {
-        if ($arg -eq "-Help" -or $arg -eq "--help" -or $arg -eq "-h" -or $arg -eq "-?" -or $arg -eq "/?" -or $arg -eq "help") {
-            Write-Host "PortableRalph v1.6.0 - Autonomous AI Development Loop" -ForegroundColor Green
-            Write-Host ""
-            Write-Host "Usage:" -ForegroundColor Yellow
-            Write-Host "  .\ralph.ps1 <plan-file> [mode] [max-iterations]"
-            Write-Host "  .\ralph.ps1 -Help"
-            Write-Host "  .\ralph.ps1 -Version"
-            Write-Host ""
-            Write-Host "Arguments:" -ForegroundColor Yellow
-            Write-Host "  plan-file       Path to your plan/spec file (required)"
-            Write-Host "  mode            'plan' or 'build' (default: build)"
-            Write-Host "  max-iterations  Maximum loop iterations (default: unlimited)"
-            Write-Host ""
-            Write-Host "Examples:" -ForegroundColor Yellow
-            Write-Host "  .\ralph.ps1 .\feature.md              # Build until done"
-            Write-Host "  .\ralph.ps1 .\feature.md plan         # Plan only"
-            Write-Host "  .\ralph.ps1 .\feature.md build 20     # Build, max 20 iterations"
-            Write-Host ""
-            Write-Host "More info: https://github.com/aaron777collins/portableralph"
-            exit 0
-        }
-        if ($arg -eq "-Version" -or $arg -eq "--version" -or $arg -eq "-v" -or $arg -eq "version") {
-            Write-Host "PortableRalph v1.6.0"
-            exit 0
-        }
-    }
-}
+# PowerShell parameter-based help handling provides cleaner interface
 
 param(
     [Parameter(Position=0)]

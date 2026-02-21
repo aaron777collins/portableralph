@@ -601,8 +601,7 @@ run_all_tests() {
     test_custom_script_executable_check
     test_custom_script_path_traversal
     test_custom_script_shell_injection
-    # TODO: Fix test_custom_script_timeout - currently hangs for 60 seconds
-    # test_custom_script_timeout
+    # test_custom_script_timeout - DISABLED: test hangs due to timeout implementation issue
 
     echo ""
     echo "=== Path Traversal Prevention Tests ==="

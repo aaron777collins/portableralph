@@ -29,11 +29,17 @@ set -euo pipefail
 VERSION="1.6.0"
 REPO_URL="https://github.com/aaron777collins/portableralph.git"
 
-# Determine home directory (use USERPROFILE on Windows, HOME elsewhere)
-if [ -n "${USERPROFILE:-}" ] && [[ "$(uname -s)" =~ ^(MINGW|MSYS|CYGWIN) ]]; then
-    USER_HOME="${USERPROFILE}"
+# Load platform utilities for home directory detection
+if [ -f "$(dirname "$0")/lib/platform-utils.sh" ]; then
+    source "$(dirname "$0")/lib/platform-utils.sh"
+    USER_HOME=$(get_home_dir)
 else
-    USER_HOME="${HOME}"
+    # Fallback for when lib is not available (during download)
+    if [ -n "${USERPROFILE:-}" ] && [[ "$(uname -s)" =~ ^(MINGW|MSYS|CYGWIN) ]]; then
+        USER_HOME="${USERPROFILE}"
+    else
+        USER_HOME="${HOME}"
+    fi
 fi
 
 DEFAULT_INSTALL_DIR="${USER_HOME}/ralph"
