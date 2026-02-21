@@ -1,6 +1,8 @@
 # PortableRalph
 
 [![Deploy Documentation](https://github.com/aaron777collins/portableralph/actions/workflows/docs.yml/badge.svg)](https://github.com/aaron777collins/portableralph/actions/workflows/docs.yml)
+[![Windows Compatibility](https://github.com/aaron777collins/portableralph/actions/workflows/windows-test.yml/badge.svg)](https://github.com/aaron777collins/portableralph/actions/workflows/windows-test.yml)
+[![CI Tests](https://github.com/aaron777collins/portableralph/actions/workflows/ci.yml/badge.svg)](https://github.com/aaron777collins/portableralph/actions/workflows/ci.yml)
 
 An autonomous AI development loop that works in **any repo**.
 
@@ -353,7 +355,9 @@ The `.gitattributes` file ensures proper line endings across platforms (LF for `
 
 ## Windows Support
 
-PortableRalph is fully cross-platform with native Windows support:
+PortableRalph is fully cross-platform with **CI-verified native Windows support**:
+
+> **✅ CI Verified:** Windows compatibility is automatically tested on every push via GitHub Actions. See the [Windows Compatibility](https://github.com/aaron777collins/portableralph/actions/workflows/windows-test.yml) workflow badge above.
 
 ### Installation Options
 
@@ -368,6 +372,13 @@ PortableRalph is fully cross-platform with native Windows support:
    ```
 
 3. **WSL:** Run Linux version in Windows Subsystem for Linux
+
+### Windows Requirements
+
+- **PowerShell 5.1+** (pre-installed on Windows 10/11)
+- **Execution Policy:** Run `Set-ExecutionPolicy RemoteSigned -Scope CurrentUser` if scripts are blocked
+- **Claude Code CLI:** Must be installed and authenticated
+- **Git for Windows:** Recommended for version control features
 
 ### Path Handling
 
@@ -431,6 +442,84 @@ ralph C:\absolute\path\to\plan.md build
 - Build mode loops until all tasks are complete, then writes `RALPH_DONE` on its own line in the Status section
 - Only build mode should ever write the completion marker
 - The marker must be on its own line to be detected (not inline with other text)
+
+## For Maintainers: CI/CD Workflows
+
+PortableRalph uses GitHub Actions for automated testing and deployment:
+
+### CI Workflows
+
+| Workflow | File | Purpose |
+|----------|------|---------|
+| **Windows Compatibility** | `.github/workflows/windows-test.yml` | Tests PowerShell scripts, batch files, and Windows integration |
+| **CI Tests** | `.github/workflows/ci.yml` | General compatibility and linting tests |
+| **Test Suite** | `.github/workflows/test.yml` | Full test suite execution |
+| **Documentation** | `.github/workflows/docs.yml` | MkDocs documentation deployment |
+| **Release** | `.github/workflows/release.yml` | Version releases |
+
+### Windows CI Testing Details
+
+The Windows CI workflow (`windows-test.yml`) automatically verifies:
+
+1. **PowerShell Script Testing**
+   - Syntax validation for all `.ps1` files
+   - Help/version parameter testing
+   - Dependency verification
+
+2. **Batch File Testing**
+   - `launcher.bat` functionality
+   - Windows CMD environment compatibility
+
+3. **Integration Testing**
+   - Batch-to-PowerShell interop
+   - End-to-end workflow simulation
+
+4. **Notification System Testing**
+   - Dry-run notification tests
+   - Status reporting verification
+
+### Running CI Locally
+
+To test Windows changes locally before pushing:
+
+```powershell
+# Test PowerShell syntax
+$scriptContent = Get-Content "ralph.ps1" -Raw
+[System.Management.Automation.PSParser]::Tokenize($scriptContent, [ref]@())
+
+# Test basic functionality
+.\ralph.ps1 -Help
+.\install.ps1 -Help
+```
+
+### CI Artifacts
+
+The Windows CI generates a `windows-compatibility-report.md` artifact containing:
+- Test results summary
+- PowerShell version tested
+- Platform information
+- Recommendations
+
+## Troubleshooting (Quick Reference)
+
+### Windows Issues
+
+| Problem | Solution |
+|---------|----------|
+| Scripts blocked | `Set-ExecutionPolicy RemoteSigned -Scope CurrentUser` |
+| Line ending errors (`'\r': command not found`) | `git config core.autocrlf input` and re-clone |
+| `claude: command not found` | Install [Claude Code CLI](https://docs.anthropic.com/en/docs/claude-code) |
+| Path issues in WSL | Use `/mnt/c/...` paths, not `C:\...` |
+
+### All Platforms
+
+| Problem | Solution |
+|---------|----------|
+| Ralph command not found | Add alias: `alias ralph="~/ralph/ralph.sh"` |
+| Tasks repeating | Check build/test errors; mark completed tasks manually |
+| Notifications failing | Run `ralph notify test` to diagnose |
+
+See [Troubleshooting Guide](docs/TROUBLESHOOTING.md) for detailed solutions.
 
 ## License
 
