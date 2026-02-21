@@ -7,6 +7,50 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.8.0] - 2026-02-21
+
+### Added
+- Comprehensive security audit with TDD approach and security checklist
+- Code quality improvements and enhanced testing infrastructure  
+- Windows CI support and comprehensive Windows compatibility documentation
+- Enhanced error handling across all PortableRalph components
+- Comprehensive PowerShell syntax validation tests
+- Production readiness documentation including troubleshooting and performance guides
+- Docker sandbox implementation (PR #2 from dmelo)
+- Comprehensive Windows installation and CI documentation
+
+### Changed
+- Improved launcher.bat reliability with better test result handling
+- Enhanced parameter-based help handling with error protection
+- Improved PowerShell invocation and quoting in batch scripts
+
+### Fixed
+- Critical error handling validation failures in p4-3
+- PowerShell syntax errors for Windows compatibility  
+- Unmatched quote issues in ralph.ps1
+- Error handling for invalid modes, options, and help requests
+- Launcher.bat reliability improvements and batch syntax errors
+- Email notifications fix (PR #3 from avwohl)
+- Unicode character issues causing PowerShell syntax errors
+- YAML parsing errors in Windows workflow
+- SSRF protection - properly reject localhost URLs
+
+### Security
+- Comprehensive security audit report and security theater removal
+- SSRF protection improvements for URL validation
+- Enhanced error protection in parameter handling
+
+## [1.7.0] - 2025-01-15
+
+### Added
+- Windows support and concurrency fixes
+- Claude Code skill integration for ralph
+- New terminal-style icon with white variant for better visibility
+
+### Changed
+- Updated icons to new R> terminal style
+- Improved icon scaling and centering
+
 ## [1.6.0] - 2025-01-15
 
 ### Added
@@ -77,7 +121,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Progress file tracking
 - Git integration for automatic commits
 
-[Unreleased]: https://github.com/aaron777collins/portableralph/compare/v1.6.0...HEAD
+[Unreleased]: https://github.com/aaron777collins/portableralph/compare/v1.8.0...HEAD
+[1.8.0]: https://github.com/aaron777collins/portableralph/compare/v1.7.0...v1.8.0
+[1.7.0]: https://github.com/aaron777collins/portableralph/compare/v1.6.0...v1.7.0
 [1.6.0]: https://github.com/aaron777collins/portableralph/compare/v1.5.0...v1.6.0
 [1.5.0]: https://github.com/aaron777collins/portableralph/compare/v1.4.0...v1.5.0
 [1.4.0]: https://github.com/aaron777collins/portableralph/compare/v1.3.0...v1.4.0
