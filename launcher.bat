@@ -53,6 +53,9 @@ echo Running PortableRalph system test...
 echo.
 echo === Testing System Components ===
 
+REM Clear any previous test state
+set "TEST_FAILED="
+
 REM Test PowerShell availability
 echo Testing PowerShell availability...
 where powershell.exe >nul 2>&1
