@@ -16,92 +16,102 @@ set "SCRIPT_DIR=%SCRIPT_DIR:~0,-1%"
 REM Get command to run
 set "COMMAND=%~1"
 
-REM Handle help flags and test mode
+REM Handle help flags, version, and test mode
 if "%COMMAND%"=="--help" goto :show_help
+if "%COMMAND%"=="--version" goto :show_version
 if "%COMMAND%"=="--test" goto :run_test
 if "%COMMAND%"=="-h" goto :show_help
 if "%COMMAND%"=="-?" goto :show_help
 if "%COMMAND%"=="/?" goto :show_help
 if "%COMMAND%"=="help" goto :show_help
+if "%COMMAND%"=="" goto :show_help
 
-if "%COMMAND%"=="" (
-    :show_help
-    echo Usage: %~nx0 ^<command^> [args...]
-    echo.
-    echo Commands:
-    echo   ralph   - Run PortableRalph
-    echo   update  - Update PortableRalph
-    echo   notify  - Configure notifications
-    echo   monitor - Monitor progress
-    echo.
-    echo Options:
-    echo   --help, -h, -?  - Show this help message
-    echo   --test          - Run system test
-    exit /b 0
+goto :parse_command
+
+:show_help
+echo Usage: %~nx0 ^<command^> [args...]
+echo.
+echo Commands:
+echo   ralph   - Run PortableRalph
+echo   update  - Update PortableRalph
+echo   notify  - Configure notifications
+echo   monitor - Monitor progress
+echo.
+echo Options:
+echo   --help, -h, -?  - Show this help message
+echo   --version       - Show version information
+echo   --test          - Run system test
+exit /b 0
+
+:show_version
+echo PortableRalph Launcher v1.0.0
+echo Auto-detection launcher for Windows environments
+exit /b 0
 
 :run_test
-    echo Running PortableRalph system test...
-    echo.
-    echo === Testing System Components ===
-    
-    REM Test PowerShell availability
-    echo Testing PowerShell availability...
-    where powershell.exe >nul 2>&1
-    if %ERRORLEVEL% EQU 0 (
-        echo ✅ PowerShell is available
+echo Running PortableRalph system test...
+echo.
+echo === Testing System Components ===
+
+REM Test PowerShell availability
+echo Testing PowerShell availability...
+where powershell.exe >nul 2>&1
+if %ERRORLEVEL% EQU 0 (
+    echo ✅ PowerShell is available
+) else (
+    echo ❌ PowerShell is not available
+    set "TEST_FAILED=1"
+)
+
+REM Test core scripts exist
+echo Testing core script files...
+if exist "%SCRIPT_DIR%\ralph.ps1" (
+    echo ✅ ralph.ps1 found
+) else (
+    echo ❌ ralph.ps1 not found
+    set "TEST_FAILED=1"
+)
+
+if exist "%SCRIPT_DIR%\install.ps1" (
+    echo ✅ install.ps1 found
+) else (
+    echo ❌ install.ps1 not found
+    set "TEST_FAILED=1"
+)
+
+if exist "%SCRIPT_DIR%\notify.ps1" (
+    echo ✅ notify.ps1 found
+) else (
+    echo ❌ notify.ps1 not found
+    set "TEST_FAILED=1"
+)
+
+REM Test ralph.ps1 help functionality
+echo Testing ralph.ps1 help functionality...
+powershell.exe -ExecutionPolicy Bypass -File "%SCRIPT_DIR%\ralph.ps1" -Help >nul 2>&1
+set "HELP_EXIT_CODE=%ERRORLEVEL%"
+REM Accept exit code 0 (success) or 1 (expected for help display) as valid
+if %HELP_EXIT_CODE% EQU 0 (
+    echo ✅ ralph.ps1 help works
+) else (
+    if %HELP_EXIT_CODE% EQU 1 (
+        echo ✅ ralph.ps1 help works (exit code 1 - normal for help display)
     ) else (
-        echo ❌ PowerShell is not available
+        echo ❌ ralph.ps1 help failed (exit code: %HELP_EXIT_CODE%)
         set "TEST_FAILED=1"
-    )
-    
-    REM Test core scripts exist
-    echo Testing core script files...
-    if exist "%SCRIPT_DIR%\ralph.ps1" (
-        echo ✅ ralph.ps1 found
-    ) else (
-        echo ❌ ralph.ps1 not found
-        set "TEST_FAILED=1"
-    )
-    
-    if exist "%SCRIPT_DIR%\install.ps1" (
-        echo ✅ install.ps1 found
-    ) else (
-        echo ❌ install.ps1 not found
-        set "TEST_FAILED=1"
-    )
-    
-    if exist "%SCRIPT_DIR%\notify.ps1" (
-        echo ✅ notify.ps1 found
-    ) else (
-        echo ❌ notify.ps1 not found
-        set "TEST_FAILED=1"
-    )
-    
-    REM Test ralph.ps1 help functionality
-    echo Testing ralph.ps1 help functionality...
-    powershell.exe -ExecutionPolicy Bypass -File "%SCRIPT_DIR%\ralph.ps1" -Help >nul 2>&1
-    set "HELP_EXIT_CODE=%ERRORLEVEL%"
-    REM Accept exit code 0 (success) or 1 (expected for help display) as valid
-    if %HELP_EXIT_CODE% EQU 0 (
-        echo ✅ ralph.ps1 help works
-    ) else (
-        if %HELP_EXIT_CODE% EQU 1 (
-            echo ✅ ralph.ps1 help works (exit code 1 - normal for help display)
-        ) else (
-            echo ❌ ralph.ps1 help failed (exit code: %HELP_EXIT_CODE%)
-            set "TEST_FAILED=1"
-        )
-    )
-    
-    echo.
-    if defined TEST_FAILED (
-        echo ❌ SYSTEM TEST FAILED - Some components are not working
-        exit /b 1
-    ) else (
-        echo ✅ SYSTEM TEST PASSED - All components are working
-        exit /b 0
     )
 )
+
+echo.
+if defined TEST_FAILED (
+    echo ❌ SYSTEM TEST FAILED - Some components are not working
+    exit /b 1
+) else (
+    echo ✅ SYSTEM TEST PASSED - All components are working
+    exit /b 0
+)
+
+:parse_command
 
 REM Remove first argument
 shift
