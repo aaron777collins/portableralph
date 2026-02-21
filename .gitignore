@@ -33,3 +33,24 @@ Thumbs.db
 # Security - Credentials files
 credentials
 credentials.*
+*secret*
+*password*
+*token*
+
+# Security - SSH and crypto
+.ssh/
+*.pub
+*.p12
+*.pfx
+
+# Security - Cloud provider credentials  
+.aws/
+.azure/
+.gcp/
+gcloud/
+
+# Security - Backup files that might contain secrets
+*.backup
+*.bak
+*.old
+*.orig

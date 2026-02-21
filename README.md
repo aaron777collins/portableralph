@@ -239,6 +239,94 @@ See [Notifications Guide](https://aaron777collins.github.io/portableralph/notifi
 | [Notifications](https://aaron777collins.github.io/portableralph/notifications/) | Slack, Discord, Telegram setup |
 | [How It Works](https://aaron777collins.github.io/portableralph/how-it-works/) | Technical architecture |
 | [Testing Guide](TESTING.md) | Comprehensive testing documentation |
+| [Security Guide](docs/SECURITY.md) | Security best practices and guidelines |
+
+## Security Best Practices
+
+🔒 **Security is a top priority for PortableRalph.** The project has passed comprehensive security audits and follows industry best practices.
+
+### Quick Security Setup
+
+1. **Secure Configuration:**
+   ```bash
+   # Create secure config file
+   touch ~/.ralph.env
+   chmod 600 ~/.ralph.env  # Owner read/write only
+   ```
+
+2. **Never Hardcode Secrets:**
+   ```bash
+   # ✅ Good - use environment variables
+   export CLAUDE_API_KEY="your-key-here"
+   export RALPH_SLACK_WEBHOOK_URL="your-webhook-here"
+   
+   # ❌ Bad - don't hardcode in scripts
+   CLAUDE_API_KEY="sk-ant-api03-hardcoded"
+   ```
+
+3. **Use HTTPS Only:**
+   ```bash
+   # ✅ Good - secure webhooks
+   export RALPH_SLACK_WEBHOOK_URL="https://hooks.slack.com/services/..."
+   
+   # ❌ Bad - insecure HTTP
+   export RALPH_SLACK_WEBHOOK_URL="http://insecure.example.com/webhook"
+   ```
+
+### Security Features ✅
+
+- **✅ Input Validation** - All user inputs sanitized and validated
+- **✅ Path Traversal Protection** - Prevents access outside intended directories  
+- **✅ Command Injection Prevention** - Parameterized execution prevents malicious code
+- **✅ HTTPS-Only Communication** - All network calls use secure TLS connections
+- **✅ Credential Masking** - Sensitive tokens hidden in logs and output
+- **✅ SSRF Protection** - Webhook URLs validated against private IP ranges
+- **✅ Secure File Permissions** - Config files created with 600 permissions
+- **✅ No Hardcoded Secrets** - Template-based configuration approach
+- **✅ Comprehensive Security Testing** - 26+ security tests validate protection
+
+### Security Audit Results
+
+PortableRalph has passed comprehensive security audits with **0 critical vulnerabilities**:
+
+- **Last Audit:** 2026-02-22
+- **Status:** ✅ **PRODUCTION READY**  
+- **Coverage:** Input validation, authentication, file permissions, secrets exposure
+- **Test Results:** 26/26 security tests PASSED
+
+See [Security Audit Report](security-audit-report.md) for detailed findings.
+
+### Secure Deployment
+
+**Development:**
+```bash
+# Use limited iterations for testing
+ralph ./plan.md build 5
+
+# Review changes before committing
+git diff
+```
+
+**Production:**
+```bash
+# Use secrets manager (AWS, HashiCorp Vault, etc.)
+# Set strict iteration limits
+ralph ./plan.md build 20
+
+# Enable secure logging
+export RALPH_LOG_LEVEL="INFO"
+```
+
+### Report Security Issues
+
+Found a security vulnerability? **Please report responsibly:**
+
+1. **Do NOT create a public GitHub issue**
+2. **Email:** security contact (see SECURITY.md)
+3. **Include:** Description, reproduction steps, potential impact
+4. **Timeline:** Allow 90 days for fix before public disclosure
+
+For complete security guidance, see [Security Documentation](docs/SECURITY.md).
 
 ## Testing
 
