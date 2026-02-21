@@ -408,9 +408,9 @@ if ($env:RALPH_AUTO_COMMIT -ne "true") {
 
 # Print banner
 Write-Host ""
-Write-Host "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" -ForegroundColor Blue
+Write-Host "========================================================" -ForegroundColor Blue
 Write-Host "  RALPH - Autonomous AI Development Loop" -ForegroundColor Green
-Write-Host "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" -ForegroundColor Blue
+Write-Host "========================================================" -ForegroundColor Blue
 Write-Host "  Plan:      " -NoNewline
 Write-Host $PlanFile -ForegroundColor Yellow
 Write-Host "  Mode:      " -NoNewline
@@ -443,7 +443,7 @@ if (Test-NotificationsEnabled) {
     Write-Host "disabled (run '.\ralph.ps1 notify setup')" -ForegroundColor Yellow
 }
 
-Write-Host "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" -ForegroundColor Blue
+Write-Host "========================================================" -ForegroundColor Blue
 Write-Host ""
 Write-Host "Exit conditions:" -ForegroundColor Yellow
 if ($Mode -eq "plan") {
@@ -496,18 +496,18 @@ while ($true) {
     # Check exit conditions
     if (Test-Done) {
         Write-Host ""
-        Write-Host "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" -ForegroundColor Green
+        Write-Host "========================================================" -ForegroundColor Green
         Write-Host "  RALPH_DONE - Work complete!" -ForegroundColor Green
-        Write-Host "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" -ForegroundColor Green
+        Write-Host "========================================================" -ForegroundColor Green
         Send-Notification ":white_check_mark: *Ralph Complete!*\n\`\`\`Plan: $PLAN_BASENAME\nIterations: $ITERATION\nRepo: $REPO_NAME\`\`\`"
         break
     }
 
     if ($MaxIterations -gt 0 -and $ITERATION -ge $MaxIterations) {
         Write-Host ""
-        Write-Host "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" -ForegroundColor Yellow
+        Write-Host "========================================================" -ForegroundColor Yellow
         Write-Host "  Max iterations reached: $MaxIterations" -ForegroundColor Yellow
-        Write-Host "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" -ForegroundColor Yellow
+        Write-Host "========================================================" -ForegroundColor Yellow
         Send-Notification ":warning: *Ralph Stopped*\n\`\`\`Plan: $PLAN_BASENAME\nReason: Max iterations reached ($MaxIterations)\nRepo: $REPO_NAME\`\`\`"
         break
     }
@@ -537,9 +537,9 @@ while ($true) {
     # Plan mode: exit after one iteration
     if ($Mode -eq "plan") {
         Write-Host ""
-        Write-Host "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" -ForegroundColor Green
+        Write-Host "========================================================" -ForegroundColor Green
         Write-Host "  Planning complete! Task list created in $PROGRESS_FILE" -ForegroundColor Green
-        Write-Host "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" -ForegroundColor Green
+        Write-Host "========================================================" -ForegroundColor Green
         Write-Host ""
         Write-Host "Next step: Run " -NoNewline
         Write-Host ".\ralph.ps1 $PlanFile build" -ForegroundColor Yellow -NoNewline
