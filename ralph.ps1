@@ -63,18 +63,40 @@ param(
     [switch]$TestNotifications
 )
 
-# Handle parameter-based flags (after param block)
+# CRITICAL: Handle parameter-based flags IMMEDIATELY after param block
+# This MUST be the first real code after param() to prevent any dependency loading issues
 if ($Help) {
-    Write-Host "PortableRalph v1.6.0 - Autonomous AI Development Loop" -ForegroundColor Green
-    Write-Host ""
-    Write-Host "Usage:" -ForegroundColor Yellow
-    Write-Host "  .\ralph.ps1 <plan-file> [mode] [max-iterations]"
-    Write-Host ""
-    Write-Host "More info: https://github.com/aaron777collins/portableralph"
+    try {
+        Write-Host "PortableRalph v1.6.0 - Autonomous AI Development Loop" -ForegroundColor Green
+        Write-Host ""
+        Write-Host "Usage:" -ForegroundColor Yellow
+        Write-Host "  .\ralph.ps1 <plan-file> [mode] [max-iterations]"
+        Write-Host "  .\ralph.ps1 -Help"
+        Write-Host "  .\ralph.ps1 -Version"
+        Write-Host ""
+        Write-Host "Arguments:" -ForegroundColor Yellow
+        Write-Host "  plan-file       Path to your plan/spec file (required)"
+        Write-Host "  mode            'plan' or 'build' (default: build)"
+        Write-Host "  max-iterations  Maximum loop iterations (default: unlimited)"
+        Write-Host ""
+        Write-Host "Examples:" -ForegroundColor Yellow
+        Write-Host "  .\ralph.ps1 .\feature.md              # Build until done"
+        Write-Host "  .\ralph.ps1 .\feature.md plan         # Plan only"
+        Write-Host "  .\ralph.ps1 .\feature.md build 20     # Build, max 20 iterations"
+        Write-Host ""
+        Write-Host "More info: https://github.com/aaron777collins/portableralph"
+    } catch {
+        # Fallback - ensure we always exit cleanly for help
+        Write-Host "PortableRalph v1.6.0 - Help available at github.com/aaron777collins/portableralph"
+    }
     exit 0
 }
 if ($Version) {
-    Write-Host "PortableRalph v1.6.0"
+    try {
+        Write-Host "PortableRalph v1.6.0"
+    } catch {
+        Write-Host "v1.6.0"
+    }
     exit 0
 }
 
