@@ -132,9 +132,13 @@ function Load-Config {
             $line = $_.Trim()
             if ($line -and !$line.StartsWith('#')) {
                 # Parse environment variables (export VAR="value" or VAR="value")
-                if ($line -match '^(?:export\s+)?(\w+)="?([^"]*)"?$') {
+                if ($line -match '^(?:export\s+)?(\w+)=(.*)$') {
                     $varName = $matches[1]
                     $varValue = $matches[2]
+                    # Remove surrounding quotes if present
+                    if ($varValue -match '^"(.*)"$') {
+                        $varValue = $matches[1]
+                    }
                     Set-Item -Path "env:$varName" -Value $varValue -ErrorAction SilentlyContinue
                 }
             }
