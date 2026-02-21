@@ -160,6 +160,57 @@ check_rate_limit() {
     return 0
 }
 
+# Check for help flag
+if [ "${1:-}" = "--help" ] || [ "${1:-}" = "-h" ]; then
+    cat << 'EOF'
+notify.sh - Multi-platform notifications for Ralph
+
+USAGE:
+    ./notify.sh [OPTIONS] [MESSAGE]
+
+OPTIONS:
+    --test                  Send a test notification to all configured platforms
+    --help, -h              Show this help message
+
+EXAMPLES:
+    ./notify.sh "Build complete!"
+    ./notify.sh --test
+    ./notify.sh "🚀 Deployment finished successfully"
+
+CONFIGURATION:
+    Configure notification platforms using environment variables:
+
+    Slack:
+        RALPH_SLACK_WEBHOOK_URL      - Slack webhook URL
+        RALPH_SLACK_CHANNEL          - Channel override (optional)
+        RALPH_SLACK_USERNAME         - Bot username (default: "Ralph")
+
+    Discord:
+        RALPH_DISCORD_WEBHOOK_URL    - Discord webhook URL
+        RALPH_DISCORD_USERNAME       - Bot username (default: "Ralph")
+
+    Telegram:
+        RALPH_TELEGRAM_BOT_TOKEN     - Bot token from @BotFather
+        RALPH_TELEGRAM_CHAT_ID       - Chat/channel ID
+
+    Email:
+        RALPH_EMAIL_TO               - Recipient email(s)
+        RALPH_EMAIL_FROM             - Sender email
+        RALPH_SMTP_HOST              - SMTP server
+        RALPH_SMTP_USER              - SMTP username
+        RALPH_SMTP_PASSWORD          - SMTP password
+
+    Custom Script:
+        RALPH_CUSTOM_NOTIFY_SCRIPT   - Path to custom script
+
+    For detailed configuration, see the script header comments.
+
+SETUP:
+    Run 'ralph notify setup' to configure notification platforms interactively.
+EOF
+    exit 0
+fi
+
 # Check for test mode
 if [ "${1:-}" = "--test" ]; then
     TEST_MODE=true

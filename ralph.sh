@@ -495,13 +495,13 @@ MAX_ITERATIONS="${3:-${MAX_ITERATIONS_DEFAULT:-0}}"
 if ! validate_file_enhanced "$PLAN_FILE" "Plan file"; then
     exit 1
 fi
-    exit 1
-fi
 
 # Validate mode
 if [ "$MODE" != "plan" ] && [ "$MODE" != "build" ]; then
-    log_error "Mode must be 'plan' or 'build', got: $MODE"
-    echo "Run 'ralph --help' for usage information."
+    # Disable the exit trap temporarily to show our specific error
+    trap - EXIT
+    printf "Error: Invalid mode '%s'. Valid modes are: plan, build\n" "$MODE" >&2
+    printf "Run 'ralph --help' for usage information.\n" >&2
     exit 1
 fi
 

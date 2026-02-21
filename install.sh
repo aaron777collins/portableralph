@@ -664,8 +664,8 @@ print_success() {
 # ============================================
 
 main() {
-    parse_args "$@"
     setup_colors
+    parse_args "$@"
 
     print_banner
 
