@@ -545,3 +545,6 @@ while ($true) {
 Write-Host ""
 Write-Host "Total iterations: $ITERATION"
 Write-Host "Progress file: $PROGRESS_FILE"
+
+# Exit with success code
+exit 0

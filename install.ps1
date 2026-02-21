@@ -498,3 +498,6 @@ Set-Notifications
 Test-Installation
 
 Show-Success
+
+# Exit with success code
+exit 0
