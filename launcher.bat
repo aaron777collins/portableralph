@@ -102,10 +102,14 @@ if %HELP_EXIT_CODE% EQU 0 (
 )
 
 echo.
+echo DEBUG: TEST_FAILED value is [%TEST_FAILED%]
+echo DEBUG: Checking if TEST_FAILED is defined...
 if defined TEST_FAILED (
+    echo DEBUG: TEST_FAILED IS defined
     echo [FAIL] SYSTEM TEST FAILED - Some components are not working
     exit /b 1
 ) else (
+    echo DEBUG: TEST_FAILED is NOT defined
     echo [PASS] SYSTEM TEST PASSED - All components are working
     exit /b 0
 )
