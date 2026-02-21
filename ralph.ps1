@@ -443,7 +443,7 @@ Write-Host ""
 
 # Send start notification
 $REPO_NAME = Split-Path -Leaf (Get-Location)
-Send-Notification ":rocket: *Ralph Started*\n\`\`\`Plan: $PLAN_BASENAME\nMode: $Mode\nRepo: $REPO_NAME\`\`\`"
+Send-Notification ":rocket: *Ralph Started*\n``````Plan: $PLAN_BASENAME\nMode: $Mode\nRepo: $REPO_NAME``````"
 
 # Initialize progress file if it doesn't exist
 if (-not (Test-Path $PROGRESS_FILE)) {
@@ -485,7 +485,7 @@ while ($true) {
         Write-Host "========================================================" -ForegroundColor Green
         Write-Host "  RALPH_DONE - Work complete!" -ForegroundColor Green
         Write-Host "========================================================" -ForegroundColor Green
-        Send-Notification ":white_check_mark: *Ralph Complete!*\n\`\`\`Plan: $PLAN_BASENAME\nIterations: $ITERATION\nRepo: $REPO_NAME\`\`\`"
+        Send-Notification ":white_check_mark: *Ralph Complete!*\n``````Plan: $PLAN_BASENAME\nIterations: $ITERATION\nRepo: $REPO_NAME``````"
         break
     }
 
@@ -494,7 +494,7 @@ while ($true) {
         Write-Host "========================================================" -ForegroundColor Yellow
         Write-Host "  Max iterations reached: $MaxIterations" -ForegroundColor Yellow
         Write-Host "========================================================" -ForegroundColor Yellow
-        Send-Notification ":warning: *Ralph Stopped*\n\`\`\`Plan: $PLAN_BASENAME\nReason: Max iterations reached ($MaxIterations)\nRepo: $REPO_NAME\`\`\`"
+        Send-Notification ":warning: *Ralph Stopped*\n``````Plan: $PLAN_BASENAME\nReason: Max iterations reached ($MaxIterations)\nRepo: $REPO_NAME``````"
         break
     }
 
@@ -530,14 +530,14 @@ while ($true) {
         Write-Host "Next step: Run " -NoNewline
         Write-Host ".\ralph.ps1 $PlanFile build" -ForegroundColor Yellow -NoNewline
         Write-Host " to implement tasks"
-        Send-Notification ":clipboard: *Ralph Planning Complete!*\n\`\`\`Plan: $PLAN_BASENAME\nTask list created in: $PROGRESS_FILE\nRepo: $REPO_NAME\`\`\`"
+        Send-Notification ":clipboard: *Ralph Planning Complete!*\n``````Plan: $PLAN_BASENAME\nTask list created in: $PROGRESS_FILE\nRepo: $REPO_NAME``````"
         break
     }
 
     # Send iteration notification (configurable frequency)
     $NOTIFY_FREQ = if ($env:RALPH_NOTIFY_FREQUENCY) { [int]$env:RALPH_NOTIFY_FREQUENCY } else { 5 }
     if ($ITERATION -eq 1 -or ($ITERATION % $NOTIFY_FREQ) -eq 0) {
-        Send-Notification ":gear: *Ralph Progress*: Iteration $ITERATION completed\n\`Plan: $PLAN_BASENAME\`"
+        Send-Notification ":gear: *Ralph Progress*: Iteration $ITERATION completed\n``Plan: $PLAN_BASENAME``"
     }
 
     # Small delay between iterations

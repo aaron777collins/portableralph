@@ -59,7 +59,7 @@ function Test-NumericValue {
     # Check range
     if ($numValue -lt $Min -or $numValue -gt $Max) {
         if (Get-Command Write-RalphError -ErrorAction SilentlyContinue) {
-            Write-RalphError "$Name must be between $Min and $Max: $Value"
+            Write-RalphError "$Name must be between $Min and $Max - Value: $Value"
         }
         return $false
     }
