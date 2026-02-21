@@ -96,7 +96,7 @@ validate_file_path() {
     validate_path "$@"
 }
 
-# Validate config file syntax before sourcing
+# Validate config file syntax before sourcing - enhanced with corruption handling
 validate_config() {
     local config_file="$1"
 
@@ -105,27 +105,57 @@ validate_config() {
         return 0  # File doesn't exist, nothing to validate
     fi
 
+    # Check for binary corruption or severely invalid content
+    if ! file "$config_file" 2>/dev/null | grep -q "text"; then
+        log_warning "Configuration file appears to be corrupted or contains binary data: $config_file"
+        suggest_recovery "Remove corrupted config file: rm '$config_file' and reconfigure with 'ralph config'"
+        return 2  # Corrupted file, handled gracefully
+    fi
+
+    # Check for null bytes or other corruption indicators
+    if grep -l $'\0' "$config_file" >/dev/null 2>&1; then
+        log_warning "Configuration file contains null bytes (corrupted): $config_file"
+        suggest_recovery "Remove corrupted config file: rm '$config_file' and reconfigure with 'ralph config'"
+        return 2  # Corrupted file, handled gracefully
+    fi
+
     # Just check basic bash syntax
     if ! bash -n "$config_file" 2>/dev/null; then
-        echo -e "${YELLOW}Warning: Syntax error in $config_file${NC}" >&2
-        echo -e "${YELLOW}Run: bash -n $config_file to see details${NC}" >&2
-        return 1
+        log_warning "Configuration file has syntax errors: $config_file"
+        suggest_recovery "Fix syntax errors or remove file: rm '$config_file' and reconfigure with 'ralph config'"
+        return 2  # Syntax error, handled gracefully
     fi
 
     return 0
 }
 
-# Load configuration (use platform-appropriate config location)
+# Load configuration (use platform-appropriate config location) with corruption recovery
 RALPH_CONFIG_FILE="${USER_HOME}/.ralph.env"
-if [ -f "$RALPH_CONFIG_FILE" ] && validate_config "$RALPH_CONFIG_FILE"; then
-    source "$RALPH_CONFIG_FILE"
+if [ -f "$RALPH_CONFIG_FILE" ]; then
+    # Temporarily disable exit on error for config validation
+    set +e
+    validate_config "$RALPH_CONFIG_FILE"
+    config_status=$?
+    set -e
+    
+    if [ $config_status -eq 0 ]; then
+        # Config is valid, source it
+        source "$RALPH_CONFIG_FILE"
 
-    # Validate loaded configuration values
-    if [ -n "${RALPH_SLACK_WEBHOOK_URL:-}" ]; then
-        if ! validate_webhook_url "$RALPH_SLACK_WEBHOOK_URL" "RALPH_SLACK_WEBHOOK_URL"; then
-            echo -e "${YELLOW}Warning: Invalid RALPH_SLACK_WEBHOOK_URL, disabling Slack notifications${NC}" >&2
-            unset RALPH_SLACK_WEBHOOK_URL
+        # Validate loaded configuration values
+        if [ -n "${RALPH_SLACK_WEBHOOK_URL:-}" ]; then
+            if ! validate_webhook_url "$RALPH_SLACK_WEBHOOK_URL" "RALPH_SLACK_WEBHOOK_URL"; then
+                echo -e "${YELLOW}Warning: Invalid RALPH_SLACK_WEBHOOK_URL, disabling Slack notifications${NC}" >&2
+                unset RALPH_SLACK_WEBHOOK_URL
+            fi
         fi
+    elif [ $config_status -eq 2 ]; then
+        # Config is corrupted but handled gracefully - continue with defaults
+        log_info "Continuing with default configuration due to corrupted config file"
+        echo -e "${BLUE}Info: Using default configuration due to corrupted config file${NC}" >&2
+    else
+        # Other validation failure - continue with defaults
+        log_warning "Configuration validation failed, using defaults"
     fi
 
     if [ -n "${RALPH_DISCORD_WEBHOOK_URL:-}" ]; then
@@ -623,15 +653,22 @@ is_done() {
 PLAN_HASH=$(echo "$PLAN_FILE_ABS" | md5sum 2>/dev/null | cut -d' ' -f1 || echo "$PLAN_BASENAME")
 LOCK_FILE="${TEMP_DIR:-/tmp}/ralph_${PLAN_HASH}.lock"
 
-# Cleanup function for graceful exit
+# Cleanup function for graceful exit - integrates with error handling library
 cleanup_lock() {
     if [ -n "${LOCK_FILE:-}" ]; then
         release_lock "$LOCK_FILE" 2>/dev/null || true
     fi
 }
 
-# Set up trap to release lock on exit (normal or error)
-trap cleanup_lock EXIT INT TERM
+# Script-specific cleanup function called by error handling library
+cleanup_script_specific() {
+    local exit_code="${1:-1}"
+    cleanup_lock
+}
+
+# Set up trap to use error handling library (which calls cleanup_script_specific)
+# This ensures proper signal handling with exit code 130 for SIGINT
+# The error handling library's trap will call cleanup_script_specific which calls cleanup_lock
 
 # Acquire lock before starting the main loop
 if ! acquire_lock "$LOCK_FILE"; then

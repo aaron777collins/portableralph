@@ -1,0 +1,109 @@
+2026-02-21T18:09:55.575Z [DEBUG] Failed to check enabledPlatforms: TypeError: undefined is not an object (evaluating 'l_.join')
+2026-02-21T18:09:55.627Z [DEBUG] [init] configureGlobalMTLS starting
+2026-02-21T18:09:55.627Z [DEBUG] [init] configureGlobalMTLS complete
+2026-02-21T18:09:55.627Z [DEBUG] [init] configureGlobalAgents starting
+2026-02-21T18:09:55.627Z [DEBUG] [init] configureGlobalAgents complete
+2026-02-21T18:09:55.632Z [DEBUG] [STARTUP] Loading MCP configs...
+2026-02-21T18:09:55.640Z [DEBUG] Found 0 plugins (0 enabled, 0 disabled)
+2026-02-21T18:09:55.640Z [DEBUG] [claudeai-mcp] Checking gate (cached)...
+2026-02-21T18:09:55.640Z [DEBUG] [claudeai-mcp] Gate returned: false
+2026-02-21T18:09:55.640Z [DEBUG] [claudeai-mcp] Disabled via gate
+2026-02-21T18:09:55.684Z [DEBUG] Git remote URL: https://github.com/aaron777collins/portableralph.git
+2026-02-21T18:09:55.684Z [DEBUG] Parsed repository: aaron777collins/portableralph from https://github.com/aaron777collins/portableralph.git
+2026-02-21T18:09:55.684Z [DEBUG] Parsed repository: aaron777collins/portableralph from URL: https://github.com/aaron777collins/portableralph.git
+2026-02-21T18:09:55.686Z [DEBUG] [ToolSearch:optimistic] mode=tst-auto, ENABLE_TOOL_SEARCH=undefined, result=true
+2026-02-21T18:09:55.688Z [DEBUG] [STARTUP] Running setup()...
+2026-02-21T18:09:55.692Z [DEBUG] Loading skills from: managed=/etc/claude-code/.claude/skills, user=/home/ubuntu/repos/portableralph/tests/test-output-error-handling/.claude/skills, project=[]
+2026-02-21T18:09:55.692Z [DEBUG] Error log sink initialized
+2026-02-21T18:09:55.693Z [DEBUG] getPluginSkills: Processing 0 enabled plugins
+2026-02-21T18:09:55.693Z [DEBUG] Total plugin skills loaded: 0
+2026-02-21T18:09:55.693Z [DEBUG] Total plugin commands loaded: 0
+2026-02-21T18:09:55.693Z [DEBUG] [STARTUP] setup() completed in 5ms
+2026-02-21T18:09:55.693Z [DEBUG] [STARTUP] Loading commands and agents...
+2026-02-21T18:09:55.694Z [DEBUG] Registered 0 hooks from 0 plugins
+2026-02-21T18:09:55.696Z [DEBUG] Total plugin agents loaded: 0
+2026-02-21T18:09:55.697Z [DEBUG] Writing to temp file: /home/ubuntu/repos/portableralph/tests/test-output-error-handling/.claude.json.tmp.3498036.1771697395697
+2026-02-21T18:09:55.697Z [DEBUG] Preserving file permissions: 100600
+2026-02-21T18:09:55.704Z [DEBUG] Temp file written successfully, size: 282 bytes
+2026-02-21T18:09:55.704Z [DEBUG] Applied original permissions to temp file
+2026-02-21T18:09:55.704Z [DEBUG] Renaming /home/ubuntu/repos/portableralph/tests/test-output-error-handling/.claude.json.tmp.3498036.1771697395697 to /home/ubuntu/repos/portableralph/tests/test-output-error-handling/.claude.json
+2026-02-21T18:09:55.704Z [DEBUG] File /home/ubuntu/repos/portableralph/tests/test-output-error-handling/.claude.json written atomically
+2026-02-21T18:09:55.705Z [DEBUG] Loaded 0 unique skills (0 unconditional, 0 conditional, managed: 0, user: 0, project: 0, additional: 0, legacy commands: 0)
+2026-02-21T18:09:55.705Z [DEBUG] getSkills returning: 0 skill dir commands, 0 plugin skills, 3 bundled skills
+2026-02-21T18:09:55.706Z [DEBUG] [STARTUP] Commands and agents loaded in 13ms
+2026-02-21T18:09:55.706Z [DEBUG] [LSP MANAGER] initializeLspServerManager() called
+2026-02-21T18:09:55.706Z [DEBUG] [LSP MANAGER] Created manager instance, state=pending
+2026-02-21T18:09:55.706Z [DEBUG] [LSP MANAGER] Starting async initialization (generation 1)
+2026-02-21T18:09:55.707Z [DEBUG] Total LSP servers loaded: 0
+2026-02-21T18:09:55.707Z [DEBUG] Failed to fetch org fast mode status, defaulting to disabled
+2026-02-21T18:09:55.707Z [DEBUG] [STARTUP] MCP configs loaded in 75ms
+2026-02-21T18:09:55.707Z [DEBUG] [LSP SERVER MANAGER] getAllLspServers returned 0 server(s)
+2026-02-21T18:09:55.707Z [DEBUG] LSP manager initialized with 0 servers
+2026-02-21T18:09:55.707Z [DEBUG] LSP server manager initialized successfully
+2026-02-21T18:09:55.707Z [DEBUG] LSP notification handlers registered successfully for all 0 server(s)
+2026-02-21T18:09:55.725Z [DEBUG] installed_plugins.json doesn't exist, returning empty V2 object
+2026-02-21T18:09:55.725Z [DEBUG] Initialized versioned plugins system with 0 plugins
+2026-02-21T18:09:55.725Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-02-21T18:09:55.789Z [DEBUG] [Perfetto] initializePerfettoTracing called, env value: undefined
+2026-02-21T18:09:55.789Z [DEBUG] [3P telemetry] isTelemetryEnabled=false (CLAUDE_CODE_ENABLE_TELEMETRY=undefined)
+2026-02-21T18:09:56.096Z [DEBUG] Getting matching hook commands for SessionStart with query: startup
+2026-02-21T18:09:56.096Z [DEBUG] Found 0 hook matchers in settings
+2026-02-21T18:09:56.096Z [DEBUG] Matched 0 unique hooks for query "startup" (0 before deduplication)
+2026-02-21T18:09:56.097Z [DEBUG] [FileIndex] getProjectFiles called, respectGitignore=true
+2026-02-21T18:09:56.097Z [DEBUG] [FileIndex] getFilesUsingGit called
+2026-02-21T18:09:56.100Z [DEBUG] installPluginsForHeadless: starting
+2026-02-21T18:09:56.100Z [DEBUG] Found 0 installed plugins (V2 format)
+2026-02-21T18:09:56.100Z [DEBUG] installPluginsForHeadless: no missing plugins or marketplaces configured
+2026-02-21T18:09:56.114Z [DEBUG] Writing to temp file: /home/ubuntu/repos/portableralph/tests/test-output-error-handling/.claude.json.tmp.3498036.1771697396114
+2026-02-21T18:09:56.114Z [DEBUG] Preserving file permissions: 100600
+2026-02-21T18:09:56.141Z [DEBUG] Temp file written successfully, size: 282 bytes
+2026-02-21T18:09:56.141Z [DEBUG] Applied original permissions to temp file
+2026-02-21T18:09:56.141Z [DEBUG] Renaming /home/ubuntu/repos/portableralph/tests/test-output-error-handling/.claude.json.tmp.3498036.1771697396114 to /home/ubuntu/repos/portableralph/tests/test-output-error-handling/.claude.json
+2026-02-21T18:09:56.141Z [DEBUG] File /home/ubuntu/repos/portableralph/tests/test-output-error-handling/.claude.json written atomically
+2026-02-21T18:09:56.144Z [DEBUG] Total plugin output styles loaded: 0
+2026-02-21T18:09:56.145Z [DEBUG] Security messages are fresh (<1h old), skipping fetch
+2026-02-21T18:09:56.152Z [DEBUG] [FileIndex] git ls-files (tracked) took 55ms
+2026-02-21T18:09:56.152Z [DEBUG] [FileIndex] git ls-files: 263 tracked files in 55ms
+2026-02-21T18:09:56.154Z [DEBUG] [FileIndex] using git ls-files result (263 files)
+2026-02-21T18:09:56.162Z [DEBUG] [FileIndex] cache refresh completed in 65ms (rust index)
+2026-02-21T18:09:56.178Z [DEBUG] Writing to temp file: /home/ubuntu/repos/portableralph/tests/test-output-error-handling/.claude.json.tmp.3498036.1771697396178
+2026-02-21T18:09:56.178Z [DEBUG] Preserving file permissions: 100600
+2026-02-21T18:09:56.185Z [DEBUG] Temp file written successfully, size: 282 bytes
+2026-02-21T18:09:56.185Z [DEBUG] Applied original permissions to temp file
+2026-02-21T18:09:56.185Z [DEBUG] Renaming /home/ubuntu/repos/portableralph/tests/test-output-error-handling/.claude.json.tmp.3498036.1771697396178 to /home/ubuntu/repos/portableralph/tests/test-output-error-handling/.claude.json
+2026-02-21T18:09:56.185Z [DEBUG] File /home/ubuntu/repos/portableralph/tests/test-output-error-handling/.claude.json written atomically
+2026-02-21T18:09:56.187Z [DEBUG] LSP Diagnostics: getLSPDiagnosticAttachments called
+2026-02-21T18:09:56.187Z [DEBUG] LSP Diagnostics: Checking registry - 0 pending
+2026-02-21T18:09:56.187Z [DEBUG] Hooks: Found 0 total hooks in registry
+2026-02-21T18:09:56.187Z [DEBUG] Hooks: checkForNewResponses returning 0 responses
+2026-02-21T18:09:56.204Z [DEBUG] Sending 1 skills via attachment (initial, 1 total sent)
+2026-02-21T18:09:56.206Z [WARN] [3P telemetry] Event dropped (no event logger initialized): user_prompt
+2026-02-21T18:09:56.206Z [DEBUG] Getting matching hook commands for UserPromptSubmit with query: undefined
+2026-02-21T18:09:56.206Z [DEBUG] Found 0 hook matchers in settings
+2026-02-21T18:09:56.206Z [DEBUG] Matched 0 unique hooks for query "no match query" (0 before deduplication)
+2026-02-21T18:09:56.210Z [DEBUG] autocompact: tokens=1073 threshold=167000 effectiveWindow=180000
+2026-02-21T18:09:56.211Z [DEBUG] Auto tool search disabled: 0 tokens (threshold: 20000, 10% of context) [source: query]
+2026-02-21T18:09:56.233Z [DEBUG] Writing to temp file: /home/ubuntu/repos/portableralph/tests/test-output-error-handling/.claude.json.tmp.3498036.1771697396233
+2026-02-21T18:09:56.233Z [DEBUG] Preserving file permissions: 100600
+2026-02-21T18:09:56.238Z [DEBUG] Temp file written successfully, size: 282 bytes
+2026-02-21T18:09:56.238Z [DEBUG] Applied original permissions to temp file
+2026-02-21T18:09:56.238Z [DEBUG] Renaming /home/ubuntu/repos/portableralph/tests/test-output-error-handling/.claude.json.tmp.3498036.1771697396233 to /home/ubuntu/repos/portableralph/tests/test-output-error-handling/.claude.json
+2026-02-21T18:09:56.238Z [DEBUG] File /home/ubuntu/repos/portableralph/tests/test-output-error-handling/.claude.json written atomically
+2026-02-21T18:09:56.240Z [DEBUG] attribution header x-anthropic-billing-header: cc_version=2.1.50.b97; cc_entrypoint=sdk-cli; cch=00000;
+2026-02-21T18:09:56.240Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-02-21T18:09:56.241Z [DEBUG] [API:request] Creating client, ANTHROPIC_CUSTOM_HEADERS present: false, has Authorization header: false
+2026-02-21T18:09:56.241Z [DEBUG] [API:auth] OAuth token check starting
+2026-02-21T18:09:56.241Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-02-21T18:09:56.241Z [DEBUG] [API:auth] OAuth token check complete
+2026-02-21T18:09:56.242Z [DEBUG] Fast mode unavailable: Fast mode is not available in the Agent SDK
+2026-02-21T18:09:56.244Z [ERROR] API error (attempt 1/11): Could not resolve authentication method. Expected either apiKey or authToken to be set. Or for one of the "X-Api-Key" or "Authorization" headers to be explicitly omitted
+2026-02-21T18:09:56.246Z [ERROR] Error in API request: Could not resolve authentication method. Expected either apiKey or authToken to be set. Or for one of the "X-Api-Key" or "Authorization" headers to be explicitly omitted
+2026-02-21T18:09:56.247Z [ERROR] Error: Error: Could not resolve authentication method. Expected either apiKey or authToken to be set. Or for one of the "X-Api-Key" or "Authorization" headers to be explicitly omitted
+    at validateHeaders (/$bunfs/root/claude:300:1013)
+    at buildHeaders (/$bunfs/root/claude:300:8580)
+    at async buildRequest (/$bunfs/root/claude:300:7646)
+    at async makeRequest (/$bunfs/root/claude:300:3411)
+    at processTicksAndRejections (native:7:39)
+2026-02-21T18:09:56.248Z [DEBUG] Getting matching hook commands for Stop with query: undefined
+2026-02-21T18:09:56.248Z [DEBUG] Found 0 hook matchers in settings
+2026-02-21T18:09:56.248Z [DEBUG] Matched 0 unique hooks for query "no match query" (0 before deduplication)
