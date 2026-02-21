@@ -25,8 +25,19 @@ curl -fsSL https://raw.githubusercontent.com/aaron777collins/portableralph/maste
 
 **Or manual:**
 ```bash
+# Clone the repository
 git clone https://github.com/aaron777collins/portableralph.git ~/ralph
+
+# Make scripts executable
 chmod +x ~/ralph/*.sh
+
+# Add to PATH (optional)
+echo 'export PATH="$HOME/ralph:$PATH"' >> ~/.bashrc
+source ~/.bashrc
+
+# Or create alias
+echo 'alias ralph="$HOME/ralph/ralph.sh"' >> ~/.bashrc
+source ~/.bashrc
 ```
 
 **Run:**
@@ -43,7 +54,23 @@ irm https://raw.githubusercontent.com/aaron777collins/portableralph/master/insta
 
 **Or manual:**
 ```powershell
+# Clone the repository
 git clone https://github.com/aaron777collins/portableralph.git $env:USERPROFILE\ralph
+
+# Navigate to the directory
+cd $env:USERPROFILE\ralph
+
+# Test PowerShell execution policy (may need to adjust)
+Get-ExecutionPolicy
+
+# If needed, set execution policy
+Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
+
+# Add to PATH (optional)
+$env:PATH += ";$env:USERPROFILE\ralph"
+
+# Or create PowerShell alias (add to $PROFILE)
+New-Alias -Name ralph -Value $env:USERPROFILE\ralph\ralph.ps1
 ```
 
 **Run (PowerShell):**
@@ -136,6 +163,250 @@ Add JWT-based authentication to the API.
 ```
 
 See [Writing Effective Plans](https://aaron777collins.github.io/portableralph/writing-plans/) for more examples.
+
+## Configuration
+
+PortableRalph supports extensive configuration through environment variables. Create a configuration file to customize behavior:
+
+**Create Configuration File:**
+```bash
+# Unix/Linux/macOS
+touch ~/.ralph.env
+chmod 600 ~/.ralph.env
+
+# Windows (PowerShell)
+New-Item -Path $env:USERPROFILE\.ralph.env -ItemType File -Force
+```
+
+## Core Settings
+
+### Core Configuration
+
+**API Settings:**
+```bash
+# Claude API Configuration
+export CLAUDE_API_KEY="your-api-key-here"           # Required: Your Claude API key
+export CLAUDE_MODEL="claude-3-sonnet-20240229"      # Optional: Default model to use
+export CLAUDE_TIMEOUT=30                            # Optional: API timeout in seconds
+export CLAUDE_RETRY_COUNT=3                         # Optional: Number of API retries
+```
+
+**Execution Settings:**
+```bash
+# Ralph Behavior Configuration
+export RALPH_MAX_ITERATIONS=50                      # Maximum iterations per run
+export RALPH_TASK_TIMEOUT=300                       # Task timeout in seconds (5 minutes)
+export RALPH_LOG_LEVEL="INFO"                       # Log level: DEBUG, INFO, WARN, ERROR
+export RALPH_DEBUG=false                            # Enable debug mode
+export RALPH_TRACE=false                            # Enable trace mode (very verbose)
+```
+
+**File and Directory Settings:**
+```bash
+# Path Configuration
+export RALPH_TEMP_DIR="/tmp/ralph"                  # Temporary files directory
+export RALPH_LOG_DIR="$HOME/.ralph/logs"            # Log files directory
+export RALPH_CONFIG_DIR="$HOME/.ralph"              # Configuration directory
+export RALPH_BACKUP_DIR="$HOME/.ralph/backups"     # Backup files directory
+```
+
+**Git Integration:**
+```bash
+# Git Configuration
+export RALPH_GIT_ENABLED=true                       # Enable automatic git commits
+export RALPH_GIT_AUTO_PUSH=false                    # Automatically push commits
+export RALPH_GIT_COMMIT_PREFIX="ralph:"             # Prefix for commit messages
+export RALPH_GIT_BRANCH="ralph-dev"                 # Branch for Ralph commits
+```
+
+## Notification Settings
+
+### Notification Configuration
+
+**Global Notification Settings:**
+```bash
+# Notification Behavior
+export RALPH_NOTIFY_FREQUENCY=5                     # Notify every N iterations
+export RALPH_NOTIFY_ENABLED=true                    # Enable notifications
+export RALPH_NOTIFY_ON_START=true                   # Notify when Ralph starts
+export RALPH_NOTIFY_ON_ERROR=true                   # Notify on errors
+export RALPH_NOTIFY_ON_COMPLETION=true              # Notify when Ralph completes
+```
+
+**Slack Configuration:**
+```bash
+# Slack Integration
+export RALPH_SLACK_ENABLED=true                     # Enable Slack notifications
+export RALPH_SLACK_WEBHOOK_URL="https://hooks.slack.com/services/YOUR/WEBHOOK/URL"
+export RALPH_SLACK_CHANNEL="#general"               # Target channel (optional)
+export RALPH_SLACK_USERNAME="Ralph"                 # Bot username
+export RALPH_SLACK_EMOJI=":robot_face:"             # Bot emoji
+export RALPH_SLACK_MENTION_ON_ERROR="@channel"      # Mention on errors
+```
+
+**Discord Configuration:**
+```bash
+# Discord Integration
+export RALPH_DISCORD_ENABLED=true                   # Enable Discord notifications
+export RALPH_DISCORD_WEBHOOK_URL="https://discord.com/api/webhooks/YOUR/WEBHOOK/URL"
+export RALPH_DISCORD_USERNAME="Ralph"               # Bot username
+export RALPH_DISCORD_AVATAR_URL="https://example.com/ralph-avatar.png"
+```
+
+**Telegram Configuration:**
+```bash
+# Telegram Integration
+export RALPH_TELEGRAM_ENABLED=true                  # Enable Telegram notifications
+export RALPH_TELEGRAM_BOT_TOKEN="your-bot-token"    # Bot token from @BotFather
+export RALPH_TELEGRAM_CHAT_ID="your-chat-id"        # Chat ID to send messages to
+export RALPH_TELEGRAM_PARSE_MODE="Markdown"         # Message format: Markdown or HTML
+```
+
+## Email Settings
+
+### Email Configuration
+
+**SMTP Configuration:**
+```bash
+# SMTP Settings
+export RALPH_EMAIL_ENABLED=true                     # Enable email notifications
+export RALPH_EMAIL_TO="you@example.com"             # Recipient email
+export RALPH_EMAIL_FROM="ralph@example.com"         # Sender email
+export RALPH_EMAIL_SMTP_SERVER="smtp.gmail.com"     # SMTP server
+export RALPH_EMAIL_PORT="587"                       # SMTP port
+export RALPH_EMAIL_USER="your-email@gmail.com"      # SMTP username
+export RALPH_EMAIL_PASS="your-app-password"         # SMTP password (use app password for Gmail)
+export RALPH_EMAIL_TLS=true                         # Enable TLS encryption
+```
+
+**Email Batching Configuration:**
+```bash
+# Email Batching Settings
+export RALPH_EMAIL_BATCH_ENABLED=true               # Enable email batching
+export RALPH_EMAIL_BATCH_DELAY=300                  # Batch delay in seconds (5 minutes)
+export RALPH_EMAIL_BATCH_MAX=10                     # Maximum notifications per batch
+export RALPH_EMAIL_HTML=true                        # Use HTML email templates
+export RALPH_EMAIL_TEMPLATE_DIR="$HOME/.ralph/templates" # Custom template directory
+```
+
+**SendGrid Configuration:**
+```bash
+# SendGrid API Settings
+export RALPH_SENDGRID_ENABLED=true                  # Enable SendGrid
+export RALPH_SENDGRID_API_KEY="SG.your-api-key"     # SendGrid API key
+export RALPH_EMAIL_TO="you@example.com"             # Recipient email
+export RALPH_EMAIL_FROM="ralph@yourdomain.com"      # Sender email (must be verified)
+```
+
+**AWS SES Configuration:**
+```bash
+# AWS SES Settings
+export RALPH_AWS_SES_ENABLED=true                   # Enable AWS SES
+export RALPH_AWS_SES_REGION="us-east-1"             # AWS region
+export RALPH_AWS_ACCESS_KEY_ID="your-access-key"    # AWS access key
+export RALPH_AWS_SECRET_KEY="your-secret-key"       # AWS secret key
+export RALPH_EMAIL_TO="you@example.com"             # Recipient email
+export RALPH_EMAIL_FROM="ralph@yourdomain.com"      # Sender email (must be verified in SES)
+```
+
+## Advanced Settings
+
+### Advanced Configuration
+
+**Performance Settings:**
+```bash
+# Performance Optimization
+export RALPH_PARALLEL_TASKS=false                   # Enable parallel task processing
+export RALPH_MAX_CONCURRENT=4                       # Maximum concurrent operations
+export RALPH_MEMORY_LIMIT=1048576                   # Memory limit in KB (1GB)
+export RALPH_CPU_LIMIT=200                          # CPU limit as percentage (200% = 2 cores)
+export RALPH_IO_TIMEOUT=60                          # I/O operation timeout in seconds
+```
+
+**Security Settings:**
+```bash
+# Security Configuration
+export RALPH_SECURE_MODE=true                       # Enable security features
+export RALPH_MASK_SECRETS=true                      # Mask secrets in logs
+export RALPH_VERIFY_SSL=true                        # Verify SSL certificates
+export RALPH_ALLOWED_HOSTS="github.com,api.anthropic.com" # Allowed network hosts
+export RALPH_DISABLE_SHELL_EXEC=false               # Disable shell command execution
+```
+
+**Development Settings:**
+```bash
+# Development Configuration
+export RALPH_DEV_MODE=false                         # Enable development features
+export RALPH_MOCK_API=false                         # Use mock API responses
+export RALPH_SAVE_REQUESTS=false                    # Save API requests/responses
+export RALPH_VALIDATE_CONFIG=true                   # Validate configuration on startup
+export RALPH_PROFILE_PERFORMANCE=false              # Enable performance profiling
+```
+
+## Environment-Specific Settings
+
+### Environment-Specific Configurations
+
+**Production Environment:**
+```bash
+# ~/.ralph.env - Production settings
+export RALPH_LOG_LEVEL="WARN"
+export RALPH_DEBUG=false
+export RALPH_MAX_ITERATIONS=100
+export RALPH_NOTIFY_FREQUENCY=10
+export RALPH_EMAIL_BATCH_DELAY=600
+export RALPH_SECURE_MODE=true
+export RALPH_VERIFY_SSL=true
+```
+
+**Development Environment:**
+```bash
+# ~/.ralph.env - Development settings
+export RALPH_LOG_LEVEL="DEBUG"
+export RALPH_DEBUG=true
+export RALPH_MAX_ITERATIONS=10
+export RALPH_NOTIFY_FREQUENCY=1
+export RALPH_DEV_MODE=true
+export RALPH_PROFILE_PERFORMANCE=true
+```
+
+**Testing Environment:**
+```bash
+# ~/.ralph.env - Testing settings
+export RALPH_LOG_LEVEL="INFO"
+export RALPH_MAX_ITERATIONS=5
+export RALPH_NOTIFY_ENABLED=false
+export RALPH_GIT_ENABLED=false
+export RALPH_MOCK_API=true
+```
+
+## Configuration Management
+
+### Configuration Management
+
+**Loading Configuration:**
+```bash
+# Ralph automatically loads configuration from:
+# 1. ~/.ralph.env (user configuration)
+# 2. ./.ralph.env (project configuration)
+# 3. Environment variables (highest priority)
+
+# Check loaded configuration
+ralph --config
+
+# Validate configuration
+ralph --validate-config
+```
+
+**Configuration Templates:**
+```bash
+# Generate default configuration
+ralph --generate-config > ~/.ralph.env
+
+# Generate specific configuration
+ralph --generate-config --template production > ~/.ralph.env
+ralph --generate-config --template development > ~/.ralph.env
+```
 
 ## Notifications
 
@@ -317,7 +588,7 @@ ralph ./plan.md build 20
 export RALPH_LOG_LEVEL="INFO"
 ```
 
-### Report Security Issues
+## Report Security Issues
 
 Found a security vulnerability? **Please report responsibly:**
 
@@ -401,6 +672,50 @@ ralph rollback
 - **Option 3:** WSL (Windows Subsystem for Linux)
 
 **Note:** PowerShell scripts (`.ps1`) are fully native on Windows and require no additional installation. Bash scripts (`.sh`) require Git Bash or WSL.
+
+## Installation Verification
+
+After installation, verify Ralph is working correctly:
+
+**Test Installation:**
+```bash
+# Unix/Linux/macOS
+ralph --help
+
+# Windows (PowerShell)
+ralph --help
+
+# Windows (Command Prompt)
+launcher.bat ralph --help
+```
+
+**Test Claude CLI Connection:**
+```bash
+claude --version
+claude auth status
+```
+
+**Test Basic Functionality:**
+```bash
+# Create a simple test plan
+echo "# Test Plan" > test-plan.md
+echo "Create a hello.txt file with 'Hello World'" >> test-plan.md
+
+# Run Ralph in plan mode (analysis only)
+ralph test-plan.md plan
+
+# Clean up
+rm test-plan.md progress.md
+```
+
+**Verify Configuration:**
+```bash
+# Check environment variables
+env | grep RALPH
+
+# Test notifications (optional)
+ralph notify test
+```
 
 ## Files
 
@@ -595,7 +910,7 @@ $scriptContent = Get-Content "ralph.ps1" -Raw
 .\install.ps1 -Help
 ```
 
-### CI Artifacts
+## CI Artifacts
 
 The Windows CI generates a `windows-compatibility-report.md` artifact containing:
 - Test results summary
@@ -623,6 +938,12 @@ The Windows CI generates a `windows-compatibility-report.md` artifact containing
 | Notifications failing | Run `ralph notify test` to diagnose |
 
 See [Troubleshooting Guide](docs/TROUBLESHOOTING.md) for detailed solutions.
+
+For comprehensive troubleshooting including:
+- **Platform-specific issues** (Windows PowerShell, Unix permissions, macOS Gatekeeper)
+- **Installation problems** (dependency issues, network failures, configuration errors)
+- **Runtime issues** (task loops, permission errors, performance problems)
+- **Advanced debugging** (log analysis, system diagnostics, performance profiling)
 
 ## License
 
