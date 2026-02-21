@@ -16,8 +16,9 @@ set "SCRIPT_DIR=%SCRIPT_DIR:~0,-1%"
 REM Get command to run
 set "COMMAND=%~1"
 
-REM Handle help flags
+REM Handle help flags and test mode
 if "%COMMAND%"=="--help" goto :show_help
+if "%COMMAND%"=="--test" goto :run_test
 if "%COMMAND%"=="-h" goto :show_help
 if "%COMMAND%"=="-?" goto :show_help
 if "%COMMAND%"=="/?" goto :show_help
@@ -35,7 +36,65 @@ if "%COMMAND%"=="" (
     echo.
     echo Options:
     echo   --help, -h, -?  - Show this help message
+    echo   --test          - Run system test
     exit /b 0
+
+:run_test
+    echo Running PortableRalph system test...
+    echo.
+    echo === Testing System Components ===
+    
+    REM Test PowerShell availability
+    echo Testing PowerShell availability...
+    where powershell.exe >nul 2>&1
+    if %ERRORLEVEL% EQU 0 (
+        echo ✅ PowerShell is available
+    ) else (
+        echo ❌ PowerShell is not available
+        set "TEST_FAILED=1"
+    )
+    
+    REM Test core scripts exist
+    echo Testing core script files...
+    if exist "%SCRIPT_DIR%\ralph.ps1" (
+        echo ✅ ralph.ps1 found
+    ) else (
+        echo ❌ ralph.ps1 not found
+        set "TEST_FAILED=1"
+    )
+    
+    if exist "%SCRIPT_DIR%\install.ps1" (
+        echo ✅ install.ps1 found
+    ) else (
+        echo ❌ install.ps1 not found
+        set "TEST_FAILED=1"
+    )
+    
+    if exist "%SCRIPT_DIR%\notify.ps1" (
+        echo ✅ notify.ps1 found
+    ) else (
+        echo ❌ notify.ps1 not found
+        set "TEST_FAILED=1"
+    )
+    
+    REM Test ralph.ps1 help functionality
+    echo Testing ralph.ps1 help functionality...
+    powershell.exe -ExecutionPolicy Bypass -File "%SCRIPT_DIR%\ralph.ps1" -Help >nul 2>&1
+    if %ERRORLEVEL% EQU 0 (
+        echo ✅ ralph.ps1 help works
+    ) else (
+        echo ❌ ralph.ps1 help failed
+        set "TEST_FAILED=1"
+    )
+    
+    echo.
+    if defined TEST_FAILED (
+        echo ❌ SYSTEM TEST FAILED - Some components are not working
+        exit /b 1
+    ) else (
+        echo ✅ SYSTEM TEST PASSED - All components are working
+        exit /b 0
+    )
 )
 
 REM Remove first argument
