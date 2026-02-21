@@ -15,28 +15,11 @@
 #
 # Progress is tracked in: <plan-name>_PROGRESS.md (in current directory)
 
-param(
-    [Parameter(Position=0)]
-    [string]$PlanFile,
-
-    [Parameter(Position=1)]
-    [string]$Mode = "build",
-
-    [Parameter(Position=2)]
-    [int]$MaxIterations = 0,
-
-    [switch]$Help,
-    [switch]$Version,
-    [switch]$TestNotify,
-    [switch]$TestNotifications
-)
-
-# Handle Help and Version IMMEDIATELY before any processing that might fail
-# This ensures help always works regardless of script state or dependencies
-try {
-    # Check for Help/Version first, before any variables or operations
+# CRITICAL: Handle Help and Version IMMEDIATELY before param() or any other operations
+# This prevents any dependency loading or variable setup from interfering with help display
+if ($args.Count -gt 0) {
     foreach ($arg in $args) {
-        if ($arg -eq "-Help" -or $arg -eq "--help" -or $arg -eq "-h" -or $arg -eq "-?" -or $arg -eq "/?") {
+        if ($arg -eq "-Help" -or $arg -eq "--help" -or $arg -eq "-h" -or $arg -eq "-?" -or $arg -eq "/?" -or $arg -eq "help") {
             Write-Host "PortableRalph v1.6.0 - Autonomous AI Development Loop" -ForegroundColor Green
             Write-Host ""
             Write-Host "Usage:" -ForegroundColor Yellow
@@ -57,30 +40,41 @@ try {
             Write-Host "More info: https://github.com/aaron777collins/portableralph"
             exit 0
         }
-        if ($arg -eq "-Version" -or $arg -eq "--version" -or $arg -eq "-v") {
+        if ($arg -eq "-Version" -or $arg -eq "--version" -or $arg -eq "-v" -or $arg -eq "version") {
             Write-Host "PortableRalph v1.6.0"
             exit 0
         }
     }
+}
 
-    # Also handle parameter-based flags
-    if ($Help) {
-        Write-Host "PortableRalph v1.6.0 - Autonomous AI Development Loop" -ForegroundColor Green
-        Write-Host ""
-        Write-Host "Usage:" -ForegroundColor Yellow
-        Write-Host "  .\ralph.ps1 <plan-file> [mode] [max-iterations]"
-        Write-Host ""
-        Write-Host "More info: https://github.com/aaron777collins/portableralph"
-        exit 0
-    }
-    if ($Version) {
-        Write-Host "PortableRalph v1.6.0"
-        exit 0
-    }
-} catch {
-    # If anything fails in help handling, at least show basic help
+param(
+    [Parameter(Position=0)]
+    [string]$PlanFile,
+
+    [Parameter(Position=1)]
+    [string]$Mode = "build",
+
+    [Parameter(Position=2)]
+    [int]$MaxIterations = 0,
+
+    [switch]$Help,
+    [switch]$Version,
+    [switch]$TestNotify,
+    [switch]$TestNotifications
+)
+
+# Handle parameter-based flags (after param block)
+if ($Help) {
+    Write-Host "PortableRalph v1.6.0 - Autonomous AI Development Loop" -ForegroundColor Green
+    Write-Host ""
+    Write-Host "Usage:" -ForegroundColor Yellow
+    Write-Host "  .\ralph.ps1 <plan-file> [mode] [max-iterations]"
+    Write-Host ""
+    Write-Host "More info: https://github.com/aaron777collins/portableralph"
+    exit 0
+}
+if ($Version) {
     Write-Host "PortableRalph v1.6.0"
-    Write-Host "Usage: .\ralph.ps1 <plan-file> [mode] [max-iterations]"
     exit 0
 }
 
