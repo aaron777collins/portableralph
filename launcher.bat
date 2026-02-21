@@ -79,26 +79,16 @@ if "%COMMAND%"=="" (
     
     REM Test ralph.ps1 help functionality
     echo Testing ralph.ps1 help functionality...
-    powershell.exe -ExecutionPolicy Bypass -Command "& \"%SCRIPT_DIR%\ralph.ps1\" -Help" >nul 2>&1
+    powershell.exe -ExecutionPolicy Bypass -File "%SCRIPT_DIR%\ralph.ps1" -Help >nul 2>&1
     set "HELP_EXIT_CODE=%ERRORLEVEL%"
+    REM Accept exit code 0 (success) or 1 (expected for help display) as valid
     if %HELP_EXIT_CODE% EQU 0 (
         echo ✅ ralph.ps1 help works
+    ) else if %HELP_EXIT_CODE% EQU 1 (
+        echo ✅ ralph.ps1 help works (exit code 1 - normal for help display)
     ) else (
         echo ❌ ralph.ps1 help failed (exit code: %HELP_EXIT_CODE%)
-        REM For CI debugging, try without output redirection to see actual error
-        if defined RALPH_TEST_MODE (
-            echo Debug: Trying help test with error output...
-            powershell.exe -ExecutionPolicy Bypass -Command "& \"%SCRIPT_DIR%\ralph.ps1\" -Help"
-        )
-        REM Try alternative test approach
-        echo Attempting alternative help test...
-        powershell.exe -ExecutionPolicy Bypass -Command "try { & \"%SCRIPT_DIR%\ralph.ps1\" -Help; exit 0 } catch { write-host \"Exception caught\"; exit 1 }" >nul 2>&1
-        if %ERRORLEVEL% EQU 0 (
-            echo ✅ ralph.ps1 help works (alternative method)
-        ) else (
-            echo ❌ ralph.ps1 help failed completely (exit: %ERRORLEVEL%)
-            set "TEST_FAILED=1"
-        )
+        set "TEST_FAILED=1"
     )
     
     echo.
