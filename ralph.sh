@@ -212,6 +212,11 @@ RALPH_AUTO_COMMIT="${RALPH_AUTO_COMMIT:-true}"
 # Can be set via: export RALPH_MODEL="claude-opus-4-6" in ~/.ralph.env
 RALPH_MODEL="${RALPH_MODEL:-sonnet}"
 
+# Stream output setting (default: true)
+# When true, Claude output is streamed to the terminal in real-time via tee.
+# When false, output is captured and displayed after each iteration completes.
+RALPH_STREAM_OUTPUT="${RALPH_STREAM_OUTPUT:-true}"
+
 # Check if plan file contains DO_NOT_COMMIT directive
 # Skips content inside ``` code blocks to avoid false positives
 should_skip_commit_from_plan() {
@@ -589,6 +594,16 @@ echo -e "  Mode:      ${YELLOW}$MODE${NC}"
 echo -e "  Progress:  ${YELLOW}$PROGRESS_FILE${NC}"
 [ "$MAX_ITERATIONS" -gt 0 ] && echo -e "  Max Iter:  ${YELLOW}$MAX_ITERATIONS${NC}"
 echo -e "  Model:     ${YELLOW}$RALPH_MODEL${NC}"
+if [ "$RALPH_STREAM_OUTPUT" = "true" ]; then
+    if command -v jq &>/dev/null; then
+        echo -e "  Stream:    ${GREEN}enabled${NC}"
+    else
+        echo -e "  Stream:    ${YELLOW}disabled${NC} (jq not found)"
+        echo -e "             ${YELLOW}Install jq for real-time streaming, or set RALPH_STREAM_OUTPUT=false to silence this warning${NC}"
+    fi
+else
+    echo -e "  Stream:    ${YELLOW}disabled${NC}"
+fi
 if [ "$SHOULD_COMMIT" = "true" ]; then
     echo -e "  Commit:    ${GREEN}enabled${NC}"
 else
@@ -847,8 +862,7 @@ while true; do
         }
         chmod 600 "$claude_output_file" "$claude_error_file"
 
-        # Run Claude with streaming output
-        if command -v jq &>/dev/null; then
+        if [ "$RALPH_STREAM_OUTPUT" = "true" ] && command -v jq &>/dev/null; then
             # Stream JSON events, display text content in real-time
             echo "$PROMPT" | claude -p \
                 --dangerously-skip-permissions \
@@ -870,11 +884,15 @@ while true; do
                     else empty end
                 ' || claude_exit_code=$?
         else
-            # No jq available: capture output, no streaming display
+            # Non-streaming: capture output, display after completion
             echo "$PROMPT" | claude -p \
                 --dangerously-skip-permissions \
                 --model "$RALPH_MODEL" \
                 --verbose 2>"$claude_error_file" > "$claude_output_file" || claude_exit_code=$?
+
+            if [ -f "$claude_output_file" ]; then
+                cat "$claude_output_file"
+            fi
         fi
 
         # Capture any error output

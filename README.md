@@ -155,6 +155,11 @@ export RALPH_MODEL="sonnet"
 
 # Auto-commit after each iteration (default: true)
 export RALPH_AUTO_COMMIT="true"
+
+# Stream Claude output to the terminal in real-time (default: true)
+# Requires jq. Falls back to non-streaming if jq is not installed.
+# Set to false to capture output and display after each iteration completes.
+export RALPH_STREAM_OUTPUT="true"
 ```
 
 You can also override the model per-run via environment variable:
