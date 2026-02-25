@@ -764,13 +764,15 @@ PortableRalph is fully cross-platform with **CI-verified native Windows support*
 
 ### Windows CI Testing
 
-The [`windows-test.yml`](.github/workflows/windows-test.yml) GitHub Actions workflow provides comprehensive Windows validation:
+The [`windows-test.yml`](.github/workflows/windows-test.yml) GitHub Actions workflow provides comprehensive Windows validation with **5 automated test jobs**:
 
-- **PowerShell Script Testing:** Syntax validation, help/version parameters, dependency verification for all `.ps1` files
-- **Batch File Testing:** `launcher.bat` functionality and Windows CMD environment compatibility  
-- **Integration Testing:** Batch-to-PowerShell interop and end-to-end workflow simulation
-- **Notification System:** Dry-run notification tests and status reporting verification
-- **Windows-Specific Features:** Registry access, services, environment variables, file system operations
+1. **PowerShell Script Testing:** Syntax validation, help/version parameters, dependency verification for all `.ps1` files (install.ps1, ralph.ps1, notify.ps1, setup-notifications.ps1)
+2. **Batch File Testing:** `launcher.bat` functionality and Windows CMD environment compatibility  
+3. **Integration Testing:** Batch-to-PowerShell interop and end-to-end workflow simulation
+4. **Notification System Testing:** Dry-run notification tests and status reporting verification
+5. **Windows-Specific Features:** Registry access, services, environment variables, file system operations
+
+**Manual Workflow Triggers:** You can manually trigger the Windows CI workflow by going to the [Actions tab](https://github.com/aaron777collins/portableralph/actions/workflows/windows-test.yml) and clicking "Run workflow".
 
 The CI generates a detailed compatibility report artifact documenting test results and platform information.
 
