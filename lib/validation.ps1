@@ -43,7 +43,7 @@ function Test-NumericValue {
     $numValue = 0
     if (-not [int]::TryParse($Value, [ref]$numValue)) {
         if (Get-Command Write-RalphError -ErrorAction SilentlyContinue) {
-            Write-RalphError "$Name must be a positive integer: $Value"
+            Write-RalphError "$Name must be a positive integer - Value: $Value"
         }
         return $false
     }
@@ -51,7 +51,7 @@ function Test-NumericValue {
     # Check if non-negative
     if ($numValue -lt 0) {
         if (Get-Command Write-RalphError -ErrorAction SilentlyContinue) {
-            Write-RalphError "$Name must be a positive integer: $Value"
+            Write-RalphError "$Name must be a positive integer - Value: $Value"
         }
         return $false
     }
@@ -59,7 +59,7 @@ function Test-NumericValue {
     # Check range
     if ($numValue -lt $Min -or $numValue -gt $Max) {
         if (Get-Command Write-RalphError -ErrorAction SilentlyContinue) {
-            Write-RalphError "$Name must be between $Min and $Max - Value: $Value"
+            Write-RalphError "$Name must be between $Min and $Max (Value: $Value)"
         }
         return $false
     }
@@ -94,7 +94,7 @@ function Test-WebhookUrl {
     # Must start with http:// or https://
     if (-not ($Url.StartsWith("http://") -or $Url.StartsWith("https://"))) {
         if (Get-Command Write-RalphError -ErrorAction SilentlyContinue) {
-            Write-RalphError "$Name URL must use HTTP or HTTPS: $Url"
+            Write-RalphError "$Name URL must use HTTP or HTTPS - URL: $Url"
         }
         return $false
     }
@@ -129,7 +129,7 @@ function Test-EmailAddress {
     # Basic email validation regex
     if ($Email -notmatch '^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$') {
         if (Get-Command Write-RalphError -ErrorAction SilentlyContinue) {
-            Write-RalphError "$Name address format invalid: $Email"
+            Write-RalphError "$Name address format invalid - Email: $Email"
         }
         return $false
     }
@@ -175,7 +175,7 @@ function Test-FilePath {
     # Check if file exists if required
     if ($RequireExists -and -not (Test-Path $Path)) {
         if (Get-Command Write-RalphError -ErrorAction SilentlyContinue) {
-            Write-RalphError "$Name does not exist: $Path"
+            Write-RalphError "$Name does not exist - Path: $Path"
         }
         return $false
     }

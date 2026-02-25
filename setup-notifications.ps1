@@ -401,7 +401,7 @@ Write-Host ""
 Write-Host "  # Load Ralph configuration" -ForegroundColor Cyan
 Write-Host "  if (Test-Path '$CONFIG_FILE') {" -ForegroundColor Cyan
 Write-Host "      Get-Content '$CONFIG_FILE' | ForEach-Object {" -ForegroundColor Cyan
-Write-Host "          if (`$_ -match '^(?:export\s+)?(\w+)=`"?([^`"]*)`"?`$') {" -ForegroundColor Cyan
+Write-Host '          if ($_ -match "^(?:export\s+)?(\w+)=\"?([^\"]*)\"?$") {' -ForegroundColor Cyan
 Write-Host "              Set-Item -Path `"env:`$(`$matches[1])`" -Value `$matches[2]" -ForegroundColor Cyan
 Write-Host "          }" -ForegroundColor Cyan
 Write-Host "      }" -ForegroundColor Cyan
