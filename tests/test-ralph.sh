@@ -191,7 +191,7 @@ test_invalid_mode() {
     local output
     local exit_code=0
     output=$("$RALPH_DIR/ralph.sh" "$test_plan" invalid_mode 2>&1) || exit_code=$?
-    assert_contains "$output" "Mode must be" "Should error on invalid mode"
+    assert_contains "$output" "Invalid mode" "Should error on invalid mode"
     assert_exit_code 1 "$exit_code" "Should exit with code 1 for invalid mode"
 }
 
