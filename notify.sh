@@ -1167,7 +1167,7 @@ send_custom() {
 
     # Check script ownership (must be owned by current user or root)
     local script_owner
-    script_owner=$(stat -c '%U' "$RALPH_CUSTOM_NOTIFY_SCRIPT" 2>/dev/null || echo "unknown")
+    script_owner=$(stat -f '%Su' "$RALPH_CUSTOM_NOTIFY_SCRIPT" 2>/dev/null || stat -c '%U' "$RALPH_CUSTOM_NOTIFY_SCRIPT" 2>/dev/null || echo "unknown")
     if [ "$script_owner" != "$USER" ] && [ "$script_owner" != "root" ]; then
         $TEST_MODE && echo "  Custom: FAILED (script not owned by user or root)"
         return 1
@@ -1175,7 +1175,7 @@ send_custom() {
 
     # Security: Check file permissions - should not be world-writable
     local perms
-    perms=$(stat -c '%a' "$RALPH_CUSTOM_NOTIFY_SCRIPT" 2>/dev/null)
+    perms=$(stat -f '%Lp' "$RALPH_CUSTOM_NOTIFY_SCRIPT" 2>/dev/null || stat -c '%a' "$RALPH_CUSTOM_NOTIFY_SCRIPT" 2>/dev/null)
     if [[ "${perms: -1}" =~ [2367] ]]; then
         $TEST_MODE && echo "  Custom: FAILED (script is world-writable)"
         return 1
@@ -1206,7 +1206,7 @@ send_custom() {
     if [ "$script_owner" = "root" ]; then
         # Check if we've already confirmed this script (cache confirmation)
         local script_hash
-        script_hash=$(sha256sum "$RALPH_CUSTOM_NOTIFY_SCRIPT" 2>/dev/null | awk '{print $1}')
+        script_hash=$(shasum -a 256 "$RALPH_CUSTOM_NOTIFY_SCRIPT" 2>/dev/null || sha256sum "$RALPH_CUSTOM_NOTIFY_SCRIPT" 2>/dev/null | awk '{print $1}')
         # Use platform-appropriate home directory
         if command -v get_home_dir &>/dev/null; then
             local user_home=$(get_home_dir)
@@ -1336,28 +1336,28 @@ if ! $TEST_MODE; then
     fi
 fi
 
-# Track errors for better reporting
-declare -A SEND_ERRORS
+# Track errors for better reporting (using simple string instead of associative array for bash 3 compat)
+SEND_ERRORS=""
 
 # Send to all configured platforms with individual error tracking
 if ! send_slack "$MESSAGE"; then
-    SEND_ERRORS[slack]="failed"
+    SEND_ERRORS="${SEND_ERRORS}slack "
 fi
 
 if ! send_discord "$MESSAGE"; then
-    SEND_ERRORS[discord]="failed"
+    SEND_ERRORS="${SEND_ERRORS}discord "
 fi
 
 if ! send_telegram "$MESSAGE"; then
-    SEND_ERRORS[telegram]="failed"
+    SEND_ERRORS="${SEND_ERRORS}telegram "
 fi
 
 if ! send_email "$MESSAGE"; then
-    SEND_ERRORS[email]="failed"
+    SEND_ERRORS="${SEND_ERRORS}email "
 fi
 
 if ! send_custom "$MESSAGE"; then
-    SEND_ERRORS[custom]="failed"
+    SEND_ERRORS="${SEND_ERRORS}custom "
 fi
 
 # Cleanup rate limit file on exit
@@ -1367,7 +1367,7 @@ if $TEST_MODE; then
     echo ""
     if $SENT_ANY; then
         echo "Test complete! Check your notification channels."
-        if [[ "$(declare -p SEND_ERRORS 2>/dev/null)" == *"="* ]]; then
+        if [ -n "$SEND_ERRORS" ]; then
             echo ""
             echo "Note: Some platforms failed to send. Check configuration."
         fi

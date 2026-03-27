@@ -112,8 +112,8 @@ validate_config() {
         return 2  # Corrupted file, handled gracefully
     fi
 
-    # Check for null bytes or other corruption indicators
-    if grep -l $'\0' "$config_file" >/dev/null 2>&1; then
+    # Check for null bytes or other corruption indicators (use LC_ALL=C tr to avoid BSD grep false positives)
+    if [ "$(LC_ALL=C tr -cd '\0' < "$config_file" | wc -c)" -gt 0 ]; then
         log_warning "Configuration file contains null bytes (corrupted): $config_file"
         suggest_recovery "Remove corrupted config file: rm '$config_file' and reconfigure with 'ralph config'"
         return 2  # Corrupted file, handled gracefully
