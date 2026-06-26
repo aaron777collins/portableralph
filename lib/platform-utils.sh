@@ -364,11 +364,15 @@ get_temp_dir() {
 
     case "$os" in
         Windows)
-            # Windows CMD uses TEMP or TMP, fallback to /tmp for Git Bash/MSYS
-            echo "${TEMP:-${TMP:-/tmp}}"
+            # In Git Bash/MSYS, prefer POSIX /tmp over $TEMP (which has
+            # Windows backslash paths that break bash operations).
+            if [ -d "/tmp" ]; then
+                echo "/tmp"
+            else
+                echo "${TEMP:-${TMP:-/tmp}}"
+            fi
             ;;
         WSL)
-            # WSL can use Windows temp through /mnt/c/... or Linux temp
             echo "${TMPDIR:-/tmp}"
             ;;
         *)
@@ -405,8 +409,14 @@ get_home_dir() {
 
     case "$os" in
         Windows)
-            # Windows CMD uses USERPROFILE, fallback to HOME for Git Bash/MSYS
-            echo "${USERPROFILE:-${HOME:-~}}"
+            # In Git Bash/MSYS/Cygwin, prefer $HOME (POSIX path like /c/Users/X)
+            # over $USERPROFILE (Windows path like C:\Users\X) — backslash paths
+            # break bash path concatenation and file operations.
+            if [ -n "${HOME:-}" ]; then
+                echo "$HOME"
+            else
+                echo "${USERPROFILE:-~}"
+            fi
             ;;
         *)
             echo "${HOME:-~}"

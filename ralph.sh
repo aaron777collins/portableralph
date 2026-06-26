@@ -113,7 +113,7 @@ validate_config() {
         log_info "Auto-converting to UTF-8..."
         local _fix_tmp
         _fix_tmp=$(mktemp) || return 2
-        if sed 's/\x00//g' "$config_file" > "$_fix_tmp" 2>/dev/null; then
+        if sed 's/\x00//g' "$config_file" | tr -d '\r' > "$_fix_tmp" 2>/dev/null; then
             mv "$_fix_tmp" "$config_file"
             chmod 600 "$config_file" 2>/dev/null || true
             log_info "Configuration file repaired successfully"
@@ -153,8 +153,16 @@ if [ -f "$RALPH_CONFIG_FILE" ]; then
     set -e
     
     if [ $config_status -eq 0 ]; then
-        # Config is valid, source it
-        source "$RALPH_CONFIG_FILE"
+        # Strip carriage returns before sourcing (PowerShell writes CRLF which
+        # leaves \r in every value, breaking string comparisons silently).
+        _clean_config=$(mktemp) || true
+        if [ -n "${_clean_config:-}" ]; then
+            tr -d '\r' < "$RALPH_CONFIG_FILE" > "$_clean_config"
+            source "$_clean_config"
+            rm -f "$_clean_config"
+        else
+            source "$RALPH_CONFIG_FILE"
+        fi
 
         # Decrypt encrypted environment variables BEFORE validation
         if [ -f "$RALPH_DIR/decrypt-env.sh" ]; then
@@ -447,47 +455,38 @@ if [ "$1" = "config" ]; then
         local key="$1"
         local value="$2"
 
-        # Security: Escape special characters in value for safe sed usage
-        # This prevents sed injection by escaping: / \ & newlines and special chars
-        local escaped_value
-        escaped_value=$(printf '%s\n' "$value" | sed -e 's/[\/&]/\\&/g' -e 's/$/\\/' | tr -d '\n' | sed 's/\\$//')
-
         if [ -f "$CONFIG_FILE" ]; then
-            # Check if key exists (with or without export)
-            if grep -qE "^(export )?${key}=" "$CONFIG_FILE" 2>/dev/null; then
-                # Update existing (handle both patterns)
-                # Use a temporary file for atomic operation
-                local temp_file
-                temp_file=$(mktemp) || {
-                    log_error "Failed to create temp file for config update"
-                    return 1
-                }
-                chmod 600 "$temp_file"
-                trap 'rm -f "$temp_file" 2>/dev/null' RETURN
+            # Strip CRs from existing file before processing (PowerShell may have written CRLF)
+            local temp_file
+            temp_file=$(mktemp) || {
+                log_error "Failed to create temp file for config update"
+                return 1
+            }
+            chmod 600 "$temp_file" 2>/dev/null || true
 
-                # Process the file line by line to avoid sed injection
+            if grep -qE "^(export )?${key}=" "$CONFIG_FILE" 2>/dev/null; then
+                # Update existing key
                 while IFS= read -r line || [ -n "$line" ]; do
+                    line="${line%$'\r'}"
                     if [[ "$line" =~ ^export\ ${key}= ]] || [[ "$line" =~ ^${key}= ]]; then
-                        echo "export ${key}=\"${escaped_value}\""
+                        echo "export ${key}=\"${value}\""
                     else
                         echo "$line"
                     fi
                 done < "$CONFIG_FILE" > "$temp_file"
-
                 mv "$temp_file" "$CONFIG_FILE"
             else
-                # Append to existing file (preserve content)
+                rm -f "$temp_file"
                 echo "" >> "$CONFIG_FILE"
-                echo "# Auto-commit setting" >> "$CONFIG_FILE"
-                echo "export ${key}=\"${escaped_value}\"" >> "$CONFIG_FILE"
+                echo "export ${key}=\"${value}\"" >> "$CONFIG_FILE"
             fi
         else
             # Create new file
             echo '# PortableRalph Configuration' > "$CONFIG_FILE"
             echo "# Generated on $(date)" >> "$CONFIG_FILE"
             echo "" >> "$CONFIG_FILE"
-            echo "export ${key}=\"${escaped_value}\"" >> "$CONFIG_FILE"
-            chmod 600 "$CONFIG_FILE"
+            echo "export ${key}=\"${value}\"" >> "$CONFIG_FILE"
+            chmod 600 "$CONFIG_FILE" 2>/dev/null || true
         fi
     }
 
@@ -639,7 +638,13 @@ fi
 PLAN_BASENAME=$(basename "$PLAN_FILE" .md)
 PROGRESS_FILE="${PLAN_BASENAME}_PROGRESS.md"
 GUARDRAILS_FILE="RALPH_GUARDRAILS.md"
-PLAN_FILE_ABS=$(realpath "$PLAN_FILE")
+if command -v get_absolute_path &>/dev/null; then
+    PLAN_FILE_ABS=$(get_absolute_path "$PLAN_FILE")
+elif command -v realpath &>/dev/null; then
+    PLAN_FILE_ABS=$(realpath "$PLAN_FILE")
+else
+    PLAN_FILE_ABS="$(cd "$(dirname "$PLAN_FILE")" && pwd)/$(basename "$PLAN_FILE")"
+fi
 
 # Select prompt template
 if [ "$MODE" = "plan" ]; then
