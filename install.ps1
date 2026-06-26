@@ -255,7 +255,7 @@ if (Test-Path "$env:USERPROFILE\.ralph.env") {
 }
 function ralph { & "$InstallDir\ralph.ps1" @args }
 "@
-        Add-Content -Path $PROFILE -Value $configBlock
+        Add-Content -Path $PROFILE -Value $configBlock -Encoding UTF8
         Write-Success "Added to PowerShell profile"
         Write-Info "Run '. `$PROFILE' or restart PowerShell to use 'ralph' command"
     }
@@ -406,7 +406,7 @@ export RALPH_AUTO_COMMIT="true"
         $configContent += "export RALPH_CUSTOM_NOTIFY_SCRIPT=`"$CustomScript`"`n"
     }
 
-    Set-Content -Path $configFile -Value $configContent
+    Set-Content -Path $configFile -Value $configContent -Encoding UTF8
     Write-Success "Configuration saved to $configFile"
 }
 

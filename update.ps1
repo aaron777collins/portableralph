@@ -188,10 +188,10 @@ function Save-VersionHistory {
 # Ralph Version History
 # Format: VERSION|DATE|PREVIOUS_VERSION
 "@
-        Set-Content -Path $VERSION_HISTORY -Value $header
+        Set-Content -Path $VERSION_HISTORY -Value $header -Encoding UTF8
     }
 
-    Add-Content -Path $VERSION_HISTORY -Value "$NewVersion|$timestamp|$OldVersion"
+    Add-Content -Path $VERSION_HISTORY -Value "$NewVersion|$timestamp|$OldVersion" -Encoding UTF8
 }
 
 function Get-PreviousVersion {
@@ -252,7 +252,7 @@ function Backup-Current {
     }
 
     # Record backup version
-    Set-Content -Path (Join-Path $BACKUP_DIR ".version") -Value $CURRENT_VERSION
+    Set-Content -Path (Join-Path $BACKUP_DIR ".version") -Value $CURRENT_VERSION -Encoding UTF8
 
     Write-Success "Backup complete"
 }

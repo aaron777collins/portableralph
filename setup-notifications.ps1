@@ -359,7 +359,7 @@ export RALPH_CUSTOM_NOTIFY_SCRIPT="$CUSTOM_SCRIPT"
 "@
 }
 
-Set-Content -Path $CONFIG_FILE -Value $configContent
+Set-Content -Path $CONFIG_FILE -Value $configContent -Encoding UTF8
 Write-Host "Configuration saved to: $CONFIG_FILE" -ForegroundColor Green
 
 # ============================================

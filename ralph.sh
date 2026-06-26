@@ -106,18 +106,31 @@ validate_config() {
         return 0  # File doesn't exist, nothing to validate
     fi
 
-    # Check for binary corruption or severely invalid content
-    if ! file "$config_file" 2>/dev/null | grep -q "text"; then
-        log_warning "Configuration file appears to be corrupted or contains binary data: $config_file"
-        suggest_recovery "Remove corrupted config file: rm '$config_file' and reconfigure with 'ralph config'"
-        return 2  # Corrupted file, handled gracefully
+    # Check for null bytes (common when PowerShell writes UTF-16LE without -Encoding UTF8).
+    # Auto-fix by converting to UTF-8 so the user doesn't have to manually delete the file.
+    if grep -Pl '\x00' "$config_file" >/dev/null 2>&1; then
+        log_warning "Configuration file contains null bytes (likely UTF-16 encoding): $config_file"
+        log_info "Auto-converting to UTF-8..."
+        local _fix_tmp
+        _fix_tmp=$(mktemp) || return 2
+        if sed 's/\x00//g' "$config_file" > "$_fix_tmp" 2>/dev/null; then
+            mv "$_fix_tmp" "$config_file"
+            chmod 600 "$config_file" 2>/dev/null || true
+            log_info "Configuration file repaired successfully"
+        else
+            rm -f "$_fix_tmp"
+            suggest_recovery "Remove corrupted config file: rm '$config_file' and reconfigure with 'ralph config'"
+            return 2
+        fi
     fi
 
-    # Check for null bytes or other corruption indicators
-    if grep -l $'\0' "$config_file" >/dev/null 2>&1; then
-        log_warning "Configuration file contains null bytes (corrupted): $config_file"
-        suggest_recovery "Remove corrupted config file: rm '$config_file' and reconfigure with 'ralph config'"
-        return 2  # Corrupted file, handled gracefully
+    # Check for binary corruption (skip if 'file' command is not available, e.g. MINGW64)
+    if command -v file &>/dev/null; then
+        if ! file "$config_file" 2>/dev/null | grep -q "text"; then
+            log_warning "Configuration file appears to be corrupted or contains binary data: $config_file"
+            suggest_recovery "Remove corrupted config file: rm '$config_file' and reconfigure with 'ralph config'"
+            return 2
+        fi
     fi
 
     # Just check basic bash syntax
