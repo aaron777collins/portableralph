@@ -148,6 +148,14 @@ readonly LOG_TAIL_LINES=10                   # Number of lines to show when tail
 # Update backups to keep
 readonly UPDATE_MAX_BACKUPS=5                # Maximum number of update backups to keep
 
+# ============================================
+# GUARDRAILS
+# ============================================
+
+# Guardrails file line limits
+readonly GUARDRAILS_SOFT_LIMIT=50            # Prompt Claude to consolidate at this many lines
+readonly GUARDRAILS_WARN_LIMIT=100           # Show warning in banner at this many lines
+
 # Export all constants for use in other scripts
 export HTTP_MAX_TIME HTTP_CONNECT_TIMEOUT HTTP_SMTP_TIMEOUT
 export CUSTOM_SCRIPT_TIMEOUT
@@ -173,3 +181,4 @@ export CONFIG_FILE_MODE
 export TELEGRAM_TOKEN_PREFIX_MIN TELEGRAM_TOKEN_PREFIX_MAX TELEGRAM_TOKEN_SECRET_LENGTH
 export SPINNER_FRAMES LOG_TAIL_LINES
 export UPDATE_MAX_BACKUPS
+export GUARDRAILS_SOFT_LIMIT GUARDRAILS_WARN_LIMIT

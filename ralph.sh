@@ -142,7 +142,16 @@ if [ -f "$RALPH_CONFIG_FILE" ]; then
         # Config is valid, source it
         source "$RALPH_CONFIG_FILE"
 
-        # Validate loaded configuration values
+        # Decrypt encrypted environment variables BEFORE validation
+        if [ -f "$RALPH_DIR/decrypt-env.sh" ]; then
+            source "$RALPH_DIR/decrypt-env.sh"
+            if ! decrypt_ralph_env; then
+                echo -e "${YELLOW}Warning: Failed to decrypt some environment variables${NC}" >&2
+                echo "Some notification platforms may not work correctly" >&2
+            fi
+        fi
+
+        # Validate loaded configuration values (now with decrypted values)
         if [ -n "${RALPH_SLACK_WEBHOOK_URL:-}" ]; then
             if ! validate_webhook_url "$RALPH_SLACK_WEBHOOK_URL" "RALPH_SLACK_WEBHOOK_URL"; then
                 echo -e "${YELLOW}Warning: Invalid RALPH_SLACK_WEBHOOK_URL, disabling Slack notifications${NC}" >&2
@@ -192,23 +201,21 @@ if [ -f "$RALPH_CONFIG_FILE" ]; then
     fi
 fi
 
-# Decrypt encrypted environment variables
-if [ -f "$RALPH_DIR/decrypt-env.sh" ]; then
-    source "$RALPH_DIR/decrypt-env.sh"
-    if ! decrypt_ralph_env 2>&1 | grep -q "^Error:"; then
-        : # Decryption succeeded or no encrypted values
-    else
-        echo -e "${YELLOW}Warning: Failed to decrypt some environment variables${NC}" >&2
-        echo "Run 'ralph notify setup' if you have notification issues" >&2
-    fi
-fi
-
 VERSION="1.7.0"
 
 # Auto-commit setting (default: true)
 # Can be disabled via: ralph config commit off
 # Or by adding DO_NOT_COMMIT on its own line in the plan file
 RALPH_AUTO_COMMIT="${RALPH_AUTO_COMMIT:-true}"
+
+# Model setting (default: sonnet)
+# Can be set via: export RALPH_MODEL="claude-opus-4-6" in ~/.ralph.env
+RALPH_MODEL="${RALPH_MODEL:-sonnet}"
+
+# Stream output setting (default: true)
+# When true, Claude output is streamed to the terminal in real-time via tee.
+# When false, output is captured and displayed after each iteration completes.
+RALPH_STREAM_OUTPUT="${RALPH_STREAM_OUTPUT:-true}"
 
 # Check if plan file contains DO_NOT_COMMIT directive
 # Skips content inside ``` code blocks to avoid false positives
@@ -548,6 +555,7 @@ fi
 # Derive progress file name from plan file
 PLAN_BASENAME=$(basename "$PLAN_FILE" .md)
 PROGRESS_FILE="${PLAN_BASENAME}_PROGRESS.md"
+GUARDRAILS_FILE="RALPH_GUARDRAILS.md"
 PLAN_FILE_ABS=$(realpath "$PLAN_FILE")
 
 # Select prompt template
@@ -585,6 +593,17 @@ echo -e "  Plan:      ${YELLOW}$PLAN_FILE${NC}"
 echo -e "  Mode:      ${YELLOW}$MODE${NC}"
 echo -e "  Progress:  ${YELLOW}$PROGRESS_FILE${NC}"
 [ "$MAX_ITERATIONS" -gt 0 ] && echo -e "  Max Iter:  ${YELLOW}$MAX_ITERATIONS${NC}"
+echo -e "  Model:     ${YELLOW}$RALPH_MODEL${NC}"
+if [ "$RALPH_STREAM_OUTPUT" = "true" ]; then
+    if command -v jq &>/dev/null; then
+        echo -e "  Stream:    ${GREEN}enabled${NC}"
+    else
+        echo -e "  Stream:    ${YELLOW}disabled${NC} (jq not found)"
+        echo -e "             ${YELLOW}Install jq for real-time streaming, or set RALPH_STREAM_OUTPUT=false to silence this warning${NC}"
+    fi
+else
+    echo -e "  Stream:    ${YELLOW}disabled${NC}"
+fi
 if [ "$SHOULD_COMMIT" = "true" ]; then
     echo -e "  Commit:    ${GREEN}enabled${NC}"
 else
@@ -600,6 +619,17 @@ if notifications_enabled; then
     echo -e "  Notify:    ${GREEN}${PLATFORMS}${NC}"
 else
     echo -e "  Notify:    ${YELLOW}disabled${NC} (run 'ralph notify setup')"
+fi
+if [ -f "$GUARDRAILS_FILE" ]; then
+    GUARDRAILS_LINES=$(wc -l < "$GUARDRAILS_FILE")
+    guardrails_warn="${GUARDRAILS_WARN_LIMIT:-100}"
+    if [ "$GUARDRAILS_LINES" -gt "$guardrails_warn" ]; then
+        echo -e "  Guardrails:${YELLOW} $GUARDRAILS_FILE ($GUARDRAILS_LINES lines - consider consolidating)${NC}"
+    else
+        echo -e "  Guardrails:${GREEN} $GUARDRAILS_FILE ($GUARDRAILS_LINES lines)${NC}"
+    fi
+else
+    echo -e "  Guardrails:${YELLOW} none (created when needed)${NC}"
 fi
 echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
 echo ""
@@ -632,6 +662,43 @@ if [ ! -f "$PROGRESS_FILE" ]; then
 fi
 
 ITERATION=0
+
+# Extract a short summary from the progress file (task counts + last completed task)
+get_progress_summary() {
+    if [ ! -f "$PROGRESS_FILE" ]; then
+        echo ""
+        return
+    fi
+
+    local done_count=0
+    local total_count=0
+    local last_done=""
+
+    while IFS= read -r line; do
+        if [[ "$line" =~ ^-\ \[x\]\ (.+) ]]; then
+            total_count=$((total_count + 1))
+            done_count=$((done_count + 1))
+            last_done="${BASH_REMATCH[1]}"
+        elif [[ "$line" =~ ^-\ \[\ \]\ (.+) ]]; then
+            total_count=$((total_count + 1))
+        fi
+    done < "$PROGRESS_FILE"
+
+    if [ "$total_count" -eq 0 ]; then
+        echo ""
+        return
+    fi
+
+    local summary="Tasks: ${done_count}/${total_count}"
+    if [ -n "$last_done" ]; then
+        # Truncate long task names
+        if [ "${#last_done}" -gt 60 ]; then
+            last_done="${last_done:0:57}..."
+        fi
+        summary="${summary}\nLast: ${last_done}"
+    fi
+    echo "$summary"
+}
 
 # Check for completion
 # Uses -x to match whole lines only, preventing false positives from
@@ -693,7 +760,10 @@ while true; do
         echo -e "${GREEN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
         echo -e "${GREEN}  RALPH_DONE - Work complete!${NC}"
         echo -e "${GREEN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
-        notify ":white_check_mark: *Ralph Complete!*\n\`\`\`Plan: $PLAN_BASENAME\nIterations: $ITERATION\nRepo: $REPO_NAME\`\`\`" ":white_check_mark:"
+        SUMMARY=$(get_progress_summary)
+        SUMMARY_BLOCK=""
+        [ -n "$SUMMARY" ] && SUMMARY_BLOCK="\n$SUMMARY"
+        notify ":white_check_mark: *Ralph Complete!*\n\`\`\`Plan: $PLAN_BASENAME\nIterations: $ITERATION\nRepo: $REPO_NAME${SUMMARY_BLOCK}\`\`\`" ":white_check_mark:"
         break
     fi
 
@@ -702,7 +772,10 @@ while true; do
         echo -e "${YELLOW}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
         echo -e "${YELLOW}  Max iterations reached: $MAX_ITERATIONS${NC}"
         echo -e "${YELLOW}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
-        notify ":warning: *Ralph Stopped*\n\`\`\`Plan: $PLAN_BASENAME\nReason: Max iterations reached ($MAX_ITERATIONS)\nRepo: $REPO_NAME\`\`\`" ":warning:"
+        SUMMARY=$(get_progress_summary)
+        SUMMARY_BLOCK=""
+        [ -n "$SUMMARY" ] && SUMMARY_BLOCK="\n$SUMMARY"
+        notify ":warning: *Ralph Stopped*\n\`\`\`Plan: $PLAN_BASENAME\nReason: Max iterations reached ($MAX_ITERATIONS)\nRepo: $REPO_NAME${SUMMARY_BLOCK}\`\`\`" ":warning:"
         break
     fi
 
@@ -727,12 +800,16 @@ while true; do
     safe_progress_file=$(escape_sed "$PROGRESS_FILE")
     safe_plan_name=$(escape_sed "$PLAN_BASENAME")
     safe_should_commit=$(escape_sed "$SHOULD_COMMIT")
+    safe_guardrails_file=$(escape_sed "$GUARDRAILS_FILE")
+    safe_guardrails_soft_limit=$(escape_sed "${GUARDRAILS_SOFT_LIMIT:-50}")
 
     PROMPT=$(cat "$PROMPT_TEMPLATE" | \
         sed "s|\${PLAN_FILE}|$safe_plan_file|g" | \
         sed "s|\${PROGRESS_FILE}|$safe_progress_file|g" | \
         sed "s|\${PLAN_NAME}|$safe_plan_name|g" | \
-        sed "s|\${AUTO_COMMIT}|$safe_should_commit|g")
+        sed "s|\${AUTO_COMMIT}|$safe_should_commit|g" | \
+        sed "s|\${GUARDRAILS_FILE}|$safe_guardrails_file|g" | \
+        sed "s|\${GUARDRAILS_SOFT_LIMIT}|$safe_guardrails_soft_limit|g")
 
     # Validate prerequisites before calling Claude
     if [ -n "${CLAUDE_API_KEY:-}" ]; then
@@ -785,15 +862,34 @@ while true; do
         }
         chmod 600 "$claude_output_file" "$claude_error_file"
 
-            #            --model sonnet \
-        # Run Claude
-        echo "$PROMPT" | claude -p \
-            --dangerously-skip-permissions \
-                        --model claude-opus-4-5 \
-            --verbose > "$claude_output_file" 2>"$claude_error_file" || claude_exit_code=$?
+        if [ "$RALPH_STREAM_OUTPUT" = "true" ] && command -v jq &>/dev/null; then
+            # Stream JSON events, display text content in real-time
+            echo "$PROMPT" | claude -p \
+                --dangerously-skip-permissions \
+                --model "$RALPH_MODEL" \
+                --verbose \
+                --output-format stream-json 2>"$claude_error_file" | \
+                tee "$claude_output_file" | \
+                jq --unbuffered -r '
+                    select(.type == "assistant") |
+                    .message.content[]? |
+                    if .type == "text" then .text
+                    elif .type == "tool_use" then
+                        "  \u001b[0;34m→ " + .name +
+                        (if .input.file_path then ": " + .input.file_path
+                         elif .input.pattern then " /" + .input.pattern + "/"
+                         elif .input.command then ": " + (.input.command | .[0:80])
+                         elif .input.prompt then ": " + (.input.prompt | .[0:80])
+                         else "" end) + "\u001b[0m"
+                    else empty end
+                ' || claude_exit_code=$?
+        else
+            # Non-streaming: capture output, display after completion
+            echo "$PROMPT" | claude -p \
+                --dangerously-skip-permissions \
+                --model "$RALPH_MODEL" \
+                --verbose 2>"$claude_error_file" > "$claude_output_file" || claude_exit_code=$?
 
-        # Display output on first attempt or final retry
-        if [ $claude_attempt -eq 1 ] || [ $claude_attempt -eq $max_claude_retries ]; then
             if [ -f "$claude_output_file" ]; then
                 cat "$claude_output_file"
             fi
@@ -885,7 +981,10 @@ while true; do
 
         # Send error notification and log
         log_error "Stopping Ralph due to Claude CLI failure at iteration $ITERATION after $claude_attempt attempts"
-        notify ":x: *Ralph Error*\n\`\`\`Plan: $PLAN_BASENAME\nIteration: $ITERATION\nError: $error_type (after $claude_attempt retries)\nRepo: $REPO_NAME\`\`\`" ":x:"
+        SUMMARY=$(get_progress_summary)
+        SUMMARY_BLOCK=""
+        [ -n "$SUMMARY" ] && SUMMARY_BLOCK="\n$SUMMARY"
+        notify ":x: *Ralph Error*\n\`\`\`Plan: $PLAN_BASENAME\nIteration: $ITERATION\nError: $error_type (after $claude_attempt retries)\nRepo: $REPO_NAME${SUMMARY_BLOCK}\`\`\`" ":x:"
         exit $claude_exit_code
     fi
 
@@ -915,7 +1014,10 @@ while true; do
         log_error "Invalid RALPH_NOTIFY_FREQUENCY, using default: $notify_default"
     fi
     if [ "$ITERATION" -eq 1 ] || [ $((ITERATION % NOTIFY_FREQ)) -eq 0 ]; then
-        notify ":gear: *Ralph Progress*: Iteration $ITERATION completed\n\`Plan: $PLAN_BASENAME\`" ":gear:"
+        SUMMARY=$(get_progress_summary)
+        SUMMARY_BLOCK=""
+        [ -n "$SUMMARY" ] && SUMMARY_BLOCK="\n$SUMMARY"
+        notify ":gear: *Ralph Progress*: Iteration $ITERATION completed\n\`\`\`Plan: $PLAN_BASENAME\nRepo: $REPO_NAME${SUMMARY_BLOCK}\`\`\`" ":gear:"
     fi
 
     # Small delay between iterations
