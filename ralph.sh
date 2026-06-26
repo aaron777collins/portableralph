@@ -73,6 +73,7 @@ log_error() {
 # Source shared libraries
 source "${RALPH_DIR}/lib/validation.sh"
 source "${RALPH_DIR}/lib/error-handling.sh"
+source "${RALPH_DIR}/lib/ai-tool.sh"
 
 # Initialize enhanced error handling
 setup_error_handling "ralph.sh" "$LOG_DIR"
@@ -208,9 +209,9 @@ VERSION="1.7.0"
 # Or by adding DO_NOT_COMMIT on its own line in the plan file
 RALPH_AUTO_COMMIT="${RALPH_AUTO_COMMIT:-true}"
 
-# Model setting (default: sonnet)
+# Model setting (per-tool default if not set)
 # Can be set via: export RALPH_MODEL="claude-opus-4-6" in ~/.ralph.env
-RALPH_MODEL="${RALPH_MODEL:-sonnet}"
+RALPH_MODEL="${RALPH_MODEL:-$(get_default_model)}"
 
 # Stream output setting (default: true)
 # When true, Claude output is streamed to the terminal in real-time via tee.
@@ -347,6 +348,11 @@ usage() {
     echo "  ralph config commit on      Enable auto-commit (default)"
     echo "  ralph config commit off     Disable auto-commit"
     echo "  ralph config commit status  Show current setting"
+    echo "  ralph config tool claude    Use Claude Code (default)"
+    echo "  ralph config tool codex     Use OpenAI Codex"
+    echo "  ralph config tool opencode  Use OpenCode"
+    echo "  ralph config tool custom    Use a custom AI command"
+    echo "  ralph config model <name>   Set model for the AI tool"
     echo ""
     echo -e "${YELLOW}Plan File Directives:${NC}"
     echo "  Add DO_NOT_COMMIT on its own line to disable commits for that plan"
@@ -509,11 +515,70 @@ if [ "$1" = "config" ]; then
             esac
             exit 0
             ;;
+        tool)
+            case "${3:-}" in
+                claude|codex|opencode|custom)
+                    set_config_value "RALPH_AI_TOOL" "$3"
+                    echo -e "${GREEN}AI tool set to: $3${NC}"
+                    echo "Ralph will use $3 for all future runs."
+                    if [ "$3" = "custom" ]; then
+                        echo -e "${YELLOW}Don't forget to set RALPH_AI_COMMAND in ~/.ralph.env${NC}"
+                    fi
+                    ;;
+                status|"")
+                    _current_tool="${RALPH_AI_TOOL:-claude}"
+                    echo -e "${YELLOW}AI tool setting:${NC}"
+                    echo -e "  Current: ${GREEN}$_current_tool${NC}"
+                    echo ""
+                    echo -e "${YELLOW}Available tools:${NC}"
+                    echo "  claude     Claude Code CLI (default)"
+                    echo "  codex      OpenAI Codex CLI"
+                    echo "  opencode   OpenCode CLI"
+                    echo "  custom     Custom command (set RALPH_AI_COMMAND)"
+                    echo ""
+                    echo -e "${YELLOW}Usage:${NC}"
+                    echo "  ralph config tool claude      Use Claude Code"
+                    echo "  ralph config tool codex       Use OpenAI Codex"
+                    echo "  ralph config tool opencode    Use OpenCode"
+                    echo "  ralph config tool custom      Use a custom command"
+                    ;;
+                *)
+                    echo -e "${RED}Unknown tool: $3${NC}"
+                    echo "Valid tools: claude, codex, opencode, custom"
+                    echo "Usage: ralph config tool <claude|codex|opencode|custom|status>"
+                    exit 1
+                    ;;
+            esac
+            exit 0
+            ;;
+        model)
+            case "${3:-}" in
+                ""|status)
+                    echo -e "${YELLOW}Model setting:${NC}"
+                    echo -e "  Current: ${GREEN}${RALPH_MODEL:-$(get_default_model)}${NC}"
+                    echo ""
+                    echo -e "${YELLOW}Usage:${NC}"
+                    echo "  ralph config model <model-name>    Set model (e.g., sonnet, gpt-4.1)"
+                    echo "  ralph config model reset           Reset to tool default"
+                    ;;
+                reset)
+                    set_config_value "RALPH_MODEL" ""
+                    echo -e "${GREEN}Model reset to tool default${NC}"
+                    ;;
+                *)
+                    set_config_value "RALPH_MODEL" "$3"
+                    echo -e "${GREEN}Model set to: $3${NC}"
+                    ;;
+            esac
+            exit 0
+            ;;
         "")
             echo -e "${YELLOW}Usage:${NC} ralph config <setting>"
             echo ""
             echo -e "${YELLOW}Settings:${NC}"
-            echo "  commit <on|off|status>    Configure auto-commit behavior"
+            echo "  commit <on|off|status>                    Configure auto-commit behavior"
+            echo "  tool <claude|codex|opencode|custom>       Set AI tool (default: claude)"
+            echo "  model <model-name|reset|status>           Set model for the AI tool"
             exit 1
             ;;
         *)
@@ -527,6 +592,11 @@ fi
 PLAN_FILE="$1"
 MODE="${2:-build}"
 MAX_ITERATIONS="${3:-${MAX_ITERATIONS_DEFAULT:-0}}"
+
+# Validate AI tool is available
+if ! validate_ai_tool; then
+    exit 1
+fi
 
 # Enhanced validation of input parameters
 if ! validate_file_enhanced "$PLAN_FILE" "Plan file"; then
@@ -587,12 +657,14 @@ fi
 # Print banner
 echo ""
 echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+AI_DISPLAY_NAME="$(get_ai_tool_display_name)"
 echo -e "${GREEN}  RALPH - Autonomous AI Development Loop${NC}"
 echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
 echo -e "  Plan:      ${YELLOW}$PLAN_FILE${NC}"
 echo -e "  Mode:      ${YELLOW}$MODE${NC}"
 echo -e "  Progress:  ${YELLOW}$PROGRESS_FILE${NC}"
 [ "$MAX_ITERATIONS" -gt 0 ] && echo -e "  Max Iter:  ${YELLOW}$MAX_ITERATIONS${NC}"
+echo -e "  AI Tool:   ${YELLOW}$AI_DISPLAY_NAME${NC}"
 echo -e "  Model:     ${YELLOW}$RALPH_MODEL${NC}"
 if [ "$RALPH_STREAM_OUTPUT" = "true" ]; then
     if command -v jq &>/dev/null; then
@@ -811,19 +883,22 @@ while true; do
         sed "s|\${GUARDRAILS_FILE}|$safe_guardrails_file|g" | \
         sed "s|\${GUARDRAILS_SOFT_LIMIT}|$safe_guardrails_soft_limit|g")
 
-    # Validate prerequisites before calling Claude
-    if [ -n "${CLAUDE_API_KEY:-}" ]; then
+    # Validate prerequisites before calling AI tool
+    if [ "$(detect_ai_tool)" = "claude" ] && [ -n "${CLAUDE_API_KEY:-}" ]; then
         if ! validate_api_key "$CLAUDE_API_KEY"; then
             log_error "Invalid Claude API key format"
             exit 1
         fi
     fi
-    
-    # Check network connectivity
-    if ! validate_network_connectivity "api.anthropic.com" 10; then
-        log_error "Cannot reach Anthropic API servers"
-        suggest_recovery "Check your internet connection and firewall settings"
-        exit 1
+
+    # Check network connectivity for tools that need it
+    _api_host="$(get_ai_tool_api_host)"
+    if [ -n "$_api_host" ]; then
+        if ! validate_network_connectivity "$_api_host" 10; then
+            log_error "Cannot reach $(get_ai_tool_display_name) API servers ($_api_host)"
+            suggest_recovery "Check your internet connection and firewall settings"
+            exit 1
+        fi
     fi
     
     # Check available disk space (require 50MB minimum)
@@ -862,37 +937,10 @@ while true; do
         }
         chmod 600 "$claude_output_file" "$claude_error_file"
 
-        if [ "$RALPH_STREAM_OUTPUT" = "true" ] && command -v jq &>/dev/null; then
-            # Stream JSON events, display text content in real-time
-            echo "$PROMPT" | claude -p \
-                --dangerously-skip-permissions \
-                --model "$RALPH_MODEL" \
-                --verbose \
-                --output-format stream-json 2>"$claude_error_file" | \
-                tee "$claude_output_file" | \
-                jq --unbuffered -r '
-                    select(.type == "assistant") |
-                    .message.content[]? |
-                    if .type == "text" then .text
-                    elif .type == "tool_use" then
-                        "  \u001b[0;34m→ " + .name +
-                        (if .input.file_path then ": " + .input.file_path
-                         elif .input.pattern then " /" + .input.pattern + "/"
-                         elif .input.command then ": " + (.input.command | .[0:80])
-                         elif .input.prompt then ": " + (.input.prompt | .[0:80])
-                         else "" end) + "\u001b[0m"
-                    else empty end
-                ' || claude_exit_code=$?
+        if [ "$RALPH_STREAM_OUTPUT" = "true" ]; then
+            run_ai_tool_streaming "$PROMPT" "$RALPH_MODEL" "$claude_output_file" "$claude_error_file" || claude_exit_code=$?
         else
-            # Non-streaming: capture output, display after completion
-            echo "$PROMPT" | claude -p \
-                --dangerously-skip-permissions \
-                --model "$RALPH_MODEL" \
-                --verbose 2>"$claude_error_file" > "$claude_output_file" || claude_exit_code=$?
-
-            if [ -f "$claude_output_file" ]; then
-                cat "$claude_output_file"
-            fi
+            run_ai_tool_nonstreaming "$PROMPT" "$RALPH_MODEL" "$claude_output_file" "$claude_error_file" || claude_exit_code=$?
         fi
 
         # Capture any error output
@@ -925,7 +973,7 @@ while true; do
                 error_type="network error"
             elif echo "$claude_errors" | grep -qi "not.*found\|command.*not.*found"; then
                 error_detected=true
-                error_type="Claude CLI not found or not in PATH"
+                error_type="AI tool not found or not in PATH"
             # GitHub Issue #1: Detect API 400 errors from tool use concurrency
             elif echo "$claude_errors" | grep -qi "400\|bad.*request\|tool.*use\|concurrency"; then
                 error_detected=true
@@ -943,7 +991,7 @@ while true; do
         fi
 
         # Log the attempt error
-        log_error "Claude CLI error at iteration $ITERATION (attempt $claude_attempt/$max_claude_retries): $error_type"
+        log_error "$(get_ai_tool_display_name) error at iteration $ITERATION (attempt $claude_attempt/$max_claude_retries): $error_type"
         if [ -n "$claude_errors" ]; then
             err_truncate="${ERROR_DETAILS_TRUNCATE_LENGTH:-500}"
             log_error "Error details: ${claude_errors:0:$err_truncate}"
@@ -969,7 +1017,7 @@ while true; do
     # If all retries failed, stop iterations
     if [ "$claude_success" = false ]; then
         echo -e "${RED}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
-        echo -e "${RED}  Claude CLI Error (after $claude_attempt attempts): $error_type${NC}"
+        echo -e "${RED}  $(get_ai_tool_display_name) Error (after $claude_attempt attempts): $error_type${NC}"
         echo -e "${RED}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
 
         # Check if this is a transient error that might benefit from manual retry
@@ -980,7 +1028,7 @@ while true; do
         fi
 
         # Send error notification and log
-        log_error "Stopping Ralph due to Claude CLI failure at iteration $ITERATION after $claude_attempt attempts"
+        log_error "Stopping Ralph due to $(get_ai_tool_display_name) failure at iteration $ITERATION after $claude_attempt attempts"
         SUMMARY=$(get_progress_summary)
         SUMMARY_BLOCK=""
         [ -n "$SUMMARY" ] && SUMMARY_BLOCK="\n$SUMMARY"

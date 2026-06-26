@@ -116,9 +116,35 @@ function Test-Dependencies {
         $missing += "git"
     }
 
-    if (-not (Get-Command claude -ErrorAction SilentlyContinue)) {
-        Write-Warning2 "Claude CLI not found. Install from: https://docs.anthropic.com/en/docs/claude-code"
-        Write-Warning2 "Ralph requires Claude CLI to run."
+    $aiTool = if ($env:RALPH_AI_TOOL) { $env:RALPH_AI_TOOL.ToLower().Trim() } else { "claude" }
+    if (-not $aiTool) { $aiTool = "claude" }
+    switch ($aiTool) {
+        "claude" {
+            if (-not (Get-Command claude -ErrorAction SilentlyContinue)) {
+                Write-Warning2 "Claude Code CLI not found. Install from: https://docs.anthropic.com/en/docs/claude-code"
+                Write-Warning2 "Ralph requires an AI CLI tool to run. Currently configured: claude"
+            }
+        }
+        "codex" {
+            if (-not (Get-Command codex -ErrorAction SilentlyContinue)) {
+                Write-Warning2 "OpenAI Codex CLI not found. Install it and ensure 'codex' is on your PATH."
+                Write-Warning2 "Ralph requires an AI CLI tool to run. Currently configured: codex"
+            }
+        }
+        "opencode" {
+            if (-not (Get-Command opencode -ErrorAction SilentlyContinue)) {
+                Write-Warning2 "OpenCode CLI not found. Install it and ensure 'opencode' is on your PATH."
+                Write-Warning2 "Ralph requires an AI CLI tool to run. Currently configured: opencode"
+            }
+        }
+        "custom" {
+            if (-not $env:RALPH_AI_COMMAND) {
+                Write-Warning2 "RALPH_AI_TOOL is 'custom' but RALPH_AI_COMMAND is not set."
+            }
+        }
+        default {
+            Write-Warning2 "No AI CLI tool configured. Set RALPH_AI_TOOL to: claude, codex, opencode, or custom."
+        }
     }
 
     if ($missing.Count -gt 0) {
