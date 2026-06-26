@@ -203,7 +203,7 @@ function Start-BackgroundProcess {
                 param($proc, $outFile)
                 while (-not $proc.StandardOutput.EndOfStream) {
                     $line = $proc.StandardOutput.ReadLine()
-                    Add-Content -Path $outFile -Value $line
+                    Add-Content -Path $outFile -Value $line -Encoding UTF8
                 }
             } -ArgumentList $process, $OutputFile | Out-Null
 
@@ -211,7 +211,7 @@ function Start-BackgroundProcess {
                 param($proc, $errFile)
                 while (-not $proc.StandardError.EndOfStream) {
                     $line = $proc.StandardError.ReadLine()
-                    Add-Content -Path $errFile -Value $line
+                    Add-Content -Path $errFile -Value $line -Encoding UTF8
                 }
             } -ArgumentList $process, $errorTarget | Out-Null
         }

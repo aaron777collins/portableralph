@@ -36,5 +36,5 @@ Write-Host ""
 
 # Save PID to file
 $pidFile = Join-Path $SCRIPT_DIR "monitor.pid"
-Set-Content -Path $pidFile -Value $PID_VALUE
+Set-Content -Path $pidFile -Value $PID_VALUE -Encoding UTF8
 Write-Host "PID saved to: $pidFile"

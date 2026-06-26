@@ -124,7 +124,7 @@ function Write-RalphError {
     if ($LOG_DIR) {
         $logfile = Join-Path $LOG_DIR "ralph_$(Get-Date -Format 'yyyyMMdd').log"
         try {
-            "[$timestamp] ERROR: $Message" | Out-File -FilePath $logfile -Append -ErrorAction SilentlyContinue
+            "[$timestamp] ERROR: $Message" | Out-File -FilePath $logfile -Append -Encoding UTF8 -ErrorAction SilentlyContinue
         } catch {
             # If logging to file fails, at least note it on stderr
             Write-Warning "Failed to write to log file: $logfile"
@@ -140,7 +140,7 @@ $CONFIG_FILE = Join-Path $env:USERPROFILE ".ralph.env"
 
 function Load-Config {
     if (Test-Path $CONFIG_FILE) {
-        Get-Content $CONFIG_FILE | ForEach-Object {
+        Get-Content $CONFIG_FILE -Encoding UTF8 | ForEach-Object {
             $line = $_.Trim()
             if ($line -and !$line.StartsWith('#')) {
                 # Parse environment variables (export VAR="value" or VAR="value")
@@ -282,7 +282,7 @@ if ($PlanFile -eq "config") {
                 $newLines += "export $Key=`"$Value`""
             }
 
-            Set-Content -Path $CONFIG_FILE -Value $newLines
+            Set-Content -Path $CONFIG_FILE -Value $newLines -Encoding UTF8
         } else {
             # Create new file
             $content = @"
@@ -291,7 +291,7 @@ if ($PlanFile -eq "config") {
 
 export $Key="$Value"
 "@
-            Set-Content -Path $CONFIG_FILE -Value $content
+            Set-Content -Path $CONFIG_FILE -Value $content -Encoding UTF8
         }
     }
 
@@ -519,7 +519,7 @@ IN_PROGRESS
 ## Tasks Completed
 
 "@
-    Set-Content -Path $PROGRESS_FILE -Value $progressContent
+    Set-Content -Path $PROGRESS_FILE -Value $progressContent -Encoding UTF8
 }
 
 $ITERATION = 0

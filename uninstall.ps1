@@ -238,7 +238,7 @@ function Remove-ShellConfig {
                     $newLines += $line
                 }
 
-                $newLines | Set-Content $profilePath
+                $newLines | Set-Content $profilePath -Encoding UTF8
                 Write-Success "Removed configuration from $profilePath"
                 $modified = $true
             }
