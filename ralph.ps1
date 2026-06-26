@@ -54,6 +54,12 @@ if ($Help) {
         Write-Host "  .\ralph.ps1 .\feature.md plan         # Plan only"
         Write-Host "  .\ralph.ps1 .\feature.md build 20     # Build, max 20 iterations"
         Write-Host ""
+        Write-Host "Configuration:" -ForegroundColor Yellow
+        Write-Host "  .\ralph.ps1 config tool claude        # Select AI CLI (claude/codex/opencode/custom)"
+        Write-Host "  .\ralph.ps1 config tool status        # Show current AI tool"
+        Write-Host "  .\ralph.ps1 config commit off         # Toggle auto-commit"
+        Write-Host "  Set RALPH_MODEL to override the model (e.g. opus, gpt-4.1)"
+        Write-Host ""
         Write-Host "More info: https://github.com/aaron777collins/portableralph"
     } catch {
         # Fallback - ensure we always exit cleanly for help
@@ -84,6 +90,12 @@ $ErrorActionPreference = "Stop"
 $ValidationLib = Join-Path $RALPH_DIR "lib\validation.ps1"
 if (Test-Path $ValidationLib) {
     . $ValidationLib
+}
+
+# Load AI tool abstraction library
+$AiToolLib = Join-Path $RALPH_DIR "lib\ai-tool.ps1"
+if (Test-Path $AiToolLib) {
+    . $AiToolLib
 }
 
 # Log directory for errors
@@ -147,6 +159,15 @@ function Load-Config {
 }
 
 Load-Config
+
+# Resolve the model to use (env override, then tool default)
+if ($env:RALPH_MODEL) {
+    $RALPH_MODEL = $env:RALPH_MODEL
+} elseif (Get-Command Get-DefaultModel -ErrorAction SilentlyContinue) {
+    $RALPH_MODEL = Get-DefaultModel
+} else {
+    $RALPH_MODEL = "sonnet"
+}
 
 # Auto-commit setting (default: true)
 if (-not $env:RALPH_AUTO_COMMIT) {
@@ -315,11 +336,41 @@ export $Key="$Value"
             }
             exit 0
         }
+        "tool" {
+            switch ($MaxIterations) {
+                { $_ -in @("claude", "codex", "opencode", "custom") } {
+                    Set-ConfigValue "RALPH_AI_TOOL" "$MaxIterations"
+                    Write-Host "AI tool set to: $MaxIterations" -ForegroundColor Green
+                }
+                { $_ -in @("status", "") } {
+                    $currentTool = if ($env:RALPH_AI_TOOL) { $env:RALPH_AI_TOOL } else { "claude" }
+                    Write-Host "AI tool setting:" -ForegroundColor Yellow
+                    Write-Host "  Current: $currentTool" -ForegroundColor Green
+                    Write-Host ""
+                    Write-Host "Available tools:" -ForegroundColor Yellow
+                    Write-Host "  claude     Claude Code CLI (default)"
+                    Write-Host "  codex      OpenAI Codex CLI"
+                    Write-Host "  opencode   OpenCode CLI"
+                    Write-Host "  custom     Custom command (set RALPH_AI_COMMAND)"
+                    Write-Host ""
+                    Write-Host "Usage:" -ForegroundColor Yellow
+                    Write-Host "  .\ralph.ps1 config tool claude"
+                    Write-Host "  .\ralph.ps1 config tool codex"
+                }
+                default {
+                    Write-Host "Unknown tool: $MaxIterations" -ForegroundColor Red
+                    Write-Host "Valid tools: claude, codex, opencode, custom"
+                    exit 1
+                }
+            }
+            exit 0
+        }
         "" {
             Write-Host "Usage: .\ralph.ps1 config <setting>" -ForegroundColor Yellow
             Write-Host ""
             Write-Host "Settings:" -ForegroundColor Yellow
             Write-Host "  commit <on|off|status>    Configure auto-commit behavior"
+            Write-Host "  tool <claude|codex|opencode|custom|status>    Configure which AI CLI to use"
             exit 1
         }
         default {
@@ -403,6 +454,11 @@ Write-Host "  RALPH - Autonomous AI Development Loop" -ForegroundColor Green
 Write-Host "========================================================" -ForegroundColor Blue
 Write-Host "  Plan:      " -NoNewline
 Write-Host $PlanFile -ForegroundColor Yellow
+$AiToolName = if (Get-Command Get-AiToolDisplayName -ErrorAction SilentlyContinue) { Get-AiToolDisplayName } else { "Claude Code" }
+Write-Host "  AI Tool:   " -NoNewline
+Write-Host $AiToolName -ForegroundColor Yellow
+Write-Host "  Model:     " -NoNewline
+Write-Host $RALPH_MODEL -ForegroundColor Yellow
 Write-Host "  Mode:      " -NoNewline
 Write-Host $Mode -ForegroundColor Yellow
 Write-Host "  Progress:  " -NoNewline
@@ -514,11 +570,15 @@ while ($true) {
     $promptContent = $promptContent -replace '\$\{PLAN_NAME\}', $PLAN_BASENAME
     $promptContent = $promptContent -replace '\$\{AUTO_COMMIT\}', $SHOULD_COMMIT
 
-    # Run Claude
+    # Run the configured AI tool
     try {
-        $promptContent | claude -p --dangerously-skip-permissions --model sonnet --verbose
+        if (Get-Command Invoke-AiTool -ErrorAction SilentlyContinue) {
+            Invoke-AiTool -Prompt $promptContent -Model $RALPH_MODEL -StreamOutput $true
+        } else {
+            $promptContent | claude -p --dangerously-skip-permissions --model $RALPH_MODEL --verbose
+        }
     } catch {
-        Write-Host "Claude exited with error, continuing..." -ForegroundColor Red
+        Write-Host "AI tool exited with error, continuing..." -ForegroundColor Red
     }
 
     Write-Host ""

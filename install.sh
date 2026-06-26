@@ -266,10 +266,38 @@ check_dependencies() {
         missing+=("curl")
     fi
 
-    if ! command -v claude &>/dev/null; then
-        warn "Claude CLI not found. Install from: https://docs.anthropic.com/en/docs/claude-code"
-        warn "Ralph requires Claude CLI to run."
-    fi
+    local ai_tool="${RALPH_AI_TOOL:-claude}"
+    # Normalize the same way lib/ai-tool.sh does so the check matches runtime.
+    ai_tool="$(printf '%s' "$ai_tool" | tr '[:upper:]' '[:lower:]' | tr -d '[:space:]')"
+    [ -z "$ai_tool" ] && ai_tool="claude"
+    case "$ai_tool" in
+        claude)
+            if ! command -v claude &>/dev/null; then
+                warn "Claude Code CLI not found. Install from: https://docs.anthropic.com/en/docs/claude-code"
+                warn "Ralph requires an AI CLI tool to run. Currently configured: claude"
+            fi
+            ;;
+        codex)
+            if ! command -v codex &>/dev/null; then
+                warn "OpenAI Codex CLI not found. Install it and ensure 'codex' is on your PATH."
+                warn "Ralph requires an AI CLI tool to run. Currently configured: codex"
+            fi
+            ;;
+        opencode)
+            if ! command -v opencode &>/dev/null; then
+                warn "OpenCode CLI not found. Install it and ensure 'opencode' is on your PATH."
+                warn "Ralph requires an AI CLI tool to run. Currently configured: opencode"
+            fi
+            ;;
+        custom)
+            if [ -z "${RALPH_AI_COMMAND:-}" ]; then
+                warn "RALPH_AI_TOOL is 'custom' but RALPH_AI_COMMAND is not set."
+            fi
+            ;;
+        *)
+            warn "No AI CLI tool configured. Set RALPH_AI_TOOL to: claude, codex, opencode, or custom."
+            ;;
+    esac
 
     if [[ ${#missing[@]} -gt 0 ]]; then
         error "Missing required dependencies: ${missing[*]}"

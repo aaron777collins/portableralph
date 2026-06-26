@@ -29,6 +29,13 @@ ralph ./plan.md plan       # Plan mode - analyzes and creates task list, then ex
 ralph ./plan.md build 20   # Build mode with max 20 iterations
 ```
 
+### Switching AI Tool
+```bash
+ralph config tool codex    # Switch to OpenAI Codex
+ralph config tool claude   # Switch back to Claude Code
+ralph config tool status   # Show current tool
+```
+
 ### Notifications
 ```bash
 ralph notify setup   # Interactive setup wizard for Slack/Discord/Telegram/Email
@@ -57,10 +64,22 @@ Every script has both Bash (`.sh`) and PowerShell (`.ps1`) versions for true cro
 
 ### Configuration System
 Configuration is stored in `~/.ralph.env` and loaded at startup. Key settings:
-- `RALPH_MODEL`: Claude model to use (default: sonnet)
+- `RALPH_AI_TOOL`: Which AI CLI to use - claude, codex, opencode, or custom (default: claude)
+- `RALPH_MODEL`: Model to use (default: per-tool, e.g., sonnet for claude, gpt-4.1 for codex)
+- `RALPH_AI_COMMAND`: Custom command when RALPH_AI_TOOL=custom (prompt piped via stdin)
 - `RALPH_AUTO_COMMIT`: Auto-commit after each iteration (default: true)
 - `RALPH_NOTIFY_FREQUENCY`: Notification frequency (default: every 5 iterations)
 - Notification settings for Slack, Discord, Telegram, Email
+
+Configure via CLI:
+```bash
+ralph config tool claude       # Use Claude Code (default)
+ralph config tool codex        # Use OpenAI Codex
+ralph config tool opencode     # Use OpenCode
+ralph config tool custom       # Use a custom AI command
+ralph config model sonnet      # Set model
+ralph config model reset       # Reset to tool default
+```
 
 ### Guardrails System
 `RALPH_GUARDRAILS.md` captures project-specific lessons learned:
@@ -70,6 +89,7 @@ Configuration is stored in `~/.ralph.env` and loaded at startup. Key settings:
 - Prevents repeating the same mistakes across iterations
 
 ### Key Libraries
+- `lib/ai-tool.sh/.ps1`: AI CLI tool abstraction (claude, codex, opencode, custom)
 - `lib/constants.sh`: Centralized configuration constants (timeouts, retries, limits)
 - `lib/platform-utils.sh/.ps1`: Cross-platform path handling and utilities
 - `lib/validation.sh/.ps1`: Input validation functions (URLs, emails, paths, numeric)
